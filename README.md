@@ -21,3 +21,4 @@ Vision
   - Detecting substation for game element pickup
   - Assisted placement of game elements
   - Feedback loop with IMU for docking
+  - Docking
