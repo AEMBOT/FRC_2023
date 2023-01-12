@@ -5,7 +5,7 @@ General Goals / Overview
 We will be following a command based structure.
 
 Swerve Drive
-- Fix erroes with encoders
+- Fix errors with encoders
 - Test and Tune constants values
 - Experiment with Auto Pathing
 
