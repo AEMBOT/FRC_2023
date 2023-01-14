@@ -1,11 +1,17 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Limelight extends SubsystemBase{
     private NetworkTable limeLight;
@@ -22,7 +28,10 @@ public class Limelight extends SubsystemBase{
     private void updatePosition(){
         if(visionTargetsFound()){
             double[] rawPosition = limeLight.getEntry("camtran").getDoubleArray(new double[]{0});
-            position = new Pose2d(new Translation2d(rawPosition[0],rawPosition[1]), new Rotation2d(rawPosition[5]));
+            Transform2d relativePosition = new Transform2d(new Translation2d(rawPosition[2], rawPosition[1]), new Rotation2d(rawPosition[5]));
+            long aprilTag = limeLight.getEntry("tid").getInteger(0);
+            Pose2d aprilTagPosition = Constants.APRILTAG_LOCATIONS[(int) aprilTag];
+            position = aprilTagPosition.transformBy(relativePosition);
         }else{
             // Do Odometry Stuff
         }
