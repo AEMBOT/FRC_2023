@@ -13,6 +13,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+import java.util.ArrayList;
+
 public class Limelight extends SubsystemBase{
     private NetworkTable limeLight;
     public Limelight(){
@@ -21,6 +23,14 @@ public class Limelight extends SubsystemBase{
     private Pose2d position;
     public boolean visionTargetsFound(){
         return limeLight.getEntry("tv").getDouble(0) != 0; // Key tv is 1 for a vision target found and 0 for no target
+    }
+    private double[][] getGamePiecePositions(){
+        double[] rawPositions = limeLight.getEntry("llpython").getDoubleArray(new double[]{});
+        double[][] positions = new double[3][rawPositions.length/3];
+        for(int i=0; i<rawPositions.length/3; i++){
+            positions[i] = new double[]{rawPositions[3*i], rawPositions[3*i+1], rawPositions[3*i+2]};
+        }
+        return positions;
     }
     public Pose2d getPosition(){
         return position;
