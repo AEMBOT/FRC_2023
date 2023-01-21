@@ -20,15 +20,25 @@ public class Limelight extends SubsystemBase{
             this.yPos = yPos;
         }
     }
+    public enum Pipeline{
+        APRILTAG,
+        GAMEPIECE
+    }
     private NetworkTable limeLight;
     public Limelight(){
         limeLight = NetworkTableInstance.getDefault().getTable("limelight");
     }
     private Pose2d position;
     public boolean visionTargetsFound(){
+        if(getPipeline() != Pipeline.APRILTAG){
+
+        }
         return limeLight.getEntry("tv").getDouble(0) != 0; // Key tv is 1 for a vision target found and 0 for no target
     }
     private GamePiece[] getGamePiecePositions(){
+        if(getPipeline() != Pipeline.GAMEPIECE){
+            return new GamePiece[]{};
+        }
         double[] rawPositions = limeLight.getEntry("llpython").getDoubleArray(new double[]{});
         GamePiece[] positions = new GamePiece[rawPositions.length/3];
         for(int i=0; i<rawPositions.length/3; i++){
@@ -41,14 +51,40 @@ public class Limelight extends SubsystemBase{
     }
     private void updatePosition(){
         if(visionTargetsFound()){
-            double[] rawPosition = limeLight.getEntry("camtran").getDoubleArray(new double[]{0});
-            Transform2d relativePosition = new Transform2d(new Translation2d(rawPosition[2], rawPosition[1]), new Rotation2d(rawPosition[5]));
-            long aprilTag = limeLight.getEntry("tid").getInteger(0);
-            Pose2d aprilTagPosition = Constants.APRILTAG_LOCATIONS[(int) aprilTag];
-            position = aprilTagPosition.transformBy(relativePosition);
+            double[] rawPosition = limeLight.getEntry("botpose").getDoubleArray(new double[]{0});
+            position = new Pose2d(new Translation2d(rawPosition[0], rawPosition[1]), new Rotation2d(rawPosition[5]));
         }else{
             // Do Odometry Stuff
         }
+    }
+    public void setPipeline(Pipeline pipeline){
+        int pipelineID;
+        switch(pipeline){
+            case APRILTAG:
+                pipelineID = 0;
+                break;
+            case GAMEPIECE:
+                pipelineID = 1;
+                break;
+            default:
+                pipelineID = -1;
+        }
+        limeLight.getEntry("pipeline").setNumber(pipelineID);
+    }
+    public Pipeline getPipeline(){
+        int pipelineID = (int) Math.floor(limeLight.getEntry("getPipe").getDouble(0));
+        Pipeline pipeline;
+        switch(pipelineID){
+            case 0:
+                pipeline = Pipeline.APRILTAG;
+                break;
+            case 1:
+                pipeline = Pipeline.GAMEPIECE;
+                break;
+            default:
+                pipeline = Pipeline.APRILTAG;
+        }
+        return pipeline;
     }
     @Override
     public void periodic(){
