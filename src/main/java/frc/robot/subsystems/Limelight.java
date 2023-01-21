@@ -33,6 +33,17 @@ public class Limelight extends SubsystemBase{
             this.xPos = xPos;
             this.yPos = yPos;
         }
+
+        /**
+         * Converts the pixel coordinates to degrees
+         * @return A double list [x angle, y angle]
+         */
+        public double[] toDegrees(){
+            return new double[]{
+                    xPos*59.6/320,
+                    yPos*59.6/320
+            };
+        }
     }
     public enum Pipeline{
         APRILTAG, // ID 0
