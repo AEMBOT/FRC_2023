@@ -31,7 +31,7 @@ public class Limelight extends SubsystemBase{
     private Pose2d position;
     public boolean visionTargetsFound(){
         if(getPipeline() != Pipeline.APRILTAG){
-
+            return false
         }
         return limeLight.getEntry("tv").getDouble(0) != 0; // Key tv is 1 for a vision target found and 0 for no target
     }
