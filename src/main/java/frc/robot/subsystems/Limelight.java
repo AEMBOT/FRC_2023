@@ -44,6 +44,27 @@ public class Limelight extends SubsystemBase{
                     yPos*59.6/320
             };
         }
+
+        /**
+         * Gets the location of the game piece relative to the robot
+         * @return Translation2d representing position in robot space
+         */
+        public Translation2d relativeLocation(){
+            double distance = Math.tan(yPos) * Constants.LIMELIGHT_HEIGHT;
+            double xPosition = distance * Math.cos(xPos);
+            double yPosition = distance * Math.sin(xPos);
+            return new Translation2d(xPosition, yPosition);
+        }
+
+        /**
+         * Gets position of the game piece in world space
+         * @param position - Position of the bot in world space
+         * @return Translation2d representing position of game piece in world space
+         */
+        public Translation2d absoluteLocation(Pose2d position){
+            Translation2d relativeWorldSpace = relativeLocation().rotateBy(position.getRotation());
+            return position.getTranslation().plus(relativeWorldSpace);
+        }
     }
     public enum Pipeline{
         APRILTAG, // ID 0
