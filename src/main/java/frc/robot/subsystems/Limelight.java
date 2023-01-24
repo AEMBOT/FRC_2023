@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 /**
- * Interface for acquiring information from limelight
+ * Interface for acquiring information from a singular Limelight device
  */
 public class Limelight extends SubsystemBase{
     /**
@@ -73,10 +73,19 @@ public class Limelight extends SubsystemBase{
     private NetworkTable limeLight;
 
     /**
-     * Constructor
+     * Basic Constructor with default NetworkTable ID
      */
     public Limelight(){
         limeLight = NetworkTableInstance.getDefault().getTable("limelight");
+    }
+
+    /**
+     * Constructor using custom NetworkTable ID, for use with multiple Limelights.
+     * @param networkTableID String representing NetworkTable ID for the limelight (Default "limelight")
+     */
+    public Limelight(String networkTableID){
+        limeLight = NetworkTableInstance.getDefault().getTable(networkTableID);
+
     }
     private Pose2d position; // Position of the bot in field space
 
