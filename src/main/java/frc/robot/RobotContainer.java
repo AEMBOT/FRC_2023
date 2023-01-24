@@ -24,7 +24,7 @@ public class RobotContainer {
 
   // Subsystems
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private final ClampSubsystem m_clampSubsystem = new ClampSubsystem(Constants.EXTEND_PORT);
+  private final ClampSubsystem m_clampSubsystem = new ClampSubsystem(Constants.PNEUMATIC_CLAMP_EXTEND_PORT);
 
   // Controllers
   private final CommandXboxController m_secondaryController = new CommandXboxController(0);
