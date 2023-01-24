@@ -6,9 +6,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.Autos;
-import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.Autos;
+import frc.robot.subsystems.ClampSubsystem;
+import frc.robot.subsystems.ExampleSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -18,12 +21,19 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+
+  // Subsystems
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final ClampSubsystem m_clampSubsystem = new ClampSubsystem(Constants.EXTEND_PORT);
+
+  // Controllers
+  private final CommandXboxController m_secondaryController = new CommandXboxController(0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureBindings();
+
   }
 
   /**
@@ -32,7 +42,17 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureBindings() {}
+  private void configureBindings() {
+    // Secondary Controller
+    m_secondaryController.a().toggleOnTrue(new StartEndCommand(
+      // Extends the clamp
+      () -> m_clampSubsystem.extend(),
+      // Retracts the clamp
+      () -> m_clampSubsystem.retract(),
+      // Requires the clamp subsystem
+      m_clampSubsystem
+    ));
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
