@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.Pose2d;
  */
 public final class Constants {
     public static Pose2d[] APRILTAG_LOCATIONS = new Pose2d[]{};
+    public static double LIMELIGHT_HEIGHT = 0.0; // Height of limelight above ground (in m)
 
     public static int EXTEND_PORT = 0;
+    
 }

@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 /**
- * Interface for acquiring information from limelight
+ * Interface for acquiring information from a singular Limelight device
  */
 public class Limelight extends SubsystemBase{
     /**
@@ -33,6 +33,38 @@ public class Limelight extends SubsystemBase{
             this.xPos = xPos;
             this.yPos = yPos;
         }
+
+        /**
+         * Converts the pixel coordinates to degrees
+         * @return A double list [x angle, y angle]
+         */
+        public double[] toDegrees(){
+            return new double[]{
+                    xPos*59.6/320,
+                    yPos*59.6/320
+            };
+        }
+
+        /**
+         * Gets the location of the game piece relative to the robot
+         * @return Translation2d representing position in robot space
+         */
+        public Translation2d relativeLocation(){
+            double distance = Math.tan(yPos) * Constants.LIMELIGHT_HEIGHT;
+            double xPosition = distance * Math.cos(xPos);
+            double yPosition = distance * Math.sin(xPos);
+            return new Translation2d(xPosition, yPosition);
+        }
+
+        /**
+         * Gets position of the game piece in world space
+         * @param position - Position of the bot in world space
+         * @return Translation2d representing position of game piece in world space
+         */
+        public Translation2d absoluteLocation(Pose2d position){
+            Translation2d relativeWorldSpace = relativeLocation().rotateBy(position.getRotation());
+            return position.getTranslation().plus(relativeWorldSpace);
+        }
     }
     public enum Pipeline{
         APRILTAG, // ID 0
@@ -41,10 +73,19 @@ public class Limelight extends SubsystemBase{
     private NetworkTable limeLight;
 
     /**
-     * Constructor
+     * Basic Constructor with default NetworkTable ID
      */
     public Limelight(){
         limeLight = NetworkTableInstance.getDefault().getTable("limelight");
+    }
+
+    /**
+     * Constructor using custom NetworkTable ID, for use with multiple Limelights.
+     * @param networkTableID String representing NetworkTable ID for the limelight (Default "limelight")
+     */
+    public Limelight(String networkTableID){
+        limeLight = NetworkTableInstance.getDefault().getTable(networkTableID);
+
     }
     private Pose2d position; // Position of the bot in field space
 
