@@ -430,6 +430,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
     }
 
     /****COMMANDS */
+    /*
     public Command pathPlannerCommand(Supplier<PathPlannerTrajectory> path) {
         PPSwerveControllerCommand command = new PPSwerveControllerCommand(
             path,
@@ -451,6 +452,8 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
         );
         return command;
     }
+    */
+   
 
     /**
      * For use with PPChasePoseCommand
@@ -511,6 +514,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
      * @param targetSupplier the Supplier for the target Pose2d.
      * @return the PPChasePoseCommand
      */
+    /*
     public Command chasePoseC(Supplier<Pose2d> targetSupplier) {
         return new PPChasePoseCommand(
             targetSupplier,
@@ -521,5 +525,6 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
             (startPose, endPose)->DrivebaseS.generateTrajectoryToPose(startPose, endPose, getFieldRelativeLinearSpeedsMPS()),
             this);
     }
+    */
 
 }

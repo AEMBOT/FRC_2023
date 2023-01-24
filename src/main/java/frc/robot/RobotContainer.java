@@ -77,6 +77,7 @@ public class RobotContainer {
     configureBindings();
 
     autoSelector.setDefaultOption("pathPlanner", new InstantCommand());
+    /*
     autoSelector.addOption("1 Meter Forward",
             drivebaseS.pathPlannerCommand(
                     DrivebaseS.generateTrajectoryToPose(
@@ -86,6 +87,7 @@ public class RobotContainer {
                     )
             )
     );
+    */
   }
 
   /**
@@ -103,7 +105,7 @@ public class RobotContainer {
                             Units.degreesToRadians(m_primaryController.getHID().getPOV()))
             )
     );
-    m_primaryController.a().toggleOnTrue(drivebaseS.chasePoseC(target::getPose));
+    //m_primaryController.a().toggleOnTrue(drivebaseS.chasePoseC(target::getPose));
 
 
     // Secondary Controller
