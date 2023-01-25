@@ -125,6 +125,8 @@ public class RobotContainer {
     ));
 
     // Elevator
+    //
+    // Angle Motor
     m_secondaryController.rightBumper().onFalse(new RunCommand(
       () -> m_elevatorSubsystem.stopAngle(),
       m_elevatorSubsystem));
@@ -139,6 +141,23 @@ public class RobotContainer {
 
     m_secondaryController.leftBumper().whileTrue(new RunCommand(
       () -> m_elevatorSubsystem.angleDown(),
+      m_elevatorSubsystem));
+    //
+    // Extend Motor
+    m_secondaryController.rightTrigger().onFalse(new RunCommand(
+      () -> m_elevatorSubsystem.stopExtend(),
+      m_elevatorSubsystem));
+    
+    m_secondaryController.leftTrigger().onFalse(new RunCommand(
+      () -> m_elevatorSubsystem.stopExtend(),
+      m_elevatorSubsystem));
+
+    m_secondaryController.rightTrigger().whileTrue(new RunCommand(
+      () -> m_elevatorSubsystem.extend(),
+      m_elevatorSubsystem));
+
+    m_secondaryController.leftTrigger().whileTrue(new RunCommand(
+      () -> m_elevatorSubsystem.retract(),
       m_elevatorSubsystem));
   }
 
