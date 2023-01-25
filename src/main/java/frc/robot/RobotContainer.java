@@ -77,7 +77,6 @@ public class RobotContainer {
     configureBindings();
 
     autoSelector.setDefaultOption("pathPlanner", new InstantCommand());
-    /*
     autoSelector.addOption("1 Meter Forward",
             drivebaseS.pathPlannerCommand(
                     DrivebaseS.generateTrajectoryToPose(
@@ -87,7 +86,6 @@ public class RobotContainer {
                     )
             )
     );
-    */
   }
 
   /**

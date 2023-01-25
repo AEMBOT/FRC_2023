@@ -430,7 +430,6 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
     }
 
     /****COMMANDS */
-    /*
     public Command pathPlannerCommand(Supplier<PathPlannerTrajectory> path) {
         PPSwerveControllerCommand command = new PPSwerveControllerCommand(
             path,
@@ -452,7 +451,6 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
         );
         return command;
     }
-    */
    
 
     /**
