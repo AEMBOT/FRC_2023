@@ -4,8 +4,17 @@
 
 package frc.robot;
 
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
+import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
+
 import com.pathplanner.lib.PathPlannerTrajectory;
-import edu.wpi.first.math.geometry.*;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
@@ -16,19 +25,16 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.Autos;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import frc.robot.subsystems.ClampSubsystem;
 import frc.robot.subsystems.DrivebaseS;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import io.github.oblarg.oblog.annotations.Log;
-
-import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
-import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
-import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -44,6 +50,7 @@ public class RobotContainer {
   private final DrivebaseS drivebaseS = new DrivebaseS();
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ClampSubsystem m_clampSubsystem = new ClampSubsystem(Constants.PNEUMATIC_CLAMP_EXTEND_PORT);
+  private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
 
   // Controllers
   private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
@@ -107,6 +114,7 @@ public class RobotContainer {
 
 
     // Secondary Controller
+    // Clamp
     m_secondaryController.a().toggleOnTrue(new StartEndCommand(
       // Extends the clamp
       () -> m_clampSubsystem.extend(),
@@ -115,6 +123,23 @@ public class RobotContainer {
       // Requires the clamp subsystem
       m_clampSubsystem
     ));
+
+    // Elevator
+    m_secondaryController.rightBumper().onFalse(new RunCommand(
+      () -> m_elevatorSubsystem.stopAngle(),
+      m_elevatorSubsystem));
+
+    m_secondaryController.leftBumper().onFalse(new RunCommand(
+      () -> m_elevatorSubsystem.stopAngle(),
+      m_elevatorSubsystem));
+
+    m_secondaryController.rightBumper().whileTrue(new RunCommand(
+      () -> m_elevatorSubsystem.angleUp(),
+      m_elevatorSubsystem));
+
+    m_secondaryController.leftBumper().whileTrue(new RunCommand(
+      () -> m_elevatorSubsystem.angleDown(),
+      m_elevatorSubsystem));
   }
 
   /**
