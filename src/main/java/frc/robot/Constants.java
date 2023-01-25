@@ -28,7 +28,7 @@ public final class Constants {
     public static final class InputDevices {
 
         public static final int PRIMARY_CONTROLLER_PORT = 0;
-        public static final int SECONDARY_CONTROLLER_PORT = 0;
+        public static final int SECONDARY_CONTROLLER_PORT = 1;
 
     }
 
