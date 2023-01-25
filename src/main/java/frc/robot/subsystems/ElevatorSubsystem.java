@@ -42,7 +42,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         m_angleMotor.set(-0.1);
     }
     
-    public void extend(CANSparkMax m_extendMotor){
+    public void extend(){
         m_extendMotor.set(0.1);
     }
 
