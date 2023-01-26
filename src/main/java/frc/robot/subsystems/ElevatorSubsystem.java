@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -9,6 +10,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import frc.robot.Constants;
 
 public class ElevatorSubsystem extends SubsystemBase{
     
@@ -37,7 +40,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         m_angleMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
         // Set max current the extend motor can draw
-        m_extendMotor.setSmartCurrentLimit(1);
+        m_extendMotor.setSmartCurrentLimit(25);
         m_angleMotor.setSmartCurrentLimit(25);
     }
 
@@ -65,10 +68,10 @@ public class ElevatorSubsystem extends SubsystemBase{
     }
     
     public void extend(){
-        m_extendMotor.set(0.1);
+        m_extendMotor.set(-0.5);
     }
 
-    public void retract(CANSparkMax m_extendMotor){
-        m_extendMotor.set(-0.1);
+    public void retract(){
+        m_extendMotor.set(0.5);
     }
 }
