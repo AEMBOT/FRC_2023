@@ -156,9 +156,10 @@ public class Limelight extends SubsystemBase{
             double[] rawPosition = limeLight.getEntry("botpose").getDoubleArray(new double[]{0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
             position = new Pose2d(new Translation2d(rawPosition[0], rawPosition[1]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
             rawPosition = limeLight.getEntry("camtran").getDoubleArray(new double[]{0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
-            tagRelativePosition = new Pose2d(new Translation2d(rawPosition[0], rawPosition[1]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
+            tagRelativePosition = new Pose2d(new Translation2d(rawPosition[2], rawPosition[0]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
             if(lastAccessedTagTime != limeLight.getEntry("botpose").getLastChange()){
                 lastAccessedTagTime = limeLight.getEntry("botpose").getLastChange();
+                accessedBefore = false;
             }
         }else{
             // Do Odometry Stuff
