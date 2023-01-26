@@ -70,6 +70,7 @@ public class Limelight extends SubsystemBase{
         GAMEPIECE // ID 1
     }
     private NetworkTable limeLight;
+    private Pose2d tagRelativePosition;
 
     /**
      * Basic Constructor with default NetworkTable ID
@@ -125,12 +126,20 @@ public class Limelight extends SubsystemBase{
     }
 
     /**
+     * Returns the position of the camera relative to the AprilTag
+     * @return A Pose2d representing the position of the camera in tag space
+     */
+    public Pose2d getRelativePose() { return tagRelativePosition; }
+
+    /**
      * A function to be called periodically, updates position from limelight
      */
     private void updatePosition(){
         if(visionTargetsFound()){
             double[] rawPosition = limeLight.getEntry("botpose").getDoubleArray(new double[]{0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
             position = new Pose2d(new Translation2d(rawPosition[0], rawPosition[1]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
+            rawPosition = limeLight.getEntry("camtran").getDoubleArray(new double[]{0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
+            tagRelativePosition = new Pose2d(new Translation2d(rawPosition[0], rawPosition[1]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
         }else{
             // Do Odometry Stuff
         }

@@ -11,11 +11,9 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class ElevatorSubsystem extends SubsystemBase{
-    private static final int deviceIDa = 1; //get IDs
-    private static final int deviceIDb = 2; //get IDs
     
-    private CANSparkMax m_angleMotor = new CANSparkMax(deviceIDa, MotorType.kBrushless);
-    private CANSparkMax m_extendMotor = new CANSparkMax(deviceIDb, MotorType.kBrushless);
+    private CANSparkMax m_angleMotor = new CANSparkMax(15, MotorType.kBrushless);
+    private CANSparkMax m_extendMotor = new CANSparkMax(14, MotorType.kBrushless);
     
     RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
     RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
@@ -25,6 +23,22 @@ public class ElevatorSubsystem extends SubsystemBase{
         //periodic method (called every 1/60th of a second)
         SmartDashboard.putNumber("angleEncoder", angleEncoder.getPosition());
         SmartDashboard.putNumber("extendEncoder", angleEncoder.getPosition());
+        SmartDashboard.putNumber("angleMotor", m_angleMotor.get());
+        SmartDashboard.putNumber("extendMotor", m_extendMotor.get());
+    }
+
+    public ElevatorSubsystem() {
+        // Restore motors to factory defaults for settings to be consistent
+        m_angleMotor.restoreFactoryDefaults();
+        m_extendMotor.restoreFactoryDefaults();
+        
+        // Lift shouldn't drift, so set it to brake mode
+        m_extendMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        m_angleMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+        // Set max current the extend motor can draw
+        m_extendMotor.setSmartCurrentLimit(1);
+        m_angleMotor.setSmartCurrentLimit(25);
     }
 
     /* 
@@ -34,15 +48,23 @@ public class ElevatorSubsystem extends SubsystemBase{
         // return runEnd(() -> Math.signum(diff) * 0.1, () -> stop motor).until(close to or past position);
     }
 */
-    public void angleUp(CANSparkMax m_angleMotor){
-        m_angleMotor.set(0.1);
+    public void stopAngle(){
+        m_angleMotor.set(0);
     }
 
-    public void angleDown(CANSparkMax m_angleMotor){
-        m_angleMotor.set(-0.1);
+    public void stopExtend(){
+        m_extendMotor.set(0);
+    }
+
+    public void angleUp(){
+        m_angleMotor.set(0.5);
+    }
+
+    public void angleDown(){
+        m_angleMotor.set(-0.5);
     }
     
-    public void extend(CANSparkMax m_extendMotor){
+    public void extend(){
         m_extendMotor.set(0.1);
     }
 
