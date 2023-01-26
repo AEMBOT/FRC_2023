@@ -65,6 +65,8 @@ public class Limelight extends SubsystemBase{
             return position.getTranslation().plus(relativeWorldSpace);
         }
     }
+    private double lastAccessedTagTime;
+    private boolean accessedBefore;
     public enum Pipeline{
         APRILTAG, // ID 0
         GAMEPIECE // ID 1
@@ -72,6 +74,20 @@ public class Limelight extends SubsystemBase{
     private NetworkTable limeLight;
     private Pose2d tagRelativePosition;
 
+    /**
+     * Determines whether the position data has been accessed before
+     * @return boolean
+     */
+    public boolean getDataAccessedBefore(){
+        return accessedBefore;
+    }
+    /**
+     * Returns the time of last update for the Apriltags
+     * @return Time of last AprilTag position update
+     */
+    public double getLastTimestamp(){
+        return lastAccessedTagTime;
+    }
     /**
      * Basic Constructor with default NetworkTable ID
      */
@@ -122,6 +138,7 @@ public class Limelight extends SubsystemBase{
      * @return A Pose2d representing the position of the bot in field space
      */
     public Pose2d getPosition(){
+        accessedBefore = true;
         return position;
     }
 
@@ -140,6 +157,9 @@ public class Limelight extends SubsystemBase{
             position = new Pose2d(new Translation2d(rawPosition[0], rawPosition[1]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
             rawPosition = limeLight.getEntry("camtran").getDoubleArray(new double[]{0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
             tagRelativePosition = new Pose2d(new Translation2d(rawPosition[0], rawPosition[1]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
+            if(lastAccessedTagTime != limeLight.getEntry("botpose").getLastChange()){
+                lastAccessedTagTime = limeLight.getEntry("botpose").getLastChange();
+            }
         }else{
             // Do Odometry Stuff
         }
