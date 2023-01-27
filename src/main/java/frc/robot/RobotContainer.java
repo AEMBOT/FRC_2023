@@ -167,10 +167,14 @@ public class RobotContainer {
     m_secondaryController.leftTrigger().whileTrue(new RunCommand(
       () -> m_elevatorSubsystem.retract(),
       m_elevatorSubsystem));
+<<<<<<< HEAD
 
 
     //Docking
     m_secondaryController.a().whileTrue(m_docking);
+=======
+    m_secondaryController.a().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
+>>>>>>> ed209c3a83f851b221b0bb64f2cc4f89bda9640b
   }
 
   /**
