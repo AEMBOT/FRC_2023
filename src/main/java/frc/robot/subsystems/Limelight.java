@@ -153,6 +153,7 @@ public class Limelight extends SubsystemBase{
      */
     private void updatePosition(){
         if(visionTargetsFound()){
+            /* 
             double[] rawPosition = limeLight.getEntry("botpose").getDoubleArray(new double[]{0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
             position = new Pose2d(new Translation2d(rawPosition[0], rawPosition[1]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
             rawPosition = limeLight.getEntry("camtran").getDoubleArray(new double[]{0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
@@ -160,8 +161,9 @@ public class Limelight extends SubsystemBase{
             if(lastAccessedTagTime != limeLight.getEntry("botpose").getLastChange()){
                 lastAccessedTagTime = limeLight.getEntry("botpose").getLastChange();
             }
+            */
         }else{
-            // Do Odometry Stuff
+            // Do Odometry Stuff*
         }
     }
 

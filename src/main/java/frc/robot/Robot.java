@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import io.github.oblarg.oblog.Logger;
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI.Port;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -22,6 +24,8 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
+  AHRS navx = new AHRS(Port.kMXP);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -63,6 +67,11 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
     super.disabledPeriodic();
     CommandScheduler.getInstance().cancelAll();
+  
+    SmartDashboard.putNumber("Pitch", navx.getPitch());
+    SmartDashboard.putNumber("Roll", navx.getRoll());
+    SmartDashboard.putNumber("Yaw", navx.getYaw());
+    
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -95,7 +104,13 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    SmartDashboard.putNumber("Pitch", navx.getPitch());
+    SmartDashboard.putNumber("Roll", navx.getRoll());
+    SmartDashboard.putNumber("Yaw", navx.getYaw());
+  }
+
+ 
 
   @Override
   public void testInit() {

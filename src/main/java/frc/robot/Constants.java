@@ -41,7 +41,7 @@ public final class Constants {
         // Drivetrain Performance Mechanical limits
         static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(19.0);
         static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(19.0);
-        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Units.degreesToRadians(720.0);
+        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI;
         static public final double MAX_TRANSLATE_ACCEL_MPS2 = MAX_FWD_REV_SPEED_MPS/0.125; //0-full time of 0.25 second
         static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC/0.25; //0-full time of 0.25 second
 
@@ -116,6 +116,13 @@ public final class Constants {
         public static final double[] DRIVE_FF = {0.055, 2.6826, 0.1188};
 
         public static final SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(DRIVE_FF[0], DRIVE_FF[1], DRIVE_FF[2]);
+
+        public static final double rotationkP = 3;
+        //public static final double rotationkD = 0.05 / 2.5;
+        public static final double rotationkD = 0;
+    
+        //public static final double drivekP = 4.6; // 0.06 w/measurement delay?
+        public static final double drivekP = 3;
 
 
         public static final double MAX_MODULE_SPEED_FPS = 19;
