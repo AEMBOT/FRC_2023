@@ -153,16 +153,31 @@ public class Limelight extends SubsystemBase{
      */
     private void updatePosition(){
         if(visionTargetsFound()){
-            /* 
-            double[] rawPosition = limeLight.getEntry("botpose").getDoubleArray(new double[]{[0,0,0,0,0,0]}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
+
+            double[] rawPosition = limeLight.getEntry("botpose").getDoubleArray(new double[]{0,0,0,0,0,0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
+            NetworkTableInstance.getDefault().getTable("LimelightTesting").getEntry("rawPose").setValue(rawPosition);
+            if(rawPosition.length < 6){
+                double[] newRawPosition = new double[]{0,0,0,0,0,0};
+                for(int i = 0; i < rawPosition.length; i++){
+                    newRawPosition[i] = rawPosition[i];
+                }
+                rawPosition = newRawPosition;
+            }
             position = new Pose2d(new Translation2d(rawPosition[0], rawPosition[1]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
-            rawPosition = limeLight.getEntry("camtran").getDoubleArray(new double[]{0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
+            rawPosition = limeLight.getEntry("camtran").getDoubleArray(new double[]{0,0,0,0,0,0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
+            NetworkTableInstance.getDefault().getTable("LimelightTesting").getEntry("rawCamTran").setValue(rawPosition);
+            if(rawPosition.length < 6){
+                double[] newRawPosition = new double[]{0,0,0,0,0,0};
+                for(int i = 0; i < rawPosition.length; i++){
+                    newRawPosition[i] = rawPosition[i];
+                }
+                rawPosition = newRawPosition;}
             tagRelativePosition = new Pose2d(new Translation2d(rawPosition[2], rawPosition[0]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
             if(lastAccessedTagTime != limeLight.getEntry("botpose").getLastChange()){
                 lastAccessedTagTime = limeLight.getEntry("botpose").getLastChange();
                 accessedBefore = false;
             }
-            */
+
         }else{
             // Do Odometry Stuff*
         }
@@ -212,10 +227,12 @@ public class Limelight extends SubsystemBase{
      */
     public void periodic(){
         updatePosition(); // Update position
+        test();
     }
     public void test(){
-        updatePosition();
         NetworkTable table = NetworkTableInstance.getDefault().getTable("LimelightTesting");
-        table.getEntry("Pose").setValue(position);
+        table.getEntry("PoseX").setValue(position.getX());
+        table.getEntry("PoseY").setValue(position.getY());
+        table.getEntry("PoseR").setValue(position.getRotation().getRadians());
     }
 }
