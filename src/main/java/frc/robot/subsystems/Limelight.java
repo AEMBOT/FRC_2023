@@ -211,4 +211,8 @@ public class Limelight extends SubsystemBase{
     public void periodic(){
         updatePosition(); // Update position
     }
+    public void test(){
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("LimelightTesting");
+        table.getEntry("Pose").setValue(position);
+    }
 }

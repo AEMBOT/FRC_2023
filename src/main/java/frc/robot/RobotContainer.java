@@ -161,6 +161,7 @@ public class RobotContainer {
     m_secondaryController.leftTrigger().whileTrue(new RunCommand(
       () -> m_elevatorSubsystem.retract(),
       m_elevatorSubsystem));
+    m_secondaryController.a().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
   }
 
   /**
