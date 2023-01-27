@@ -103,7 +103,7 @@ public class Limelight extends SubsystemBase{
         limeLight = NetworkTableInstance.getDefault().getTable(networkTableID);
 
     }
-    private Pose2d position; // Position of the bot in field space
+    private Pose2d position = new Pose2d(); // Position of the bot in field space
 
     /**
      * Returns whether an apriltag is found
@@ -154,7 +154,7 @@ public class Limelight extends SubsystemBase{
     private void updatePosition(){
         if(visionTargetsFound()){
             /* 
-            double[] rawPosition = limeLight.getEntry("botpose").getDoubleArray(new double[]{0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
+            double[] rawPosition = limeLight.getEntry("botpose").getDoubleArray(new double[]{[0,0,0,0,0,0]}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
             position = new Pose2d(new Translation2d(rawPosition[0], rawPosition[1]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
             rawPosition = limeLight.getEntry("camtran").getDoubleArray(new double[]{0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
             tagRelativePosition = new Pose2d(new Translation2d(rawPosition[2], rawPosition[0]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
@@ -214,6 +214,7 @@ public class Limelight extends SubsystemBase{
         updatePosition(); // Update position
     }
     public void test(){
+        updatePosition();
         NetworkTable table = NetworkTableInstance.getDefault().getTable("LimelightTesting");
         table.getEntry("Pose").setValue(position);
     }
