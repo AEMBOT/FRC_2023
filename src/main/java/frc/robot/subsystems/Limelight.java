@@ -65,7 +65,7 @@ public class Limelight extends SubsystemBase{
             return position.getTranslation().plus(relativeWorldSpace);
         }
     }
-    private double lastAccessedTagTime;
+    private double lastUpdate;
     private boolean accessedBefore;
     public enum Pipeline{
         APRILTAG, // ID 0
@@ -86,7 +86,7 @@ public class Limelight extends SubsystemBase{
      * @return Time of last AprilTag position update
      */
     public double getLastTimestamp(){
-        return lastAccessedTagTime;
+        return lastUpdate;
     }
     /**
      * Basic Constructor with default NetworkTable ID
@@ -173,8 +173,8 @@ public class Limelight extends SubsystemBase{
                 }
                 rawPosition = newRawPosition;}
             tagRelativePosition = new Pose2d(new Translation2d(rawPosition[2], rawPosition[0]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
-            if(lastAccessedTagTime != limeLight.getEntry("botpose").getLastChange()){
-                lastAccessedTagTime = limeLight.getEntry("botpose").getLastChange();
+            if(lastUpdate != limeLight.getEntry("botpose").getLastChange() - limeLight.getEntry("tl").getDouble(0) - 11){
+                lastUpdate = limeLight.getEntry("botpose").getLastChange() - limeLight.getEntry("tl").getDouble(0) - 11;
                 accessedBefore = false;
             }
 
