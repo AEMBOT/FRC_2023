@@ -41,9 +41,9 @@ public final class Constants {
         // Drivetrain Performance Mechanical limits
         static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(19.0);
         static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(19.0);
-        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI;
+        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI * 4;
         static public final double MAX_TRANSLATE_ACCEL_MPS2 = MAX_FWD_REV_SPEED_MPS/0.125; //0-full time of 0.25 second
-        static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC/0.25; //0-full time of 0.25 second
+        static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC / 0.25; //0-full time of 0.25 second
 
         // HELPER ORGANIZATION CONSTANTS
         static public final int FL = 0; // Front Left Module Index
@@ -126,7 +126,7 @@ public final class Constants {
 
 
         public static final double MAX_MODULE_SPEED_FPS = 19;
-        public static final double teleopTurnRateDegPerSec = 1920; //Rate the robot will spin with full rotation command
+        public static final double teleopTurnRateDegPerSec = 360; //Rate the robot will spin with full rotation command
 
         public static final int ENC_PULSE_PER_REV = 1;
         public static final double WHEEL_ENC_COUNTS_PER_WHEEL_REV = ENC_PULSE_PER_REV/ WHEEL_REVS_PER_ENC_REV;  //Assume 1-1 gearing for now

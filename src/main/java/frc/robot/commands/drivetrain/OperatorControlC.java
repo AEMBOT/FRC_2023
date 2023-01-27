@@ -80,8 +80,12 @@ public class OperatorControlC extends CommandBase {
         double driveDirectionRadians = Math.atan2(fwdY, fwdX);
         double driveMagnitude = Math.hypot(fwdX, fwdY);
         driveMagnitude *= MAX_LINEAR_SPEED;
-        fwdX = driveMagnitude * Math.cos(driveDirectionRadians);
-        fwdY = driveMagnitude * Math.sin(driveDirectionRadians);
+        //fwdX = driveMagnitude * Math.cos(driveDirectionRadians);
+        //fwdY = driveMagnitude * Math.sin(driveDirectionRadians);
+
+        //PROGRAMMING MODE
+        fwdX = driveMagnitude * Math.cos(driveDirectionRadians) * 0.2;
+        fwdY = driveMagnitude * Math.sin(driveDirectionRadians) * 0.2;
 
         double rot = -rotation.getAsDouble();
         //rot = Math.copySign(rot * rot, rot);
