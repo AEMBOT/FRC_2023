@@ -7,6 +7,9 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+import static frc.robot.Constants.VisionConstants.FIELD_LENGTH;
+import static frc.robot.Constants.VisionConstants.FIELD_WIDTH;
+
 /**
  * Interface for acquiring information from a singular Limelight device
  */
@@ -171,6 +174,8 @@ public class Limelight extends SubsystemBase{
                     newRawPosition[i] = rawPosition[i];
                 }
                 rawPosition = newRawPosition;}
+            rawPosition[0] = rawPosition[0] - (FIELD_LENGTH/2);
+            rawPosition[1] = rawPosition[1] - (FIELD_WIDTH/2);
             for (int i = 3; i < rawPosition.length; i++) {
                 rawPosition[i] = Units.degreesToRadians(rawPosition[i]);
             }
