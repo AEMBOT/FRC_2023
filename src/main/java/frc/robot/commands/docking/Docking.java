@@ -108,16 +108,18 @@ public class Docking extends CommandBase implements Loggable{
         double robotLimelightX =robotLimelightdist.getX();
         double robotLimelighytY = robotLimelightdist.getY();
         double robotLLDist = Math.sqrt(Math.pow(robotLimelightX,2) + Math.pow(robotLimelighytY,2));
-        double initialLimelightDist = 2;
-        double targetLimelightDist = 1;
-        double middleDist = 0.5; // dist from start of the ramp to middle of the ramp
-        if(robotLLDist - targetLimelightDist < initialLimelightDist + middleDist){
-            m_drivebase.drive(new ChassisSpeeds(decrementSpeed(0.6, initialLimelightDist + middleDist, robotLLDist - initialLimelightDist),decrementSpeed(0.6, initialLimelightDist + middleDist, robotLLDist - initialLimelightDist),0));
-            if (robotLLDist > targetLimelightDist + 2){
+        double targetLimelightDist = 2.9083;
+        double middleDist = 0.9906; // dist from start of the ramp to middle of the ramp
+        double initialLimelightDist = targetLimelightDist + middleDist;
+        if(robotLimelightX - targetLimelightDist < initialLimelightDist + middleDist){
+            m_drivebase.drive(new ChassisSpeeds(
+                decrementSpeed(-0.6, initialLimelightDist + middleDist, robotLimelightX - initialLimelightDist),
+                decrementSpeed(-0.6, initialLimelightDist + middleDist, robotLimelightX - initialLimelightDist),0));
+            if (robotLimelightX > targetLimelightDist + 2){
                 m_drivebase.drive(new ChassisSpeeds(0,0,0));
                 if (tilt(navx.getRoll(), navx.getPitch()) > 3){
-                    while (tilt(navx.getRoll(), navx.getPitch()) > 3 && robotLLDist < targetLimelightDist){
-                        m_drivebase.drive(new ChassisSpeeds(-0.2,-0.2,0));
+                    while (tilt(navx.getRoll(), navx.getPitch()) > 3 && robotLimelightX < targetLimelightDist){
+                        m_drivebase.drive(new ChassisSpeeds(0.2,0.2,0));
                     }
                 }         
             }
