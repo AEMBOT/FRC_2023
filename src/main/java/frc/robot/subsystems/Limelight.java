@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -103,7 +101,7 @@ public class Limelight extends SubsystemBase{
         limeLight = NetworkTableInstance.getDefault().getTable(networkTableID);
 
     }
-    private Pose2d position = new Pose2d(); // Position of the bot in field space
+    private Pose3d position = new Pose3d(); // Position of the bot in field space
 
     /**
      * Returns whether an apriltag is found
@@ -137,7 +135,7 @@ public class Limelight extends SubsystemBase{
      * Returns the position of the bot in field space
      * @return A Pose2d representing the position of the bot in field space
      */
-    public Pose2d getPosition(){
+    public Pose3d getPosition(){
         accessedBefore = true;
         return position;
     }
@@ -163,7 +161,7 @@ public class Limelight extends SubsystemBase{
                 }
                 rawPosition = newRawPosition;
             }
-            position = new Pose2d(new Translation2d(rawPosition[0], rawPosition[1]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
+            position = new Pose3d(new Translation3d(rawPosition[0], rawPosition[1], rawPosition[2]), new Rotation3d(rawPosition[4], rawPosition[6], rawPosition[5])); // Convert to Pose2d for use elsewhere
             rawPosition = limeLight.getEntry("camtran").getDoubleArray(new double[]{0,0,0,0,0,0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
             NetworkTableInstance.getDefault().getTable("LimelightTesting").getEntry("rawCamTran").setValue(rawPosition);
             if(rawPosition.length < 6){
@@ -233,6 +231,6 @@ public class Limelight extends SubsystemBase{
         NetworkTable table = NetworkTableInstance.getDefault().getTable("LimelightTesting");
         table.getEntry("PoseX").setValue(position.getX());
         table.getEntry("PoseY").setValue(position.getY());
-        table.getEntry("PoseR").setValue(position.getRotation().getRadians());
+        table.getEntry("PoseR").setValue(position.getRotation().getZ());
     }
 }
