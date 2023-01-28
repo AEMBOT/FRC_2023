@@ -7,14 +7,14 @@ package frc.robot;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
 import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
+import static frc.robot.Constants.VisionConstants.TAG_FIELD_LAYOUT;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
@@ -50,13 +50,13 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // Subsystems
-  @Log
-  private final DrivebaseS drivebaseS = new DrivebaseS();
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ClampSubsystem m_clampSubsystem = new ClampSubsystem(Constants.PNEUMATIC_CLAMP_EXTEND_PORT);
   private final VisionSubsystem visionSubsystem = new VisionSubsystem(new Limelight[]{new Limelight("limelight")});
   private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
   private final Limelight m_limelight = new Limelight();
+  @Log
+  private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
 
   //Commands
   private Docking m_docking = new Docking(drivebaseS, m_limelight);
@@ -99,6 +99,17 @@ public class RobotContainer {
                             drivebaseS.getPose(),
                             drivebaseS.getPose().plus(new Transform2d(new Translation2d(1.0, 0.0), drivebaseS.getPoseHeading())),
                             drivebaseS.getFieldRelativeLinearSpeedsMPS()
+                    )
+            )
+    );
+    autoSelector.addOption("apriltag",
+            drivebaseS.pathPlannerCommand(
+                    DrivebaseS.generateTrajectoryToPose(
+                            drivebaseS.getPose(),
+                            TAG_FIELD_LAYOUT.getTagPose(1).get().toPose2d().exp(new Twist2d(-1.0, 0.0, 0.0)),
+                            drivebaseS.getFieldRelativeLinearSpeedsMPS(),
+                            1,
+                            0.5
                     )
             )
     );
@@ -173,7 +184,6 @@ public class RobotContainer {
 
     //Docking
     //m_secondaryController.a().whileTrue(m_docking);
-    m_secondaryController.b().whileTrue(m_docking);
 
     m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 
