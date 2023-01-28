@@ -86,12 +86,15 @@ public class OperatorControlC extends CommandBase {
         //PROGRAMMING MODE
         fwdX = driveMagnitude * Math.cos(driveDirectionRadians) * 0.2;
         fwdY = driveMagnitude * Math.sin(driveDirectionRadians) * 0.2;
+      
 
         double rot = -rotation.getAsDouble();
+        
         //rot = Math.copySign(rot * rot, rot);
         rot = applyDeadband(rot, JOYSTICK_DEADBAND);
         rot = thetaRateLimiter.calculate(rot);
-        rot *= Units.degreesToRadians(DriveConstants.teleopTurnRateDegPerSec);
+        rot *= Units.degreesToRadians(DriveConstants.teleopTurnRateDegPerSec) * 0.2;
+        //rot *= Units.degreesToRadians(DriveConstants.teleopTurnRateDegPerSec);
         
 
         drive.driveFieldRelative(new ChassisSpeeds(fwdX, fwdY, rot));

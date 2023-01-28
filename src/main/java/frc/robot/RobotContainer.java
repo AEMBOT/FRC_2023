@@ -56,9 +56,10 @@ public class RobotContainer {
   private final ClampSubsystem m_clampSubsystem = new ClampSubsystem(Constants.PNEUMATIC_CLAMP_EXTEND_PORT);
   private final VisionSubsystem visionSubsystem = new VisionSubsystem(new Limelight[]{new Limelight("limelight")});
   private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+  private final Limelight m_limelight = new Limelight();
 
   //Commands
-  private Docking m_docking = new Docking(drivebaseS);
+  private Docking m_docking = new Docking(drivebaseS, m_limelight);
 
   // Controllers
   private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
@@ -172,8 +173,9 @@ public class RobotContainer {
 
     //Docking
     //m_secondaryController.a().whileTrue(m_docking);
+    m_secondaryController.b().whileTrue(m_docking);
 
-    m_secondaryController.a().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
+    m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 
   }
 
