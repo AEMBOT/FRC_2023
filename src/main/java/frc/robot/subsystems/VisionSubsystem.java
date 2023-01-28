@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -23,16 +21,22 @@ public class VisionSubsystem extends SubsystemBase{
      * Averages the position given by each Limelight
      * @return Pose2d representing robot position
      */
-    public Pose2d getPose(){
+    public Pose3d getPose(){
         double avgX = 0;
         double avgY = 0;
-        double avgRot = 0;
+        double avgZ = 0;
+        double avgRotX = 0;
+        double avgRotY = 0;
+        double avgRotZ = 0;
         for(Limelight limelight: limelights){
-            Pose2d pose = limelight.getPosition();
+            Pose3d pose = limelight.getPosition();
             avgX += pose.getX() / limelights.length;
             avgY += pose.getY() / limelights.length;
-            avgRot += pose.getRotation().getRadians() / limelights.length;
+            avgZ += pose.getZ() / limelights.length;
+            avgRotX += pose.getRotation().getX() / limelights.length;
+            avgRotY += pose.getRotation().getY() / limelights.length;
+            avgRotZ += pose.getRotation().getZ() / limelights.length;
         }
-        return new Pose2d(new Translation2d(avgX, avgY), new Rotation2d(avgRot));
+        return new Pose3d(new Translation3d(avgX, avgY, avgZ), new Rotation3d(avgRotX, avgRotY, avgRotZ));
     }
 }
