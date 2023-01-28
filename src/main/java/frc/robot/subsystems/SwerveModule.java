@@ -16,7 +16,6 @@ import frc.robot.util.NomadMathUtil;
 import frc.robot.util.sim.SparkMaxEncoderWrapper;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-
 public class SwerveModule extends SubsystemBase implements Loggable {
 
     /**
@@ -26,12 +25,6 @@ public class SwerveModule extends SubsystemBase implements Loggable {
      */
 
     private SwerveModuleState desiredState = new SwerveModuleState();
-
-    private static final double rotationkP = 3;
-    //private static final double rotationkD = 0.05 / 2.5;
-    private static final double rotationkD = 0;
-
-    private static final double drivekP = 4.6; // 0.06 w/measurement delay?
 
     private final CANSparkMax driveMotor;
     private final CANSparkMax rotationMotor;
@@ -125,13 +118,13 @@ public class SwerveModule extends SubsystemBase implements Loggable {
         // we should match the velocity of the setpoint with our D term to stabilize the error,
         // then add the additional output proportional to the size of the error.
         // Trapezoid Profile Constraints: 7.8 rot/s (limit of the NEO), 40 rot/s^2
-        rotationPIDController = new ProfiledPIDController(rotationkP, 0.0, rotationkD, new TrapezoidProfile.Constraints(7.8*2 *Math.PI, 400*2*Math.PI));
+        rotationPIDController = new ProfiledPIDController(DriveConstants.rotationkP, 0.0, DriveConstants.rotationkD, new TrapezoidProfile.Constraints(7.8*2 *Math.PI, 400*2*Math.PI));
         // Tell the PID controller that it can move across the -pi to pi rollover point.
         rotationPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
         // For a velocity controller we just use P
         // (and feedforward, which is handled in #setDesiredStateClosedLoop)
-        drivePIDController = new PIDController(drivekP, 0, 0);
+        drivePIDController = new PIDController(DriveConstants.drivekP, 0, 0);
         // Give this module a unique name on the dashboard so we have four separate sub-tabs.
         loggingName = "SwerveModule-" + moduleConstants.name + "-[" + driveMotor.getDeviceId() + ',' + rotationMotor.getDeviceId() + ']';
         resetDistance();

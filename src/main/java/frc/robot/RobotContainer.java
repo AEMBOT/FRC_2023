@@ -19,6 +19,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field3d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
@@ -28,8 +29,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.docking.Docking;
 import frc.robot.commands.drivetrain.OperatorControlC;
+import frc.robot.subsystems.*;
 import frc.robot.subsystems.ClampSubsystem;
 import frc.robot.subsystems.DrivebaseS;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -50,7 +54,12 @@ public class RobotContainer {
   private final DrivebaseS drivebaseS = new DrivebaseS();
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ClampSubsystem m_clampSubsystem = new ClampSubsystem(Constants.PNEUMATIC_CLAMP_EXTEND_PORT);
+  private final VisionSubsystem visionSubsystem = new VisionSubsystem(new Limelight[]{new Limelight("limelight")});
   private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+  private final Limelight m_limelight = new Limelight();
+
+  //Commands
+  private Docking m_docking = new Docking(drivebaseS, m_limelight);
 
   // Controllers
   private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
@@ -108,8 +117,8 @@ public class RobotContainer {
             runOnce(
                     ()->drivebaseS.setRotationState(
                             Units.degreesToRadians(m_primaryController.getHID().getPOV()))
-            )
-    );
+            ));
+
     //m_primaryController.a().toggleOnTrue(drivebaseS.chasePoseC(target::getPose));
 
 
@@ -159,6 +168,15 @@ public class RobotContainer {
     m_secondaryController.leftTrigger().whileTrue(new RunCommand(
       () -> m_elevatorSubsystem.retract(),
       m_elevatorSubsystem));
+
+
+
+    //Docking
+    //m_secondaryController.a().whileTrue(m_docking);
+    m_secondaryController.b().whileTrue(m_docking);
+
+    m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
+
   }
 
   /**
@@ -172,6 +190,7 @@ public class RobotContainer {
   }
 
   public void periodic() {
+    
     drivebaseS.drawRobotOnField(field);
     field3d.setRobotPose(new Pose3d(drivebaseS.getPose()));
   }

@@ -4,12 +4,18 @@
 
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+
+import java.util.List;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -41,9 +47,9 @@ public final class Constants {
         // Drivetrain Performance Mechanical limits
         static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(19.0);
         static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(19.0);
-        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Units.degreesToRadians(720.0);
+        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI * 4;
         static public final double MAX_TRANSLATE_ACCEL_MPS2 = MAX_FWD_REV_SPEED_MPS/0.125; //0-full time of 0.25 second
-        static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC/0.25; //0-full time of 0.25 second
+        static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC / 0.25; //0-full time of 0.25 second
 
         // HELPER ORGANIZATION CONSTANTS
         static public final int FL = 0; // Front Left Module Index
@@ -117,9 +123,16 @@ public final class Constants {
 
         public static final SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(DRIVE_FF[0], DRIVE_FF[1], DRIVE_FF[2]);
 
+        public static final double rotationkP = 3;
+        //public static final double rotationkD = 0.05 / 2.5;
+        public static final double rotationkD = 0;
+    
+        //public static final double drivekP = 4.6; // 0.06 w/measurement delay?
+        public static final double drivekP = 3;
+
 
         public static final double MAX_MODULE_SPEED_FPS = 19;
-        public static final double teleopTurnRateDegPerSec = 1920; //Rate the robot will spin with full rotation command
+        public static final double teleopTurnRateDegPerSec = 360; //Rate the robot will spin with full rotation command
 
         public static final int ENC_PULSE_PER_REV = 1;
         public static final double WHEEL_ENC_COUNTS_PER_WHEEL_REV = ENC_PULSE_PER_REV/ WHEEL_REVS_PER_ENC_REV;  //Assume 1-1 gearing for now
@@ -141,5 +154,56 @@ public final class Constants {
         public static final double maxVelMetersPerSec = 2;
         public static final double maxAccelMetersPerSecondSq = 1;
 
+    }
+
+    public static final class VisionConstants {
+        public static AprilTagFieldLayout TAG_FIELD_LAYOUT = new AprilTagFieldLayout(
+                List.of(
+                        new AprilTag(
+                                1,
+                                new Pose3d(
+                                        15.513558, 1.071626, 0.462788, new Rotation3d(0, 0, Math.PI))
+                        ),
+                        new AprilTag(
+                                2,
+                                new Pose3d(
+                                        15.513558, 2.748026, 0.462788, new Rotation3d(0, 0, Math.PI))
+                        ),
+                        new AprilTag(
+                                3,
+                                new Pose3d(
+                                        15.513558, 4.424426, 0.462788, new Rotation3d(0, 0, Math.PI))
+                        ),
+                        new AprilTag(
+                                4,
+                                new Pose3d(
+                                        16.178784, 6.749796, 0.695452, new Rotation3d(0, 0, Math.PI))
+                        ),
+                        new AprilTag(
+                                5,
+                                new Pose3d(
+                                        0.36195, 6.749796, 0.695452, new Rotation3d(0, 0, 0))
+                        ),
+                        new AprilTag(
+                                6,
+                                new Pose3d(
+                                        1.02743, 4.424426, 0.462788, new Rotation3d(0, 0, 0))
+                        ),
+                        new AprilTag(
+                                7,
+                                new Pose3d(
+                                        1.02743, 2.748026, 0.462788, new Rotation3d(0, 0, 0))
+                        ),
+                        new AprilTag(
+                                8,
+                                new Pose3d(
+                                        1.02743, 1.071626, 0.462788, new Rotation3d(0, 0, 0))
+                        )
+                ),
+                16.54175,
+                8.0137
+        );
+        public static final double FIELD_LENGTH = 16.54175;
+        public static final double FIELD_WIDTH = 8.0137;
     }
 }

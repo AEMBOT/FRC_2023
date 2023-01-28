@@ -1,13 +1,14 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+
+import static frc.robot.Constants.VisionConstants.FIELD_LENGTH;
+import static frc.robot.Constants.VisionConstants.FIELD_WIDTH;
 
 /**
  * Interface for acquiring information from a singular Limelight device
@@ -66,12 +67,29 @@ public class Limelight extends SubsystemBase{
             return position.getTranslation().plus(relativeWorldSpace);
         }
     }
+    private double lastUpdate;
+    private boolean accessedBefore;
     public enum Pipeline{
         APRILTAG, // ID 0
         GAMEPIECE // ID 1
     }
     private NetworkTable limeLight;
+    private Pose2d tagRelativePosition;
 
+    /**
+     * Determines whether the position data has been accessed before
+     * @return boolean
+     */
+    public boolean getDataAccessedBefore(){
+        return accessedBefore;
+    }
+    /**
+     * Returns the time of last update for the Apriltags
+     * @return Time of last AprilTag position update
+     */
+    public double getLastTimestamp(){
+        return lastUpdate;
+    }
     /**
      * Basic Constructor with default NetworkTable ID
      */
@@ -87,7 +105,7 @@ public class Limelight extends SubsystemBase{
         limeLight = NetworkTableInstance.getDefault().getTable(networkTableID);
 
     }
-    private Pose2d position; // Position of the bot in field space
+    private Pose3d position = new Pose3d(); // Position of the bot in field space
 
     /**
      * Returns whether an apriltag is found
@@ -121,19 +139,55 @@ public class Limelight extends SubsystemBase{
      * Returns the position of the bot in field space
      * @return A Pose2d representing the position of the bot in field space
      */
-    public Pose2d getPosition(){
+    public Pose3d getPosition(){
+        accessedBefore = true;
         return position;
     }
 
+    /**
+     * Returns the position of the camera relative to the AprilTag
+     * @return A Pose2d representing the position of the camera in tag space
+     */
+    public Pose2d getRelativePose() { return tagRelativePosition; }
+    
     /**
      * A function to be called periodically, updates position from limelight
      */
     private void updatePosition(){
         if(visionTargetsFound()){
-            double[] rawPosition = limeLight.getEntry("botpose").getDoubleArray(new double[]{0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
-            position = new Pose2d(new Translation2d(rawPosition[0], rawPosition[1]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
+
+            double[] rawPosition = limeLight.getEntry("botpose").getDoubleArray(new double[]{0,0,0,0,0,0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
+            NetworkTableInstance.getDefault().getTable("LimelightTesting").getEntry("rawPose").setValue(rawPosition);
+            if(rawPosition.length < 6){
+                double[] newRawPosition = new double[]{0,0,0,0,0,0};
+                for(int i = 0; i < rawPosition.length; i++){
+                    newRawPosition[i] = rawPosition[i];
+                }
+                rawPosition = newRawPosition;
+            }
+            position = new Pose3d(new Translation3d(rawPosition[0], rawPosition[1], rawPosition[2]), new Rotation3d(rawPosition[3], rawPosition[4], rawPosition[5])); // Convert to Pose2d for use elsewhere
+            rawPosition = limeLight.getEntry("camtran").getDoubleArray(new double[]{0,0,0,0,0,0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
+            NetworkTableInstance.getDefault().getTable("LimelightTesting").getEntry("rawCamTran").setValue(rawPosition);
+            if(rawPosition.length < 6){
+                double[] newRawPosition = new double[]{0,0,0,0,0,0};
+                for(int i = 0; i < rawPosition.length; i++){
+                    newRawPosition[i] = rawPosition[i];
+                }
+                rawPosition = newRawPosition;}
+            rawPosition[0] = rawPosition[0] + (FIELD_LENGTH/2);
+            rawPosition[1] = rawPosition[1] + (FIELD_WIDTH/2);
+            for (int i = 3; i < rawPosition.length; i++) {
+                rawPosition[i] = Units.degreesToRadians(rawPosition[i]);
+            }
+
+            tagRelativePosition = new Pose2d(new Translation2d(rawPosition[2], rawPosition[0]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
+            if(lastUpdate != limeLight.getEntry("botpose").getLastChange() - limeLight.getEntry("tl").getDouble(0) - 11){
+                lastUpdate = limeLight.getEntry("botpose").getLastChange() - limeLight.getEntry("tl").getDouble(0) - 11;
+                accessedBefore = false;
+            }
+
         }else{
-            // Do Odometry Stuff
+            // Do Odometry Stuff*
         }
     }
 
@@ -181,5 +235,12 @@ public class Limelight extends SubsystemBase{
      */
     public void periodic(){
         updatePosition(); // Update position
+        test();
+    }
+    public void test(){
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("LimelightTesting");
+        table.getEntry("PoseX").setValue(position.getX());
+        table.getEntry("PoseY").setValue(position.getY());
+        table.getEntry("PoseR").setValue(position.getRotation().getZ());
     }
 }
