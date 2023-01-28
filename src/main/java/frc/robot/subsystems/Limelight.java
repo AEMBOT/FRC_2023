@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -170,6 +171,10 @@ public class Limelight extends SubsystemBase{
                     newRawPosition[i] = rawPosition[i];
                 }
                 rawPosition = newRawPosition;}
+            for (int i = 3; i < rawPosition.length; i++) {
+                rawPosition[i] = Units.degreesToRadians(rawPosition[i]);
+            }
+
             tagRelativePosition = new Pose2d(new Translation2d(rawPosition[2], rawPosition[0]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
             if(lastUpdate != limeLight.getEntry("botpose").getLastChange() - limeLight.getEntry("tl").getDouble(0) - 11){
                 lastUpdate = limeLight.getEntry("botpose").getLastChange() - limeLight.getEntry("tl").getDouble(0) - 11;
