@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -22,9 +23,11 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void periodic() {
         //periodic method (called every 1/60th of a second)
         SmartDashboard.putNumber("angleEncoder", angleEncoder.getPosition());
-        SmartDashboard.putNumber("extendEncoder", angleEncoder.getPosition());
+        SmartDashboard.putNumber("extendEncoder", extendEncoder.getPosition());
         SmartDashboard.putNumber("angleMotor", m_angleMotor.get());
         SmartDashboard.putNumber("extendMotor", m_extendMotor.get());
+        SmartDashboard.putNumber("ExtendMotorCurrent", m_extendMotor.getOutputCurrent());
+        SmartDashboard.putNumber("AngleMotorCurrent", m_angleMotor.getOutputCurrent());
     }
 
     public ElevatorSubsystem() {
@@ -68,7 +71,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         m_extendMotor.set(0.1);
     }
 
-    public void retract(CANSparkMax m_extendMotor){
+    public void retract(){
         m_extendMotor.set(-0.1);
     }
 }
