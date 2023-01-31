@@ -31,8 +31,8 @@ public class Limelight extends SubsystemBase{
          */
         private GamePiece(boolean isCube, double xPos, double yPos){
             this.isCube = isCube;
-            this.xPos = xPos;
-            this.yPos = yPos;
+            this.xPos = xPos - 1280 / 2;
+            this.yPos = - yPos + 960 / 2;
         }
 
         /**
