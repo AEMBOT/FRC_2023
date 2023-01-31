@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -91,7 +92,7 @@ public class RobotContainer {
     );
     // Configure the button bindings
     configureBindings();
-
+    
     autoSelector.setDefaultOption("pathPlanner", new InstantCommand());
     autoSelector.addOption("1 Meter Forward",
             drivebaseS.pathPlannerCommand(
@@ -102,17 +103,26 @@ public class RobotContainer {
                     )
             )
     );
+  
+    //BROKEN CODE
+    //TODO: Fix instant command
+    /* 
+    Pose2d x;
     autoSelector.addOption("apriltag",
-            drivebaseS.pathPlannerCommand(
-                    DrivebaseS.generateTrajectoryToPose(
-                            drivebaseS.getPose(),
-                            TAG_FIELD_LAYOUT.getTagPose(1).get().toPose2d().exp(new Twist2d(-1.0, 0.0, 0.0)),
-                            drivebaseS.getFieldRelativeLinearSpeedsMPS(),
-                            1,
-                            0.5
-                    )
+            new SequentialCommandGroup(
+              new InstantCommand(() -> new drivebase.getPose(), drivebases);
+              drivebaseS.pathPlannerCommand(
+                  DrivebaseS.generateTrajectoryToPose(
+                    x,
+                    TAG_FIELD_LAYOUT.getTagPose(3).get().toPose2d().exp(new Twist2d(-1.0, 0.0, 0.0)),
+                    drivebaseS.getFieldRelativeLinearSpeedsMPS(),
+                    1,
+                    0.5
+                  )
+                )
             )
     );
+    */
   }
 
   /**
@@ -180,10 +190,8 @@ public class RobotContainer {
       () -> m_elevatorSubsystem.retract(),
       m_elevatorSubsystem));
 
-
-
     //Docking
-    //m_secondaryController.a().whileTrue(m_docking);
+    m_secondaryController.b().whileTrue(m_docking);
 
     m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 
