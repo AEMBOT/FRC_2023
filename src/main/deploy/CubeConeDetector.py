@@ -20,20 +20,20 @@ class ConeDetection:
         """initializes all values to presets or None if need to be set
         """
 
-        self.__hsv_threshold_hue_cone = [0.0, 41.083790210519126]
-        self.__hsv_threshold_saturation_cone = [159.01008007153598, 255.0]
-        self.__hsv_threshold_value_cone = [22.93165467625899, 206.92900001775223]
+        self.__hsv_threshold_hue_cone = [15.0, 35.0]
+        self.__hsv_threshold_saturation_cone = [170.0, 255.0]
+        self.__hsv_threshold_value_cone = [115.0, 255.0]
 
-        self.__hsv_threshold_hue_cube = [100.0, 142.03866432337435]
-        self.__hsv_threshold_saturation_cube = [72.56940210543429, 255.0]
-        self.__hsv_threshold_value_cube = [0.0, 80.21968365553602]
+        self.__hsv_threshold_hue_cube = [108.0, 142.0]
+        self.__hsv_threshold_saturation_cube = [77.0, 255.0]
+        self.__hsv_threshold_value_cube = [46.0, 158.0]
 
         self.hsv_threshold_output = None
 
         self.__cv_erode_0_src = self.hsv_threshold_output
         self.__cv_erode_0_kernel = None
         self.__cv_erode_0_anchor = (-1, -1)
-        self.__cv_erode_0_iterations = 3.0
+        self.__cv_erode_0_iterations = 5.0
         self.__cv_erode_0_bordertype = cv2.BORDER_CONSTANT
         self.__cv_erode_0_bordervalue = (-1)
 
@@ -42,7 +42,7 @@ class ConeDetection:
         self.__cv_dilate_src = self.cv_erode_0_output
         self.__cv_dilate_kernel = None
         self.__cv_dilate_anchor = (-1, -1)
-        self.__cv_dilate_iterations = 6.0
+        self.__cv_dilate_iterations = 10.0
         self.__cv_dilate_bordertype = cv2.BORDER_CONSTANT
         self.__cv_dilate_bordervalue = (-1)
 
@@ -51,7 +51,7 @@ class ConeDetection:
         self.__cv_erode_1_src = self.cv_dilate_output
         self.__cv_erode_1_kernel = None
         self.__cv_erode_1_anchor = (-1, -1)
-        self.__cv_erode_1_iterations = 3.0
+        self.__cv_erode_1_iterations = 5.0
         self.__cv_erode_1_bordertype = cv2.BORDER_CONSTANT
         self.__cv_erode_1_bordervalue = (-1)
 
@@ -63,7 +63,7 @@ class ConeDetection:
         self.find_contours_output = None
 
         self.__filter_contours_contours = self.find_contours_output
-        self.__filter_contours_min_area = 150.0
+        self.__filter_contours_min_area = 1000.0
         self.__filter_contours_min_perimeter = 0.0
         self.__filter_contours_min_width = 0.0
         self.__filter_contours_max_width = 1000.0
