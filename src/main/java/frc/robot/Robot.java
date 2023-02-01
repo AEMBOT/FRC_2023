@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -41,6 +42,10 @@ public class Robot extends TimedRobot {
     LiveWindow.disableAllTelemetry();
     Logger.configureLoggingAndConfig(m_robotContainer, false);
     SmartDashboard.putNumber("vel", new SwerveModuleState().speedMetersPerSecond);
+    m_robotContainer.onInit();
+
+    // Remove before Comp
+    PathPlannerServer.startServer(5811);
   }
 
   /**
