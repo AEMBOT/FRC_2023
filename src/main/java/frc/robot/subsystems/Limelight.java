@@ -171,7 +171,7 @@ public class Limelight extends SubsystemBase{
                 rawPosition[i] = Units.degreesToRadians(rawPosition[i]);
             }
             position = new Pose3d(new Translation3d(rawPosition[0], rawPosition[1], rawPosition[2]), new Rotation3d(rawPosition[3], rawPosition[4], rawPosition[5])); // Convert to Pose2d for use elsewhere
-            rawPosition = limeLight.getEntry("camtran").getDoubleArray(new double[]{0,0,0,0,0,0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
+            rawPosition = limeLight.getEntry("campose").getDoubleArray(new double[]{0,0,0,0,0,0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
             NetworkTableInstance.getDefault().getTable("LimelightTesting").getEntry("rawCamTran").setValue(rawPosition);
             if(rawPosition.length < 6){
                 double[] newRawPosition = new double[]{0,0,0,0,0,0};
