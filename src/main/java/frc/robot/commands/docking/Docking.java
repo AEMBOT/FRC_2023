@@ -1,5 +1,6 @@
 package frc.robot.commands.docking;
 
+import com.fasterxml.jackson.databind.ser.std.CalendarSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
 import com.kauailabs.navx.frc.AHRS;
 import frc.robot.subsystems.DrivebaseS;
@@ -7,12 +8,15 @@ import frc.robot.subsystems.Limelight;
 import io.github.oblarg.oblog.Loggable;
 import edu.wpi.first.hal.util.HalHandleException;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI.Port;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -103,23 +107,57 @@ public class Docking extends CommandBase implements Loggable{
         //move robot when robot is farther from middle of the docking station
         //move at decrement speed
         //use tilt to make sure
-        
-        Pose2d robotLimelightdist = m_limelight.getRelativePose();
+
+        Translation2d robotLimelightdist = m_drivebase.getPose().getTranslation()
+        .minus(VisionConstants.TAG_FIELD_LAYOUT.getTagPose(2).get().toPose2d().getTranslation());
         double robotLimelightX =robotLimelightdist.getX();
+        SmartDashboard.putNumber("AbiralLook", robotLimelightX);
         double robotLimelighytY = robotLimelightdist.getY();
         double robotLLDist = Math.sqrt(Math.pow(robotLimelightX,2) + Math.pow(robotLimelighytY,2));
-        double initialLimelightDist = 2;
-        double targetLimelightDist = 1;
-        double middleDist = 0.5; // dist from start of the ramp to middle of the ramp
-        if(robotLLDist - targetLimelightDist < initialLimelightDist + middleDist){
-            m_drivebase.drive(new ChassisSpeeds(decrementSpeed(0.6, initialLimelightDist + middleDist, robotLLDist - initialLimelightDist),decrementSpeed(0.6, initialLimelightDist + middleDist, robotLLDist - initialLimelightDist),0));
-            if (robotLLDist > targetLimelightDist + 2){
+        double targetLimelightDist = 2.9083;
+        double middleDist = 0.9906; // dist from start of the ramp to middle of the ramp
+        double initialLimelightDist = targetLimelightDist + middleDist;
+        boolean stop = false;
+        if(robotLimelightX - targetLimelightDist < initialLimelightDist + middleDist){
+            /* 
+            m_drivebase.drive(new ChassisSpeeds(
+                decrementSpeed(0.6, initialLimelightDist + middleDist, robotLimelightX - initialLimelightDist),
+                decrementSpeed(0, initialLimelightDist + middleDist, robotLimelightX - initialLimelightDist),0));*/
+            /* 
+            if (tilt(navx.getRoll(), navx.getPitch()) > 4){
+                m_drivebase.drive(new ChassisSpeeds(0.4,0,0));
+                if (Math.abs(robotLimelightX) > targetLimelightDist && tilt(navx.getRoll(), navx.getPitch()) < 5){
+                //if (robotLimelightX > -3){
+                    m_drivebase.drive(new ChassisSpeeds(0,0,0));
+                    stop = true;
+                    if (tilt(navx.getRoll(), navx.getPitch()) > 3){
+                        while (tilt(navx.getRoll(), navx.getPitch()) > 3 && robotLimelightX < targetLimelightDist){
+                            m_drivebase.drive(new ChassisSpeeds(-0.2,0,0));
+                        }
+                    }         
+            }*/
+
+            m_drivebase.drive(new ChassisSpeeds(decrementSpeed(0.5, initialLimelightDist + middleDist, robotLimelightX - initialLimelightDist),0,0));
+            if (Math.abs(robotLimelightX) > targetLimelightDist && tilt(navx.getRoll(), navx.getPitch()) < 5){
+            //if (robotLimelightX > -3){
                 m_drivebase.drive(new ChassisSpeeds(0,0,0));
                 if (tilt(navx.getRoll(), navx.getPitch()) > 3){
-                    while (tilt(navx.getRoll(), navx.getPitch()) > 3 && robotLLDist < targetLimelightDist){
-                        m_drivebase.drive(new ChassisSpeeds(-0.2,-0.2,0));
+                    stop = true;
+                    while (tilt(navx.getRoll(), navx.getPitch()) > 3 && robotLimelightX < targetLimelightDist){
+                        m_drivebase.drive(new ChassisSpeeds(-0.3,0,0));
+                        if (tilt(navx.getRoll(), navx.getPitch()) < 3 && robotLimelightX > targetLimelightDist){
+                            stop = true;
+                            break;
+                        }
                     }
-                }         
+                }    
+            }
+            /* 
+            else{
+                m_drivebase.drive(new ChassisSpeeds(0.4,0,0));
+            }*/
+            if (stop){
+                m_drivebase.drive(new ChassisSpeeds(0,0,0));
             }
 
         }

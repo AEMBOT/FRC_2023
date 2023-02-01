@@ -7,14 +7,14 @@ package frc.robot;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
 import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
+import static frc.robot.Constants.VisionConstants.TAG_FIELD_LAYOUT;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -52,12 +53,12 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // Subsystems
-  @Log
-  private final DrivebaseS drivebaseS = new DrivebaseS();
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem(new Limelight[]{new Limelight("limelight")});
   private final Limelight m_limelight = new Limelight();
+  @Log
+  private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
 
   //Commands
   private Docking m_docking = new Docking(drivebaseS, m_limelight);
@@ -94,7 +95,7 @@ public class RobotContainer {
     );
     // Configure the button bindings
     configureBindings();
-
+    
     autoSelector.setDefaultOption("pathPlanner", new InstantCommand());
     autoSelector.addOption("1 Meter Forward",
             drivebaseS.pathPlannerCommand(
@@ -105,6 +106,26 @@ public class RobotContainer {
                     )
             )
     );
+  
+    //BROKEN CODE
+    //TODO: Fix instant command
+    /* 
+    Pose2d x;
+    autoSelector.addOption("apriltag",
+            new SequentialCommandGroup(
+              new InstantCommand(() -> new drivebase.getPose(), drivebases);
+              drivebaseS.pathPlannerCommand(
+                  DrivebaseS.generateTrajectoryToPose(
+                    x,
+                    TAG_FIELD_LAYOUT.getTagPose(3).get().toPose2d().exp(new Twist2d(-1.0, 0.0, 0.0)),
+                    drivebaseS.getFieldRelativeLinearSpeedsMPS(),
+                    1,
+                    0.5
+                  )
+                )
+            )
+    );
+    */
   }
 
   /**
@@ -177,7 +198,6 @@ public class RobotContainer {
 
 
     //Docking
-    //m_secondaryController.a().whileTrue(m_docking);
     m_secondaryController.b().whileTrue(m_docking);
 
     m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));

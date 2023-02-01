@@ -48,6 +48,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
 
     private final AHRS navx = new AHRS(Port.kMXP);
     private SimGyroSensorModel simNavx = new SimGyroSensorModel();
+    private final Limelight limelight;
 
     public final PIDController xController = new PIDController(3.0, 0, 0);
     public final PIDController yController = new PIDController(3.0, 0, 0);
@@ -90,7 +91,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
         fl, fr, bl, br
     );
 
-    public DrivebaseS() {
+    public DrivebaseS(Limelight m_limelight) {
         navx.reset();
         
         odometry =
@@ -101,12 +102,16 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
             new Pose2d()
         );
         resetPose(new Pose2d());
+        limelight = m_limelight;
     }
 
     @Override
     public void periodic() {
         // update the odometry every 20ms
         odometry.update(getHeading(), getModulePositions());
+        if (!limelight.getDataAccessedBefore()) {
+            odometry.addVisionMeasurement(limelight.getPosition().toPose2d(), limelight.getLastTimestamp());
+        }
     }
     
     public void drive(ChassisSpeeds speeds) {
@@ -465,9 +470,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
      * @param currentSpeedVectorMPS a Translation2d where x and y are the robot's x and y field-relative speeds in m/s.
      * @return a PathPlannerTrajectory to the target pose.
      */
-    public static PathPlannerTrajectory generateTrajectoryToPose(Pose2d robotPose, Pose2d target, Translation2d currentSpeedVectorMPS) {
-
-                
+    public static PathPlannerTrajectory generateTrajectoryToPose(Pose2d robotPose, Pose2d target, Translation2d currentSpeedVectorMPS, double maxVelocity, double maxAccel) {
                 // Robot velocity calculated from module states.
                 Rotation2d fieldRelativeTravelDirection = NomadMathUtil.getDirection(currentSpeedVectorMPS);
                 double travelSpeed = currentSpeedVectorMPS.getNorm();
@@ -484,7 +487,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
                     robotToTargetTranslation.getNorm() > 0.1
                 ) {
                     PathPlannerTrajectory pathPlannerTrajectory = PathPlanner.generatePath(
-                        new PathConstraints(4, 4), 
+                        new PathConstraints(maxVelocity, maxAccel),
                         //Start point. At the position of the robot, initial travel direction toward the target,
                         // robot rotation as the holonomic rotation, and putting in the (possibly 0) velocity override.
                         new PathPoint(
@@ -502,6 +505,10 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
                 }
 
                 return new PathPlannerTrajectory();
+    }
+
+    public static PathPlannerTrajectory generateTrajectoryToPose(Pose2d robotPose, Pose2d target, Translation2d currentSpeedVectorMPS) {
+        return generateTrajectoryToPose(robotPose, target, currentSpeedVectorMPS, 4, 4);
     }
 
     /**
