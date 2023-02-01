@@ -9,6 +9,7 @@ import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
 import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
 import static frc.robot.Constants.VisionConstants.TAG_FIELD_LAYOUT;
 
+import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.apriltag.AprilTag;
@@ -24,12 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field3d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -106,26 +102,27 @@ public class RobotContainer {
                     )
             )
     );
-  
-    //BROKEN CODE
-    //TODO: Fix instant command
-    /* 
-    Pose2d x;
-    autoSelector.addOption("apriltag",
+    pathPlannerTrajectory = PathPlanner.loadPath("twopiece", 1.0, 0.5);
+
+    autoSelector.addOption("twopiece",
             new SequentialCommandGroup(
-              new InstantCommand(() -> new drivebase.getPose(), drivebases);
-              drivebaseS.pathPlannerCommand(
-                  DrivebaseS.generateTrajectoryToPose(
-                    x,
-                    TAG_FIELD_LAYOUT.getTagPose(3).get().toPose2d().exp(new Twist2d(-1.0, 0.0, 0.0)),
-                    drivebaseS.getFieldRelativeLinearSpeedsMPS(),
-                    1,
-                    0.5
-                  )
-                )
+                    new InstantCommand(() -> drivebaseS.resetPose(pathPlannerTrajectory.getInitialHolonomicPose())),
+                    drivebaseS.pathPlannerCommand(pathPlannerTrajectory)
             )
     );
-    */
+//    autoSelector.addOption("apriltag",
+//            drivebaseS.pathPlannerCommand(
+//                    DrivebaseS.generateTrajectoryToPose(
+//                            drivebaseS.getPose(),
+//                            TAG_FIELD_LAYOUT.getTagPose(3).get().toPose2d().exp(new Twist2d(-1.0, 0.0, 0.0)),
+//                            drivebaseS.getFieldRelativeLinearSpeedsMPS(),
+//                            1,
+//                            0.5
+//                    )
+//            )
+//    );
+    autoSelector.addOption("apriltag",
+            drivebaseS.chasePoseC(() -> TAG_FIELD_LAYOUT.getTagPose(2).get().toPose2d().exp(new Twist2d(-1.0, 0.0, 0.0))));
   }
 
   /**
@@ -221,9 +218,12 @@ public class RobotContainer {
   }
 
   public void onEnabled() {
-    drivebaseS.resetRelativeRotationEncoders();
     CommandScheduler.getInstance().schedule(m_GetHomeCommand);
     m_armSubsystem.stopAngle();
     m_armSubsystem.stopExtend();
+  }
+
+  public void onInit() {
+    drivebaseS.resetRelativeRotationEncoders();
   }
 }

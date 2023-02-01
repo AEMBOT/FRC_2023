@@ -519,7 +519,6 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
      * @param targetSupplier the Supplier for the target Pose2d.
      * @return the PPChasePoseCommand
      */
-    /*
     public Command chasePoseC(Supplier<Pose2d> targetSupplier) {
         return new PPChasePoseCommand(
             targetSupplier,
@@ -527,9 +526,8 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
             holonomicDriveController,
             this::drive,
             (PathPlannerTrajectory traj) -> {}, // empty output for current trajectory.
-            (startPose, endPose)->DrivebaseS.generateTrajectoryToPose(startPose, endPose, getFieldRelativeLinearSpeedsMPS()),
+            (startPose, endPose)->DrivebaseS.generateTrajectoryToPose(startPose, endPose, getFieldRelativeLinearSpeedsMPS(), 0.5, 0.05),
             this);
     }
-    */
 
 }
