@@ -156,6 +156,16 @@ public final class Constants {
 
     }
 
+    public static final class ArmConstants {
+
+        public static final int angleMotorCanID = 15;
+        public static final int extendMotorCanID = 14;
+        public static final int movingAverage = 2;
+        public static final int extendMotorCurrentLimit = 25;
+        public static final int angleMotorCurrentLimit = 35;
+
+    }
+
     public static final class VisionConstants {
         public static AprilTagFieldLayout TAG_FIELD_LAYOUT = new AprilTagFieldLayout(
                 List.of(

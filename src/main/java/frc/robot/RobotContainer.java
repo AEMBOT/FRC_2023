@@ -25,18 +25,20 @@ import edu.wpi.first.wpilibj.smartdashboard.Field3d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.docking.Docking;
 import frc.robot.commands.drivetrain.OperatorControlC;
+import frc.robot.commands.arm.GetHomeCommand;
+import frc.robot.commands.arm.GoToPosition;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.ClampSubsystem;
 import frc.robot.subsystems.DrivebaseS;
-import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -53,13 +55,14 @@ public class RobotContainer {
   @Log
   private final DrivebaseS drivebaseS = new DrivebaseS();
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private final ClampSubsystem m_clampSubsystem = new ClampSubsystem(Constants.PNEUMATIC_CLAMP_EXTEND_PORT);
+  private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem(new Limelight[]{new Limelight("limelight")});
-  private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
   private final Limelight m_limelight = new Limelight();
 
   //Commands
   private Docking m_docking = new Docking(drivebaseS, m_limelight);
+  private GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
+  private GoToPosition m_GoToPosition = new GoToPosition(m_armSubsystem);
 
   // Controllers
   private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
@@ -126,49 +129,51 @@ public class RobotContainer {
     // Clamp
     m_secondaryController.a().toggleOnTrue(new StartEndCommand(
       // Extends the clamp
-      () -> m_clampSubsystem.extend(),
+      () -> m_armSubsystem.extendClamp(),
       // Retracts the clamp
-      () -> m_clampSubsystem.retract(),
-      // Requires the clamp subsystem
-      m_clampSubsystem
+      () -> m_armSubsystem.retractClamp(),
+      // Requires the Arm subsystem
+      m_armSubsystem
     ));
 
     // Elevator
     //
     // Angle Motor
     m_secondaryController.rightBumper().onFalse(new RunCommand(
-      () -> m_elevatorSubsystem.stopAngle(),
-      m_elevatorSubsystem));
+      () -> m_armSubsystem.stopAngle(),
+      m_armSubsystem));
 
     m_secondaryController.leftBumper().onFalse(new RunCommand(
-      () -> m_elevatorSubsystem.stopAngle(),
-      m_elevatorSubsystem));
+      () -> m_armSubsystem.stopAngle(),
+      m_armSubsystem));
 
     m_secondaryController.rightBumper().whileTrue(new RunCommand(
-      () -> m_elevatorSubsystem.angleUp(),
-      m_elevatorSubsystem));
+      () -> m_armSubsystem.angleUp(),
+      m_armSubsystem));
 
     m_secondaryController.leftBumper().whileTrue(new RunCommand(
-      () -> m_elevatorSubsystem.angleDown(),
-      m_elevatorSubsystem));
+      () -> m_armSubsystem.angleDown(),
+      m_armSubsystem));
     //
     // Extend Motor
     m_secondaryController.rightTrigger().onFalse(new RunCommand(
-      () -> m_elevatorSubsystem.stopExtend(),
-      m_elevatorSubsystem));
+      () -> m_armSubsystem.stopExtend(),
+      m_armSubsystem));
     
     m_secondaryController.leftTrigger().onFalse(new RunCommand(
-      () -> m_elevatorSubsystem.stopExtend(),
-      m_elevatorSubsystem));
+      () -> m_armSubsystem.stopExtend(),
+      m_armSubsystem));
 
     m_secondaryController.rightTrigger().whileTrue(new RunCommand(
-      () -> m_elevatorSubsystem.extend(),
-      m_elevatorSubsystem));
+      () -> m_armSubsystem.extendArm(),
+      m_armSubsystem));
 
     m_secondaryController.leftTrigger().whileTrue(new RunCommand(
-      () -> m_elevatorSubsystem.retract(),
-      m_elevatorSubsystem));
+      () -> m_armSubsystem.retractArm(),
+      m_armSubsystem));
 
+    // Elevator go to Position
+    m_secondaryController.y().whileTrue(m_GoToPosition);
 
 
     //Docking
@@ -197,5 +202,8 @@ public class RobotContainer {
 
   public void onEnabled() {
     drivebaseS.resetRelativeRotationEncoders();
+    CommandScheduler.getInstance().schedule(m_GetHomeCommand);
+    m_armSubsystem.stopAngle();
+    m_armSubsystem.stopExtend();
   }
 }
