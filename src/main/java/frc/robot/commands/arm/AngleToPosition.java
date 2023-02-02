@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class AngleToPosition extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final ArmSubsystem m_elevator;
-  private final double m_angleMotorRotation;
-  private final double m_angle;
+  //private final double m_angleMotorRotation;
+  //private final double m_angle;
   /**
    * Creates a new ExampleCommand.
    *
@@ -20,8 +20,8 @@ public class AngleToPosition extends CommandBase {
    */
   public AngleToPosition(ArmSubsystem subsystem, double angleMotorRotation, double angle) {
     m_elevator = subsystem;
-    m_angleMotorRotation = angleMotorRotation;
-    m_angle = angle;
+    //m_angleMotorRotation = angleMotorRotation;
+    //m_angle = angle;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
@@ -53,8 +53,11 @@ public class AngleToPosition extends CommandBase {
   }
 
   // Returns true when the command should end.
+  
+  
   @Override
   public boolean isFinished() {
-    return Math.abs(m_elevator.getAnglePosition()-targetPosition) < .05;
+    return false;
+    //return Math.abs(m_elevator.getAnglePosition() - targetPosition) < .05;
   }
 }
