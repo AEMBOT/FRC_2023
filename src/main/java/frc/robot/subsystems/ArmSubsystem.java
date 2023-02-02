@@ -72,6 +72,10 @@ public class ArmSubsystem extends SubsystemBase {
         m_angleMotor.set(0.5);
     }
 
+    public void getAnglePosition(){
+        angleEncoder.getPosition();
+    }
+
     public void angleDown(){
         m_angleMotor.set(-0.5);
     }
