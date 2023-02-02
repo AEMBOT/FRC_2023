@@ -163,7 +163,9 @@ public final class Constants {
         public static final int movingAverage = 2;
         public static final int extendMotorCurrentLimit = 25;
         public static final int angleMotorCurrentLimit = 35;
-
+        //Arm stuff below this is untested, needs accuracy
+        public static final double angleToSubstation = 3;
+        public static final double angleToFloor = 2;
     }
 
     public static final class VisionConstants {

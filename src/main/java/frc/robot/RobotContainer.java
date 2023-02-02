@@ -8,6 +8,9 @@ import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
 import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
 import static frc.robot.Constants.VisionConstants.TAG_FIELD_LAYOUT;
+//Arm stuff needs to be tested
+import static frc.robot.Constants.ArmConstants.angleToSubstation;
+import static frc.robot.Constants.ArmConstants.angleToFloor;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -34,6 +37,7 @@ import frc.robot.commands.docking.Docking;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
+import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.DrivebaseS;
 import frc.robot.subsystems.ExampleSubsystem;
@@ -60,6 +64,8 @@ public class RobotContainer {
   private Docking m_docking = new Docking(drivebaseS, m_limelight);
   private GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
   private GoToPosition m_GoToPosition = new GoToPosition(m_armSubsystem);
+  private AngleToPosition m_AngleToPosition = new AngleToPosition(m_armSubsystem, angleToFloor);
+  //private AngleToPosition m_AngleToPositionFloor = new AngleToPosition(m_armSubsystem, angleToSubstation);
 
   // Controllers
   private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
@@ -192,7 +198,9 @@ public class RobotContainer {
 
     // Elevator go to Position
     m_secondaryController.y().whileTrue(m_GoToPosition);
-
+      //Fix this to incorporate different precise angle positions, only has one inaccurate angle at the moment
+    m_secondaryController.a().whileTrue(m_AngleToPosition);
+    //m_secondaryController.a().WhileTrue(m_AngleToPositionFloor);
 
     //Docking
     m_secondaryController.b().whileTrue(m_docking);
