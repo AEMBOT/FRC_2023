@@ -74,6 +74,10 @@ public class Docking extends CommandBase implements Loggable{
     return initSpeed;
   }
 
+  public double omegaToDriveSpeed(double omega){
+    return (omega / 10);
+  }
+
     //assuumes intial if(navx.getPitch() > pitchUpper || navx.getPitch() < pitchLower when called
     @Override
     public void execute(){
@@ -143,6 +147,7 @@ public class Docking extends CommandBase implements Loggable{
         if (stop){
             m_drivebase.drive(new ChassisSpeeds(0.0,0,0));
         }
+        
         //double currTiltValue = tilt(navx.getRoll(), navx.getPitch());
         
        /*  if(robotLimelightX - targetLimelightDist < initialLimelightDist + middleDist){

@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.docking.Docking;
+import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
@@ -62,6 +63,7 @@ public class RobotContainer {
 
   //Commands
   private Docking m_docking = new Docking(drivebaseS, m_limelight);
+  private DockingForceBalance m_dockingForceBalance = new DockingForceBalance(drivebaseS);
   private GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
   private GoToPosition m_GoToPosition = new GoToPosition(m_armSubsystem);
   private AngleToPosition m_AngleToPosition = new AngleToPosition(m_armSubsystem, angleToFloor);
@@ -204,6 +206,8 @@ public class RobotContainer {
 
     //Docking
     m_secondaryController.b().whileTrue(m_docking);
+
+    m_primaryController.a().whileTrue(m_dockingForceBalance);
 
     m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 
