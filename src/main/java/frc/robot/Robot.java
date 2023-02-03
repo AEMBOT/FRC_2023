@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.docking.Docking;
 import frc.robot.subsystems.DrivebaseS;
+import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.VisionSubsystem;
 import io.github.oblarg.oblog.Logger;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI.Port;
@@ -27,7 +29,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-
+  private Limelight m_Limelight;
   AHRS navx = new AHRS(Port.kMXP);
 
   /**
@@ -79,7 +81,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Roll", navx.getRoll());
     SmartDashboard.putNumber("Yaw", navx.getYaw());
     SmartDashboard.putNumber("Tilt", Docking.tilt(navx.getRoll(), navx.getPitch()));
-    
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -117,6 +118,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Roll", navx.getRoll());
     SmartDashboard.putNumber("Yaw", navx.getYaw());
     SmartDashboard.putNumber("Tilt", Docking.tilt(navx.getRoll(), navx.getPitch()));
+    SmartDashboard.putNumber("RawGyroY", navx.getRawGyroY());
   }
 
  

@@ -11,6 +11,7 @@ import frc.robot.subsystems.Limelight;
 import io.github.oblarg.oblog.Loggable;
 import edu.wpi.first.hal.util.HalHandleException;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -22,6 +23,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.VisionSubsystem;
 
 public class Docking extends CommandBase implements Loggable{
 
@@ -115,8 +117,9 @@ public class Docking extends CommandBase implements Loggable{
         //move at decrement speed
         //use tilt to make sure
         
-        Translation2d robotLimelightdist = m_drivebase.getPose().getTranslation()
-        .minus(VisionConstants.TAG_FIELD_LAYOUT.getTagPose(2).get().toPose2d().getTranslation());
+        //Translation2d robotLimelightdist = m_drivebase.getPose().getTranslation()
+        //.minus(VisionConstants.TAG_FIELD_LAYOUT.getTagPose(2).get().toPose2d().getTranslation());
+        Pose3d robotLimelightdist = m_limelight.getPosition();
         double robotLimelightX =robotLimelightdist.getX();
         SmartDashboard.putNumber("AbiralLook", robotLimelightX);
         double robotLimelighytY = robotLimelightdist.getY();
@@ -126,42 +129,63 @@ public class Docking extends CommandBase implements Loggable{
         double initialLimelightDist = targetLimelightDist + middleDist;
         boolean stop = false;
         double prevTiltValue = tilt(navx.getRoll(), navx.getPitch());
+
+        double AngularY = navx.getRawGyroY();
+        
+        //if (AngularY > 10)
+        if (AngularY < -8){
+            m_drivebase.drive(new ChassisSpeeds(0,0,0));
+            stop = true;
+        }
+        else{
+            m_drivebase.drive(new ChassisSpeeds(-0.4,0,0));
+        }
+        if (stop){
+            m_drivebase.drive(new ChassisSpeeds(0.0,0,0));
+        }
         //double currTiltValue = tilt(navx.getRoll(), navx.getPitch());
-        //if(robotLimelightX - targetLimelightDist < initialLimelightDist + middleDist){
-            /* 
+        
+       /*  if(robotLimelightX - targetLimelightDist < initialLimelightDist + middleDist){
+            
             m_drivebase.drive(new ChassisSpeeds(
                 decrementSpeed(0.6, initialLimelightDist + middleDist, robotLimelightX - initialLimelightDist),
-                decrementSpeed(0, initialLimelightDist + middleDist, robotLimelightX - initialLimelightDist),0));*/
-            /* 
+                decrementSpeed(0, initialLimelightDist + middleDist, robotLimelightX - initialLimelightDist),0));
+        
+        
+            
+            m_drivebase.drive(new ChassisSpeeds(0.4,0,0));
             if (tilt(navx.getRoll(), navx.getPitch()) > 4){
-                m_drivebase.drive(new ChassisSpeeds(0.4,0,0));
-                if (Math.abs(robotLimelightX) > targetLimelightDist && tilt(navx.getRoll(), navx.getPitch()) < 5){
+                m_drivebase.drive(new ChassisSpeeds(0.3,0,0));
+                if (Math.abs(robotLimelightX) > targetLimelightDist  && tilt(navx.getRoll(), navx.getPitch()) < 12){
                 //if (robotLimelightX > -3){
                     m_drivebase.drive(new ChassisSpeeds(0,0,0));
                     stop = true;
                     if (tilt(navx.getRoll(), navx.getPitch()) > 3){
-                        while (tilt(navx.getRoll(), navx.getPitch()) > 3 && robotLimelightX < targetLimelightDist){
+                        while (tilt(navx.getRoll(), navx.getPitch()) > 3 && robotLimelightX < targetLimelightDist ){
                             m_drivebase.drive(new ChassisSpeeds(-0.2,0,0));
                         }
                     }         
-            }*/
+            }
+
+
+        }
             //m_drivebase.drive(new ChassisSpeeds(decrementSpeed(0.2, initialLimelightDist + middleDist, robotLimelightX - initialLimelightDist),0,0));
-        if(tilt(navx.getRoll(), navx.getPitch()) < 6){
+            if(tilt(navx.getRoll(), navx.getPitch()) < 6){
                 m_drivebase.drive(new ChassisSpeeds(0.4,0,0));
         } 
         else{
             m_drivebase.drive(new ChassisSpeeds(0,0,0));
         }
-            /* 
+            
             if (go){
                 m_drivebase.drive(new ChassisSpeeds(0.3,0,0));
                 if (Math.abs(robotLimelightX) > targetLimelightDist - 0.5){
                     go = false;
                 } 
             }
-            */
+            
             //if (Math.abs(robotLimelightX) > targetLimelightDist && tilt(navx.getRoll(), navx.getPitch()) < 3){
-                /* 
+                 
             else if(tilt(navx.getRoll(), navx.getPitch()) < 8){
             //if (robotLimelightX > -3){
                 m_drivebase.drive(new ChassisSpeeds(0,0,0));
@@ -177,24 +201,24 @@ public class Docking extends CommandBase implements Loggable{
                             break;
                         }
                     }
-                } */ 
-            }
-            /* 
+                } 
+    }
+            
 
             else{
                 m_drivebase.drive(new ChassisSpeeds(0.4,0,0));
-            }*/
-            /* 
+            }
+            
             if (stop){
                 m_drivebase.drive(new ChassisSpeeds(0,0,0));
-            }*/
+            }
 
         
 
-
+        }
         
-        
-
+       */ 
+    }
     @Override 
     public void end(boolean _interrupted){
         /* 
@@ -204,3 +228,4 @@ public class Docking extends CommandBase implements Loggable{
 
 }
 }
+
