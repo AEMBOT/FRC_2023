@@ -1,5 +1,8 @@
 package frc.robot.commands.docking;
 
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Delayed;
+
 import com.fasterxml.jackson.databind.ser.std.CalendarSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
 import com.kauailabs.navx.frc.AHRS;
@@ -27,6 +30,8 @@ public class Docking extends CommandBase implements Loggable{
 
     private final Limelight m_limelight; 
 
+    private boolean go = true;
+
     private final AHRS navx = new AHRS(Port.kMXP);
 
     private final DrivebaseS m_drivebase;
@@ -49,6 +54,8 @@ public class Docking extends CommandBase implements Loggable{
         double a = Units.radiansToDegrees(Math.asin(Math.sqrt(Math.pow(sy,2) + Math.pow(sx,2) * Math.pow(cy,2))));
         return a;
     }
+
+    public double distanceTrakcer(double )
 
     @Override
   public void initialize() {
@@ -107,7 +114,7 @@ public class Docking extends CommandBase implements Loggable{
         //move robot when robot is farther from middle of the docking station
         //move at decrement speed
         //use tilt to make sure
-
+        
         Translation2d robotLimelightdist = m_drivebase.getPose().getTranslation()
         .minus(VisionConstants.TAG_FIELD_LAYOUT.getTagPose(2).get().toPose2d().getTranslation());
         double robotLimelightX =robotLimelightdist.getX();
@@ -118,7 +125,9 @@ public class Docking extends CommandBase implements Loggable{
         double middleDist = 0.9906; // dist from start of the ramp to middle of the ramp
         double initialLimelightDist = targetLimelightDist + middleDist;
         boolean stop = false;
-        if(robotLimelightX - targetLimelightDist < initialLimelightDist + middleDist){
+        double prevTiltValue = tilt(navx.getRoll(), navx.getPitch());
+        //double currTiltValue = tilt(navx.getRoll(), navx.getPitch());
+        //if(robotLimelightX - targetLimelightDist < initialLimelightDist + middleDist){
             /* 
             m_drivebase.drive(new ChassisSpeeds(
                 decrementSpeed(0.6, initialLimelightDist + middleDist, robotLimelightX - initialLimelightDist),
@@ -136,35 +145,55 @@ public class Docking extends CommandBase implements Loggable{
                         }
                     }         
             }*/
-
-            m_drivebase.drive(new ChassisSpeeds(decrementSpeed(0.5, initialLimelightDist + middleDist, robotLimelightX - initialLimelightDist),0,0));
-            if (Math.abs(robotLimelightX) > targetLimelightDist && tilt(navx.getRoll(), navx.getPitch()) < 5){
+            //m_drivebase.drive(new ChassisSpeeds(decrementSpeed(0.2, initialLimelightDist + middleDist, robotLimelightX - initialLimelightDist),0,0));
+        if(tilt(navx.getRoll(), navx.getPitch()) < 6){
+                m_drivebase.drive(new ChassisSpeeds(0.4,0,0));
+        } 
+        else{
+            m_drivebase.drive(new ChassisSpeeds(0,0,0));
+        }
+            /* 
+            if (go){
+                m_drivebase.drive(new ChassisSpeeds(0.3,0,0));
+                if (Math.abs(robotLimelightX) > targetLimelightDist - 0.5){
+                    go = false;
+                } 
+            }
+            */
+            //if (Math.abs(robotLimelightX) > targetLimelightDist && tilt(navx.getRoll(), navx.getPitch()) < 3){
+                /* 
+            else if(tilt(navx.getRoll(), navx.getPitch()) < 8){
             //if (robotLimelightX > -3){
                 m_drivebase.drive(new ChassisSpeeds(0,0,0));
+                stop = true;
+                go = false;*/
+                /* 
                 if (tilt(navx.getRoll(), navx.getPitch()) > 3){
                     stop = true;
                     while (tilt(navx.getRoll(), navx.getPitch()) > 3 && robotLimelightX < targetLimelightDist){
-                        m_drivebase.drive(new ChassisSpeeds(-0.3,0,0));
+                        m_drivebase.drive(new ChassisSpeeds(-0.2,0,0));
                         if (tilt(navx.getRoll(), navx.getPitch()) < 3 && robotLimelightX > targetLimelightDist){
                             stop = true;
                             break;
                         }
                     }
-                }    
+                } */ 
             }
             /* 
+
             else{
                 m_drivebase.drive(new ChassisSpeeds(0.4,0,0));
             }*/
+            /* 
             if (stop){
                 m_drivebase.drive(new ChassisSpeeds(0,0,0));
-            }
+            }*/
 
-        }
+        
 
 
         
-        }
+        
 
     @Override 
     public void end(boolean _interrupted){
