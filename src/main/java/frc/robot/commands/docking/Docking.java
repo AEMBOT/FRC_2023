@@ -55,7 +55,7 @@ public class Docking extends CommandBase implements Loggable{
         return a;
     }
 
-    public double distanceTrakcer(double )
+    //public double distanceTrakcer(double )
 
     @Override
   public void initialize() {
