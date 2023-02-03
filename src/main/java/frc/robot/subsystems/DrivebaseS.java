@@ -108,7 +108,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
     public void periodic() {
         // update the odometry every 20ms
         odometry.update(getHeading(), getModulePositions());
-        if (!limelight.getDataAccessedBefore()) {
+        if (!limelight.getDataAccessedBefore() && limelight.visionTargetsFound()) {
             //odometry.addVisionMeasurement(limelight.getPosition().toPose2d(), limelight.getLastTimestamp());
         }
     }
