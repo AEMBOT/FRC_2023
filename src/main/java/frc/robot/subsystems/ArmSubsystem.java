@@ -11,16 +11,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+import static frc.robot.Constants.ArmConstants.*;
+
 public class ArmSubsystem extends SubsystemBase {
    
     // Elevator
-    private CANSparkMax m_angleMotor = new CANSparkMax(Constants.ArmConstants.angleMotorCanID, MotorType.kBrushless);
-    private CANSparkMax m_extendMotor = new CANSparkMax(Constants.ArmConstants.extendMotorCanID, MotorType.kBrushless);
+    private CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
+    private CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
+    private Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, clampSolenoidID);
     
     RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
     RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
 
-    LinearFilter filter = LinearFilter.movingAverage(Constants.ArmConstants.movingAverage);
+    LinearFilter filter = LinearFilter.movingAverage(movingAverage);
 
     @Override
     public void periodic() {
@@ -45,8 +48,8 @@ public class ArmSubsystem extends SubsystemBase {
         m_angleMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
         // Set max current the extend motor can draw
-        m_extendMotor.setSmartCurrentLimit(Constants.ArmConstants.extendMotorCurrentLimit);
-        m_angleMotor.setSmartCurrentLimit(Constants.ArmConstants.angleMotorCurrentLimit);
+        m_extendMotor.setSmartCurrentLimit(extendMotorCurrentLimit);
+        m_angleMotor.setSmartCurrentLimit(angleMotorCurrentLimit);
     }
 
     /* 
@@ -98,17 +101,6 @@ public class ArmSubsystem extends SubsystemBase {
         return extendEncoder.getPosition() >= 0.25 && extendEncoder.getPosition() <0.5 && angleEncoder.getPosition() >= 0.25 && angleEncoder.getPosition() <= 0.5;
     }
 
-    // Clamp
-    // The solenoid that controls the clamp
-    private Solenoid m_clampSolenoid;
-    
-    // Contructs the clamp with the ports on the PCM
-    // 
-    // extendPort = port for extending the clamp
-    public ArmSubsystem(int extendPort) {
-        m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, extendPort);
-    }
-    
     // Extends the clamp
     public void extendClamp() {
         m_clampSolenoid.set(true);

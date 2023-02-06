@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -14,7 +15,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -150,6 +153,7 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
+        public static final DriverStation.Alliance ALLIANCE = DriverStation.getAlliance();
 
         public static final double maxVelMetersPerSec = 2;
         public static final double maxAccelMetersPerSecondSq = 1;
@@ -160,6 +164,7 @@ public final class Constants {
 
         public static final int angleMotorCanID = 15;
         public static final int extendMotorCanID = 14;
+        public static final int clampSolenoidID = 0;
         public static final int movingAverage = 2;
         public static final int extendMotorCurrentLimit = 25;
         public static final int angleMotorCurrentLimit = 35;
@@ -169,7 +174,7 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static AprilTagFieldLayout TAG_FIELD_LAYOUT = new AprilTagFieldLayout(
+        public static AprilTagFieldLayout TAG_FIELD_LAYOUT_BLUE = new AprilTagFieldLayout(
                 List.of(
                         new AprilTag(
                                 1,
@@ -208,6 +213,52 @@ public final class Constants {
                         ),
                         new AprilTag(
                                 8,
+                                new Pose3d(
+                                        1.02743, 1.071626, 0.462788, new Rotation3d(0, 0, 0))
+                        )
+                ),
+                16.54175,
+                8.0137
+        );
+        public static AprilTagFieldLayout TAG_FIELD_LAYOUT_RED = new AprilTagFieldLayout(
+                List.of(
+                        new AprilTag(
+                                8,
+                                new Pose3d(
+                                        15.513558, 1.071626, 0.462788, new Rotation3d(0, 0, Math.PI))
+                        ),
+                        new AprilTag(
+                                7,
+                                new Pose3d(
+                                        15.513558, 2.748026, 0.462788, new Rotation3d(0, 0, Math.PI))
+                        ),
+                        new AprilTag(
+                                6,
+                                new Pose3d(
+                                        15.513558, 4.424426, 0.462788, new Rotation3d(0, 0, Math.PI))
+                        ),
+                        new AprilTag(
+                                5,
+                                new Pose3d(
+                                        16.178784, 6.749796, 0.695452, new Rotation3d(0, 0, Math.PI))
+                        ),
+                        new AprilTag(
+                                4,
+                                new Pose3d(
+                                        0.36195, 6.749796, 0.695452, new Rotation3d(0, 0, 0))
+                        ),
+                        new AprilTag(
+                                3,
+                                new Pose3d(
+                                        1.02743, 4.424426, 0.462788, new Rotation3d(0, 0, 0))
+                        ),
+                        new AprilTag(
+                                2,
+                                new Pose3d(
+                                        1.02743, 2.748026, 0.462788, new Rotation3d(0, 0, 0))
+                        ),
+                        new AprilTag(
+                                1,
                                 new Pose3d(
                                         1.02743, 1.071626, 0.462788, new Rotation3d(0, 0, 0))
                         )
