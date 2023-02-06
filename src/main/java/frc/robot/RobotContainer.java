@@ -5,38 +5,30 @@
 package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import static frc.robot.Constants.AutoConstants.ALLIANCE;
 import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
 import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
-import static frc.robot.Constants.VisionConstants.TAG_FIELD_LAYOUT;
-//Arm stuff needs to be tested
-import static frc.robot.Constants.ArmConstants.angleToSubstation;
 import static frc.robot.Constants.ArmConstants.angleToFloor;
+import static frc.robot.Constants.VisionConstants.*;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.Field3d;
-import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
-import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.subsystems.*;
@@ -78,6 +70,7 @@ public class RobotContainer {
   @Log
   private final Field3d field3d = new Field3d();
   private final FieldObject2d target = field.getObject("target");
+  private final AprilTagFieldLayout APRILTAG_LAYOUT;
 
   @Log
   SendableChooser<Command> autoSelector = new SendableChooser<Command>();
@@ -86,6 +79,12 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    if (ALLIANCE == DriverStation.Alliance.Red) {
+      APRILTAG_LAYOUT = TAG_FIELD_LAYOUT;
+      APRILTAG_LAYOUT.setOrigin(AprilTagFieldLayout.OriginPosition.kRedAllianceWallRightSide);
+    } else {
+      APRILTAG_LAYOUT = TAG_FIELD_LAYOUT;
+    }
     target.setPose(new Pose2d(0, 0, new Rotation2d()));
 
 
@@ -130,7 +129,7 @@ public class RobotContainer {
 //            )
 //    );
     autoSelector.addOption("apriltag",
-            drivebaseS.chasePoseC(() -> TAG_FIELD_LAYOUT.getTagPose(2).get().toPose2d().exp(new Twist2d(-1.0, 0.0, 0.0))));
+            drivebaseS.chasePoseC(() -> APRILTAG_LAYOUT.getTagPose(3).get().toPose2d().exp(new Twist2d(-Units.inchesToMeters(20.25), 0.0, 0.0))  ));
   }
 
   /**
@@ -155,9 +154,9 @@ public class RobotContainer {
     // Clamp
     m_secondaryController.a().toggleOnTrue(new StartEndCommand(
       // Extends the clamp
-      () -> m_armSubsystem.extendClamp(),
+            m_armSubsystem::extendClamp,
       // Retracts the clamp
-      () -> m_armSubsystem.retractClamp(),
+            m_armSubsystem::retractClamp,
       // Requires the Arm subsystem
       m_armSubsystem
     ));
@@ -166,36 +165,36 @@ public class RobotContainer {
     //
     // Angle Motor
     m_secondaryController.rightBumper().onFalse(new RunCommand(
-      () -> m_armSubsystem.stopAngle(),
+            m_armSubsystem::stopAngle,
       m_armSubsystem));
 
     m_secondaryController.leftBumper().onFalse(new RunCommand(
-      () -> m_armSubsystem.stopAngle(),
+            m_armSubsystem::stopAngle,
       m_armSubsystem));
 
     m_secondaryController.rightBumper().whileTrue(new RunCommand(
-      () -> m_armSubsystem.angleUp(),
+            m_armSubsystem::angleUp,
       m_armSubsystem));
 
     m_secondaryController.leftBumper().whileTrue(new RunCommand(
-      () -> m_armSubsystem.angleDown(),
+            m_armSubsystem::angleDown,
       m_armSubsystem));
     //
     // Extend Motor
     m_secondaryController.rightTrigger().onFalse(new RunCommand(
-      () -> m_armSubsystem.stopExtend(),
+            m_armSubsystem::stopExtend,
       m_armSubsystem));
     
     m_secondaryController.leftTrigger().onFalse(new RunCommand(
-      () -> m_armSubsystem.stopExtend(),
+            m_armSubsystem::stopExtend,
       m_armSubsystem));
 
     m_secondaryController.rightTrigger().whileTrue(new RunCommand(
-      () -> m_armSubsystem.extendArm(),
+            m_armSubsystem::extendArm,
       m_armSubsystem));
 
     m_secondaryController.leftTrigger().whileTrue(new RunCommand(
-      () -> m_armSubsystem.retractArm(),
+            m_armSubsystem::retractArm,
       m_armSubsystem));
 
     // Elevator go to Position
@@ -224,7 +223,7 @@ public class RobotContainer {
   }
 
   public void periodic() {
-    
+    SmartDashboard.putString("Alliance", ALLIANCE.toString());
     drivebaseS.drawRobotOnField(field);
     field3d.setRobotPose(new Pose3d(drivebaseS.getPose()));
   }
