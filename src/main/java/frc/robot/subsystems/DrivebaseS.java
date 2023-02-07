@@ -7,6 +7,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,6 +21,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI.Port;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -100,6 +102,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
                         getModulePositions(),
                         new Pose2d()
                 );
+        odometry.setVisionMeasurementStdDevs(VecBuilder.fill(0.2, 0.2, 0.2));
         resetPose(new Pose2d());
         limelight = m_limelight;
     }
@@ -108,8 +111,14 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
     public void periodic() {
         // update the odometry every 20ms
         odometry.update(getHeading(), getModulePositions());
-        if (!limelight.getDataAccessedBefore() && limelight.visionTargetsFound()) {
-            //odometry.addVisionMeasurement(limelight.getPosition().toPose2d(), limelight.getLastTimestamp());
+        if (!limelight.getDataAccessedBefore() &&
+                limelight.visionTargetsFound() &&
+                Math.abs(Timer.getFPGATimestamp() - (limelight.getLastTimestamp() / 1000.0)) < 1.0
+        ) {
+            Pose2d limelightPose = limelight.getPosition().toPose2d();
+//            if (limelightPose.minus(odometry.getEstimatedPosition()).getTranslation().getNorm() < 1.0) {
+                odometry.addVisionMeasurement(limelightPose, limelight.getLastTimestamp() / 1000.0);
+//            }
         }
     }
 

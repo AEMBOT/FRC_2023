@@ -4,9 +4,13 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 
+import static frc.robot.Constants.AutoConstants.ALLIANCE;
 import static frc.robot.Constants.VisionConstants.FIELD_LENGTH;
 import static frc.robot.Constants.VisionConstants.FIELD_WIDTH;
 
@@ -155,8 +159,14 @@ public class Limelight extends SubsystemBase{
      */
     private void updatePosition(){
         if(visionTargetsFound()){
+            String ntKey;
+            if (ALLIANCE == DriverStation.Alliance.Red) {
+                ntKey = "botpose_wpired";
+            } else {
+                ntKey = "botpose_wpiblue";
+            }
 
-            double[] rawPosition = limeLight.getEntry("botpose").getDoubleArray(new double[]{0,0,0,0,0,0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
+            double[] rawPosition = limeLight.getEntry(ntKey).getDoubleArray(new double[]{0,0,0,0,0,0}); // Get position (botpose returns a double array, [xpos, ypos, zpos, xrot, yrot, zrot]
             NetworkTableInstance.getDefault().getTable("LimelightTesting").getEntry("rawPose").setValue(rawPosition);
             if(rawPosition.length < 6){
                 double[] newRawPosition = new double[]{0,0,0,0,0,0};
@@ -165,8 +175,6 @@ public class Limelight extends SubsystemBase{
                 }
                 rawPosition = newRawPosition;
             }
-            rawPosition[0] = rawPosition[0] + (FIELD_LENGTH/2);
-            rawPosition[1] = rawPosition[1] + (FIELD_WIDTH/2);
             for (int i = 3; i < rawPosition.length; i++) {
                 rawPosition[i] = Units.degreesToRadians(rawPosition[i]);
             }
@@ -186,8 +194,8 @@ public class Limelight extends SubsystemBase{
             }
 
             tagRelativePosition = new Pose2d(new Translation2d(rawPosition[2], rawPosition[0]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
-            if(lastUpdate != limeLight.getEntry("botpose").getLastChange() - limeLight.getEntry("tl").getDouble(0) - 11){
-                lastUpdate = limeLight.getEntry("botpose").getLastChange() - limeLight.getEntry("tl").getDouble(0) - 11;
+            if(lastUpdate != (limeLight.getEntry(ntKey).getLastChange() / 1000.0) - limeLight.getEntry("tl").getDouble(0) - 11.0){
+                lastUpdate = (limeLight.getEntry(ntKey).getLastChange() / 1000.0) - limeLight.getEntry("tl").getDouble(0) - 11.0;
                 accessedBefore = false;
             }
 
