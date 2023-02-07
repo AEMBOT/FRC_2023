@@ -28,15 +28,25 @@ public class VisionSubsystem extends SubsystemBase{
         double avgRotX = 0;
         double avgRotY = 0;
         double avgRotZ = 0;
+        double num = 0;
         for(Limelight limelight: limelights){
-            Pose3d pose = limelight.getPosition();
-            avgX += pose.getX() / limelights.length;
-            avgY += pose.getY() / limelights.length;
-            avgZ += pose.getZ() / limelights.length;
-            avgRotX += pose.getRotation().getX() / limelights.length;
-            avgRotY += pose.getRotation().getY() / limelights.length;
-            avgRotZ += pose.getRotation().getZ() / limelights.length;
+            if(limelight.visionTargetsFound()){
+                Pose3d pose = limelight.getPosition();
+                avgX += pose.getX() / limelights.length;
+                avgY += pose.getY() / limelights.length;
+                avgZ += pose.getZ() / limelights.length;
+                avgRotX += pose.getRotation().getX() / limelights.length;
+                avgRotY += pose.getRotation().getY() / limelights.length;
+                avgRotZ += pose.getRotation().getZ() / limelights.length;
+                num++;
+            }
         }
+        avgX /= num;
+        avgY /= num;
+        avgZ /= num;
+        avgRotX /= num;
+        avgRotY /= num;
+        avgRotZ /= num;
         return new Pose3d(new Translation3d(avgX, avgY, avgZ), new Rotation3d(avgRotX, avgRotY, avgRotZ));
     }
 }
