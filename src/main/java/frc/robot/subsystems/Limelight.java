@@ -119,7 +119,7 @@ public class Limelight extends SubsystemBase{
         if(getPipeline() != Pipeline.APRILTAG){ // return false if wrong pipeline
             return false;
         }
-        return limeLight.getEntry("tv").getDouble(0) != 0; // Key tv is 1 for a vision target found and 0 for no target
+        return limeLight.getEntry("tv").getDouble(0) > 0.5; // Key tv is 1 for a vision target found and 0 for no target
     }
 
     /**
