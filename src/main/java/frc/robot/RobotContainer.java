@@ -113,7 +113,7 @@ public class RobotContainer {
 
     autoSelector.addOption("twopiece",
             new SequentialCommandGroup(
-                    new InstantCommand(() -> drivebaseS.resetPose(pathPlannerTrajectory.getInitialHolonomicPose())),
+                    //new InstantCommand(() -> drivebaseS.resetPose(pathPlannerTrajectory.getInitialHolonomicPose())),
                     drivebaseS.pathPlannerCommand(pathPlannerTrajectory)
             )
     );
@@ -129,7 +129,11 @@ public class RobotContainer {
 //            )
 //    );
     autoSelector.addOption("apriltag",
-            drivebaseS.chasePoseC(() -> APRILTAG_LAYOUT.getTagPose(3).get().toPose2d().exp(new Twist2d(-Units.inchesToMeters(20.25), 0.0, 0.0))  ));
+            drivebaseS.chasePoseC(
+                    () -> APRILTAG_LAYOUT.getTagPose(3).get().toPose2d().plus(new Transform2d(new Translation2d(2.77, 2.5), new Rotation2d(Math.PI)))
+            )
+    );
+    field.getObject("target").setPose(APRILTAG_LAYOUT.getTagPose(3).get().toPose2d().plus(new Transform2d(new Translation2d(2.77, 2.5), new Rotation2d(Math.PI))));
   }
 
   /**
