@@ -165,8 +165,8 @@ public final class Constants {
         public static final int angleMotorCanID = 15;
         public static final int extendMotorCanID = 14;
         public static final int clampSolenoidID = 0;
-        public static final int movingAverage = 2;
-        public static final int extendMotorCurrentLimit = 25;
+        public static final int movingAverage = 5;
+        public static final int extendMotorCurrentLimit = 35;
         public static final int angleMotorCurrentLimit = 35;
         //Arm stuff below this is untested, needs accuracy
         public static final double angleToSubstation = 3;
