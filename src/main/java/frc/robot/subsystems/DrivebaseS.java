@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -159,10 +160,13 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
         } else {
             // make sure the wheels don't try to spin faster than the maximum speed possible
             states = m_kinematics.toSwerveModuleStates(speeds);
-            NomadMathUtil.normalizeDrive(states, speeds,
+            SwerveDriveKinematics.desaturateWheelSpeeds(
+                    states,
+                    speeds,
+                    DriveConstants.MAX_MODULE_SPEED_FPS,
                     DriveConstants.MAX_FWD_REV_SPEED_MPS,
-                    DriveConstants.MAX_ROTATE_SPEED_RAD_PER_SEC,
-                    DriveConstants.MAX_MODULE_SPEED_FPS);
+                    DriveConstants.MAX_ROTATE_SPEED_RAD_PER_SEC
+            );
         } 
         
         /* 

@@ -6,9 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -17,7 +15,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -29,10 +26,7 @@ import java.util.List;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static Pose2d[] APRILTAG_LOCATIONS = new Pose2d[]{};
     public static double LIMELIGHT_HEIGHT = 0.0; // Height of limelight above ground (in m)
-
-    public static int PNEUMATIC_CLAMP_EXTEND_PORT = 0;
 
     public static final class InputDevices {
 
@@ -48,8 +42,8 @@ public final class Constants {
         static public final double ROBOT_MASS_kg = Units.lbsToKilograms(20.0);
         static public final double ROBOT_MOI_KGM2 = 1.0/12.0 * ROBOT_MASS_kg * Math.pow((WHEEL_BASE_WIDTH_M*1.1),2) * 2; //Model moment of intertia as a square slab slightly bigger than wheelbase with axis through center
         // Drivetrain Performance Mechanical limits
-        static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(19.0);
-        static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(19.0);
+        static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(12.0);
+        static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(12.0);
         static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI * 4;
         static public final double MAX_TRANSLATE_ACCEL_MPS2 = MAX_FWD_REV_SPEED_MPS/0.125; //0-full time of 0.25 second
         static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC / 0.25; //0-full time of 0.25 second
@@ -66,19 +60,6 @@ public final class Constants {
         static private double HW = WHEEL_BASE_WIDTH_M/2.0;
 
         public enum ModuleConstants {
-            /*
-            FL("FL", 9, 2, 12, 2.351588, HW, HW),
-            FR("FR", 3, 4, 10, 2.109219, HW, -HW),
-            BL("BL", 5, 6, 13, 0.971008, -HW, HW),
-            BR("BR", 7, 8, 11, 1.366774 , -HW, -HW);
-            */
-
-            //find a better solution later: changing FL to BL, FR to BR HW values
-//            FL("FL", 9, 2, 12, 2.351588, -HW, HW),
-//            FR("FR", 3, 4, 10, 2.109219, -HW, -HW),
-//            BL("BL", 5, 6, 13, 0.971008, HW, HW),
-//            BR("BR", 7, 8, 11, 1.366774 , HW, -HW);
-
             FL("FL", 9, 2, 12, 2.351588, HW, HW),
             FR("FR", 3, 4, 10, 2.109219, HW, -HW),
             BL("BL", 5, 6, 13, 0.971008, -HW, HW),
@@ -134,8 +115,8 @@ public final class Constants {
         public static final double drivekP = 3;
 
 
-        public static final double MAX_MODULE_SPEED_FPS = 19;
-        public static final double teleopTurnRateDegPerSec = 360; //Rate the robot will spin with full rotation command
+        public static final double MAX_MODULE_SPEED_FPS = Units.feetToMeters(12);
+        public static final double MAX_TELEOP_TURN_RATE = Math.PI * 4; //Rate the robot will spin with full rotation command
 
         public static final int ENC_PULSE_PER_REV = 1;
         public static final double WHEEL_ENC_COUNTS_PER_WHEEL_REV = ENC_PULSE_PER_REV/ WHEEL_REVS_PER_ENC_REV;  //Assume 1-1 gearing for now

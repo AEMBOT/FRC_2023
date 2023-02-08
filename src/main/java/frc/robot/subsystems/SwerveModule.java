@@ -232,10 +232,8 @@ public class SwerveModule extends SubsystemBase implements Loggable {
     public void setDesiredStateClosedLoop(SwerveModuleState desiredState) {
 
         // Save the desired state for reference (Simulation assumes the modules always are at the desired state)
-        
-        desiredState = SwerveModuleState.optimize(desiredState, getCanEncoderAngle());
         desiredState = NomadMathUtil.optimize(desiredState, getCanEncoderAngle(), 90.0);
-        SwerveModuleState previousState = this.desiredState;
+//        SwerveModuleState previousState = this.desiredState;
         this.desiredState = desiredState;
 
         
