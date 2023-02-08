@@ -14,6 +14,12 @@ import static frc.robot.Constants.VisionConstants.*;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
@@ -23,17 +29,31 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.Field3d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.arm.GetHomeCommand;
+import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.DrivebaseS;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.VisionSubsystem;
 import io.github.oblarg.oblog.annotations.Log;
 
 /**
@@ -202,7 +222,7 @@ public class RobotContainer {
       m_armSubsystem));
 
     // Elevator go to Position
-    m_secondaryController.y().whileTrue(m_GoToPosition);
+    m_secondaryController.y().onTrue(m_GoToPosition);
       //Fix this to incorporate different precise angle positions, only has one inaccurate angle at the moment
     m_secondaryController.a().whileTrue(m_AngleToPosition);
     //m_secondaryController.a().WhileTrue(m_AngleToPositionFloor);
@@ -233,9 +253,7 @@ public class RobotContainer {
   }
 
   public void onEnabled() {
-    CommandScheduler.getInstance().schedule(m_GetHomeCommand);
-    m_armSubsystem.stopAngle();
-    m_armSubsystem.stopExtend();
+    CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
   }
 
   public void onInit() {
