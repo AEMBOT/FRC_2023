@@ -19,16 +19,11 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.*;
-import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field3d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
@@ -47,9 +42,7 @@ import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.arm.AngleToPosition;
-import frc.robot.subsystems.*;
 import frc.robot.subsystems.DrivebaseS;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Limelight;
@@ -90,7 +83,6 @@ public class RobotContainer {
   @Log
   private final Field3d field3d = new Field3d();
   private final FieldObject2d target = field.getObject("target");
-  private final AprilTagFieldLayout APRILTAG_LAYOUT;
 
   @Log
   SendableChooser<Command> autoSelector = new SendableChooser<Command>();
@@ -99,12 +91,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    if (ALLIANCE == DriverStation.Alliance.Red) {
-      APRILTAG_LAYOUT = TAG_FIELD_LAYOUT;
-      APRILTAG_LAYOUT.setOrigin(AprilTagFieldLayout.OriginPosition.kRedAllianceWallRightSide);
-    } else {
-      APRILTAG_LAYOUT = TAG_FIELD_LAYOUT;
-    }
     target.setPose(new Pose2d(0, 0, new Rotation2d()));
 
 

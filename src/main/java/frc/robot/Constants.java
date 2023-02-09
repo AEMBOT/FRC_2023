@@ -7,15 +7,15 @@ package frc.robot;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import java.util.List;
+
+import static frc.robot.Constants.AutoConstants.ALLIANCE;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -155,53 +155,129 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static AprilTagFieldLayout TAG_FIELD_LAYOUT = new AprilTagFieldLayout(
-                List.of(
-                        new AprilTag(
-                                1,
-                                new Pose3d(
-                                        15.513558, 1.071626, 0.462788, new Rotation3d(0, 0, Math.PI))
-                        ),
-                        new AprilTag(
-                                2,
-                                new Pose3d(
-                                        15.513558, 2.748026, 0.462788, new Rotation3d(0, 0, Math.PI))
-                        ),
-                        new AprilTag(
-                                3,
-                                new Pose3d(
-                                        15.513558, 4.424426, 0.462788, new Rotation3d(0, 0, Math.PI))
-                        ),
-                        new AprilTag(
-                                4,
-                                new Pose3d(
-                                        16.178784, 6.749796, 0.695452, new Rotation3d(0, 0, Math.PI))
-                        ),
-                        new AprilTag(
-                                5,
-                                new Pose3d(
-                                        0.36195, 6.749796, 0.695452, new Rotation3d(0, 0, 0))
-                        ),
-                        new AprilTag(
-                                6,
-                                new Pose3d(
-                                        1.02743, 4.424426, 0.462788, new Rotation3d(0, 0, 0))
-                        ),
-                        new AprilTag(
-                                7,
-                                new Pose3d(
-                                        1.02743, 2.748026, 0.462788, new Rotation3d(0, 0, 0))
-                        ),
-                        new AprilTag(
-                                8,
-                                new Pose3d(
-                                        1.02743, 1.071626, 0.462788, new Rotation3d(0, 0, 0))
-                        )
-                ),
-                16.54175,
-                8.0137
-        );
+        public static AprilTagFieldLayout getFieldLayout() {
+            AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(
+                    List.of(
+                            new AprilTag(
+                                    1,
+                                    new Pose3d(
+                                            15.513558, 1.071626, 0.462788, new Rotation3d(0, 0, Math.PI))
+                            ),
+                            new AprilTag(
+                                    2,
+                                    new Pose3d(
+                                            15.513558, 2.748026, 0.462788, new Rotation3d(0, 0, Math.PI))
+                            ),
+                            new AprilTag(
+                                    3,
+                                    new Pose3d(
+                                            15.513558, 4.424426, 0.462788, new Rotation3d(0, 0, Math.PI))
+                            ),
+                            new AprilTag(
+                                    4,
+                                    new Pose3d(
+                                            16.178784, 6.749796, 0.695452, new Rotation3d(0, 0, Math.PI))
+                            ),
+                            new AprilTag(
+                                    5,
+                                    new Pose3d(
+                                            0.36195, 6.749796, 0.695452, new Rotation3d(0, 0, 0))
+                            ),
+                            new AprilTag(
+                                    6,
+                                    new Pose3d(
+                                            1.02743, 4.424426, 0.462788, new Rotation3d(0, 0, 0))
+                            ),
+                            new AprilTag(
+                                    7,
+                                    new Pose3d(
+                                            1.02743, 2.748026, 0.462788, new Rotation3d(0, 0, 0))
+                            ),
+                            new AprilTag(
+                                    8,
+                                    new Pose3d(
+                                            1.02743, 1.071626, 0.462788, new Rotation3d(0, 0, 0))
+                            )
+                    ),
+                    16.54175,
+                    8.0137
+            );
+
+            if (ALLIANCE == DriverStation.Alliance.Red) {
+                fieldLayout.setOrigin(AprilTagFieldLayout.OriginPosition.kRedAllianceWallRightSide);
+            }
+            return fieldLayout;
+        }
+        public static AprilTagFieldLayout APRILTAG_LAYOUT = getFieldLayout();
         public static final double FIELD_LENGTH = 16.54175;
         public static final double FIELD_WIDTH = 8.0137;
+
+        public static final Pose2d GRID_OUTER = new Pose2d(
+                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                Units.feetToMeters(6.25 / 2.0),
+                new Rotation2d(0)
+        ).relativeTo(
+                ALLIANCE == DriverStation.Alliance.Red ? new Pose2d(0, FIELD_WIDTH, new Rotation2d(Math.PI)) : new Pose2d()
+        );
+
+        public static final Pose2d GRID_COOP = new Pose2d(
+                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                Units.feetToMeters(6.25) + Units.feetToMeters(5.5 / 2.0),
+                new Rotation2d(0)
+        ).relativeTo(
+                ALLIANCE == DriverStation.Alliance.Red ? new Pose2d(0, FIELD_WIDTH, new Rotation2d(Math.PI)) : new Pose2d()
+        );
+
+        public static final Pose2d GRID_INNER = new Pose2d(
+                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                Units.feetToMeters(6.25) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0),
+                new Rotation2d(0)
+        ).relativeTo(
+                ALLIANCE == DriverStation.Alliance.Red ? new Pose2d(0, FIELD_WIDTH, new Rotation2d(Math.PI)) : new Pose2d()
+        );
+
+        public static final Pose2d CONE_OFFSET_LEFT = new Pose2d(
+                0,
+                Units.feetToMeters(1) + Units.inchesToMeters(6.5),
+                new Rotation2d()
+        );
+
+        public static final Pose2d CONE_OFFSET_RIGHT = new Pose2d(
+                0,
+                -(Units.feetToMeters(1) + Units.inchesToMeters(6.5)),
+                new Rotation2d()
+        );
+
+        public static final Pose2d CHARGE_STATION_CENTER = new Pose2d(
+                Units.feetToMeters(4) + Units.inchesToMeters(8.25) + Units.inchesToMeters(96.75),
+                Units.feetToMeters(6.25) + Units.feetToMeters(5.5 / 2),
+                new Rotation2d(0)
+        ).relativeTo(
+                ALLIANCE == DriverStation.Alliance.Red ? new Pose2d(0, FIELD_WIDTH, new Rotation2d(Math.PI)) : new Pose2d()
+        );
+
+        public static final Pose2d DOUBLE_SUBSTATION =
+                ALLIANCE == DriverStation.Alliance.Red ?
+                        APRILTAG_LAYOUT.getTagPose(5).get().toPose2d() :
+                        APRILTAG_LAYOUT.getTagPose(4).get().toPose2d();
+
+        public static final Pose2d DOUBLE_SUBSTATION_OFFSET_LEFT = new Pose2d(
+                0,
+                Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0),
+                new Rotation2d()
+        );
+
+        public static final Pose2d DOUBLE_SUBSTATION_OFFSET_RIGHT = new Pose2d(
+                0,
+                -(Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0)),
+                new Rotation2d()
+        );
+
+        /** Convenience Pose to be used with Pose2d.plus() **/
+        public static final Pose2d ONE_METER_BACK = new Pose2d(
+                -1,
+                0,
+                new Rotation2d()
+        );
     }
 }
