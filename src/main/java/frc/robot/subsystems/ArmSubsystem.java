@@ -1,16 +1,20 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants;
+import frc.robot.util.sim.SparkMaxEncoderWrapper;
 
 import static frc.robot.Constants.ArmConstants.*;
 
@@ -23,6 +27,8 @@ public class ArmSubsystem extends SubsystemBase {
     
     public RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
+    public DutyCycleEncoder absoluteAngleEncoder = new DutyCycleEncoder(angleEncoderPort);
+    private double rawAngle;
 
     LinearFilter filter = LinearFilter.movingAverage(movingAverage);
 
@@ -39,6 +45,8 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("AngleMotorCurrent", m_angleMotor.getOutputCurrent());
         SmartDashboard.putNumber("ExtendMotorOutput", m_extendMotor.getAppliedOutput());
         SmartDashboard.putNumber("AngleMotorOutput", m_angleMotor.getAppliedOutput());
+        rawAngle = absoluteAngleEncoder.getAbsolutePosition() - angleEncoderOffset;
+        SmartDashboard.putNumber("absoluteAngleEncoder", rawAngle);
     }
 
     public ArmSubsystem() {

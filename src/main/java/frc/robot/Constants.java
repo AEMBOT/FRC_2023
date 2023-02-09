@@ -144,6 +144,8 @@ public final class Constants {
     public static final class ArmConstants {
 
         public static final int angleMotorCanID = 15;
+        public static final int angleEncoderPort = 0;
+        public static final int angleEncoderOffset = 0;
         public static final int extendMotorCanID = 14;
         public static final int clampSolenoidID = 0;
         public static final int movingAverage = 5;
