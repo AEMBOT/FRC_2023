@@ -1,15 +1,20 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants;
+import frc.robot.util.sim.SparkMaxEncoderWrapper;
 
 import static frc.robot.Constants.ArmConstants.*;
 
@@ -20,10 +25,14 @@ public class ArmSubsystem extends SubsystemBase {
     private CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
     private Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, clampSolenoidID);
     
-    RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
-    RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
+    public RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
+    public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
+    public DutyCycleEncoder absoluteAngleEncoder = new DutyCycleEncoder(angleEncoderPort);
+    private double rawAngle;
 
     LinearFilter filter = LinearFilter.movingAverage(movingAverage);
+
+    PIDController pid = new PIDController(1, 0, 0);
 
     @Override
     public void periodic() {
@@ -36,6 +45,8 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("AngleMotorCurrent", m_angleMotor.getOutputCurrent());
         SmartDashboard.putNumber("ExtendMotorOutput", m_extendMotor.getAppliedOutput());
         SmartDashboard.putNumber("AngleMotorOutput", m_angleMotor.getAppliedOutput());
+        rawAngle = absoluteAngleEncoder.getAbsolutePosition() - angleEncoderOffset;
+        SmartDashboard.putNumber("absoluteAngleEncoder", rawAngle);
     }
 
     public ArmSubsystem() {
@@ -63,6 +74,10 @@ public class ArmSubsystem extends SubsystemBase {
         extendEncoder.setPosition(0);
     }
 
+    public void resetAngleEncoder(){
+        angleEncoder.setPosition(0);
+    }
+
     public void stopAngle(){
         m_angleMotor.set(0);
     }
@@ -88,7 +103,6 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void retractArm(){
-        m_extendMotor.set(-0.1);
         m_extendMotor.set(0.5);
     }
 
@@ -97,12 +111,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public boolean isCurrentLimited(){
-        return filter.calculate(m_extendMotor.getOutputCurrent()) >= 25;
-    }
-
-    // Get arm to go to position using the extend and angle motors
-    public boolean goToPosition(){
-        return extendEncoder.getPosition() >= 0.25 && extendEncoder.getPosition() <0.5 && angleEncoder.getPosition() >= 0.25 && angleEncoder.getPosition() <= 0.5;
+        return filter.calculate(m_extendMotor.getOutputCurrent()) >= 35;
     }
 
     // Extends the clamp
