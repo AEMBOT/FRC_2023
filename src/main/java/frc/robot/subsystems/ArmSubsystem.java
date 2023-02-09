@@ -92,6 +92,10 @@ public class ArmSubsystem extends SubsystemBase {
         m_extendMotor.set(0.5);
     }
 
+    public double getExtendPosition(){
+        return extendEncoder.getPosition();
+    }
+
     public boolean isCurrentLimited(){
         return filter.calculate(m_extendMotor.getOutputCurrent()) >= 25;
     }

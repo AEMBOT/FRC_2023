@@ -11,20 +11,17 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class AngleToPosition extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final ArmSubsystem m_elevator;
-  private final double m_targetPos; //Get targetPosition from controller??
+  private final double m_targetAngle;
 
-  //private final double m_angleMotorRotation;
-  //private final double m_angle;
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public AngleToPosition(ArmSubsystem subsystem, /*double angleMotorRotation, double angle, */ double targetPosition) {
+  public AngleToPosition(ArmSubsystem subsystem, double targetAngle) {
     m_elevator = subsystem;
-    m_targetPos = targetPosition;
-    //m_angleMotorRotation = angleMotorRotation;
-    //m_angle = angle;
+    m_targetAngle = targetAngle;
+
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
@@ -32,14 +29,17 @@ public class AngleToPosition extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double currentPos = m_elevator.getAnglePosition();
-    double diff = currentPos - m_targetPos;
-    double sig = Math.signum(diff);
-    if(sig == 1){
+    double currentAngle = m_elevator.getAnglePosition();
+    double sigA = Math.signum(currentAngle-m_targetAngle);
+    
+    if(sigA == 1.0){
       m_elevator.angleDown();
-    } else {
+    } else if (sigA == -1.0){
       m_elevator.angleUp();
+    } else{
+      m_elevator.stopAngle();
     }
+  
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -59,6 +59,7 @@ public class AngleToPosition extends CommandBase {
   
   @Override
   public boolean isFinished() {
-    return Math.abs(m_elevator.getAnglePosition() - m_targetPos) < .05;
+    //no way to check if extend meets target extend?
+    return Math.abs(m_elevator.getAnglePosition() - m_targetAngle) < 5;
   }
 }

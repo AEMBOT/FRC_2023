@@ -200,7 +200,7 @@ public class RobotContainer {
     // Elevator go to Position
     m_secondaryController.y().whileTrue(m_GoToPosition);
       //Fix this to incorporate different precise angle positions, only has one inaccurate angle at the moment
-    m_secondaryController.a().whileTrue(m_AngleToPosition);
+    m_secondaryController.a().onTrue(m_AngleToPosition);
     //m_secondaryController.a().WhileTrue(m_AngleToPositionFloor);
 
     //Docking
