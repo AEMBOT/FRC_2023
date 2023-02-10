@@ -26,26 +26,35 @@ public class AngleToPosition extends CommandBase {
     addRequirements(subsystem);
   }
 
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void initialize() {
+      m_elevator.getAnglePosition();
+    }
+
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
+  public void execute() {
     double currentAngle = m_elevator.getAnglePosition();
-    double sigA = Math.signum(currentAngle-m_targetAngle);
+    //double sigA = Math.signum(currentAngle-m_targetAngle);
     
-    if(sigA == 1.0){
+    if(currentAngle < m_targetAngle){
       m_elevator.angleDown();
-    } else if (sigA == -1.0){
+    } else if(currentAngle > m_targetAngle){
       m_elevator.angleUp();
     } else{
       m_elevator.stopAngle();
     }
-  
-  }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    m_elevator.getAnglePosition();
+
+    /*if(sigA == 1.0){
+      m_elevator.angleUp();
+    } else if (sigA == -1.0){
+      m_elevator.angleDown();
+    } else{
+      m_elevator.stopAngle();
+    }
+   */
   }
 
   // Called once the command ends or is interrupted.
@@ -60,7 +69,7 @@ public class AngleToPosition extends CommandBase {
   @Override
   public boolean isFinished() {
     //no way to check if extend meets target extend?
-    return Math.abs(m_elevator.getAnglePosition() - m_targetAngle) < 5;
+    return Math.abs(m_elevator.getAnglePosition() - m_targetAngle) < .005;
   }
 }
 

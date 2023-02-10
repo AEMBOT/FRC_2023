@@ -91,7 +91,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public double getAnglePosition(){
-        return angleEncoder.getPosition();
+        return absoluteAngleEncoder.getAbsolutePosition();
     }
 
     public void angleDown(){
