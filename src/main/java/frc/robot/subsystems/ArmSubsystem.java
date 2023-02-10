@@ -123,4 +123,10 @@ public class ArmSubsystem extends SubsystemBase {
     public void retractClamp() {
         m_clampSolenoid.set(false);
     }
+
+    // Toggles the clamp
+    public void toggleClamp() {
+        m_clampSolenoid.set(!m_clampSolenoid.get());
+    }
+
 }

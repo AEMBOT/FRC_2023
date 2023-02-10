@@ -162,12 +162,10 @@ public class RobotContainer {
 
     // Secondary Controller
     // Clamp
-    m_secondaryController.a().toggleOnTrue(new StartEndCommand(
-      // Extends the clamp
-            m_armSubsystem::extendClamp,
-      // Retracts the clamp
-            m_armSubsystem::retractClamp,
-      // Requires the Arm subsystem
+    m_secondaryController.a().toggleOnTrue(new InstantCommand(
+      // Toggles the clamp
+        m_armSubsystem::toggleClamp,
+ // Requires the Arm subsystem
       m_armSubsystem
     ));
 
@@ -210,7 +208,7 @@ public class RobotContainer {
     // Elevator go to Position
     m_secondaryController.y().onTrue(m_GoToPosition);
       //Fix this to incorporate different precise angle positions, only has one inaccurate angle at the moment
-    m_secondaryController.a().onTrue(m_AngleToPosition);
+    m_secondaryController.y().onTrue(m_AngleToPosition);
     //m_secondaryController.a().WhileTrue(m_AngleToPositionFloor);
 
     //Docking
