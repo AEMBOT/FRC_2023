@@ -14,18 +14,24 @@ public class GoToPosition extends CommandBase{
 
  @Override
  public void execute() {
+  if (m_armSubsystem.extendEncoder.getPosition() < -40) {
+    m_armSubsystem.retractArm();
+  }
+  else if (m_armSubsystem.extendEncoder.getPosition() > -35) {
     m_armSubsystem.extendArm();
-    m_armSubsystem.angleDown();
+  }
+  else {
+    m_armSubsystem.stopExtend();
+  }
  }
 
  @Override
   public void end(boolean interrupted) {
     m_armSubsystem.stopExtend();
-    m_armSubsystem.stopAngle();
   }
 
   @Override
   public boolean isFinished() {
-    return m_armSubsystem.goToPosition();
+    return m_armSubsystem.extendEncoder.getPosition() >= -40 && m_armSubsystem.extendEncoder.getPosition() <= -35;
   }
 }

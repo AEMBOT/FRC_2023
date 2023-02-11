@@ -94,8 +94,7 @@ public class OperatorControlC extends CommandBase {
         //rot = Math.copySign(rot * rot, rot);
         rot = applyDeadband(rot, JOYSTICK_DEADBAND);
         rot = thetaRateLimiter.calculate(rot);
-        rot *= Units.degreesToRadians(DriveConstants.teleopTurnRateDegPerSec) * 0.2;
-        //rot *= Units.degreesToRadians(DriveConstants.teleopTurnRateDegPerSec);
+        rot *= DriveConstants.MAX_TELEOP_TURN_RATE * 0.2;
         
 
         drive.driveFieldRelative(new ChassisSpeeds(fwdX, fwdY, rot));

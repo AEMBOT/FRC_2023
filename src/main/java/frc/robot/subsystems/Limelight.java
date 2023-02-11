@@ -5,10 +5,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 
 import static frc.robot.Constants.AutoConstants.ALLIANCE;
 import static frc.robot.Constants.VisionConstants.FIELD_LENGTH;
@@ -153,7 +151,13 @@ public class Limelight extends SubsystemBase{
      * @return A Pose2d representing the position of the camera in tag space
      */
     public Pose2d getRelativePose() { return tagRelativePosition; }
-    
+    public int getMainTag(){
+        if(!visionTargetsFound()){
+            return 0;
+        }
+        int tag = (int) limeLight.getEntry("tid").getInteger(0);
+        return tag;
+    }
     /**
      * A function to be called periodically, updates position from limelight
      */

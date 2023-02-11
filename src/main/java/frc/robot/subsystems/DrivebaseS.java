@@ -10,11 +10,13 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -34,10 +36,12 @@ import frc.robot.util.trajectory.PPChasePoseCommand;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
+import javax.sound.sampled.Line;
 import java.util.List;
 import java.util.function.Supplier;
 
 import static frc.robot.Constants.DriveConstants.*;
+import static java.lang.Math.abs;
 
 public class DrivebaseS extends SubsystemBase implements Loggable {
 
@@ -92,6 +96,10 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
             fl, fr, bl, br
     );
 
+    private final LinearFilter visionPoseAverageX = LinearFilter.movingAverage(20);
+    private final LinearFilter visionPoseAverageY = LinearFilter.movingAverage(20);
+    private final LinearFilter visionPoseAverageT = LinearFilter.movingAverage(20);
+
     public DrivebaseS(Limelight m_limelight) {
         navx.reset();
 
@@ -102,7 +110,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
                         getModulePositions(),
                         new Pose2d()
                 );
-        odometry.setVisionMeasurementStdDevs(VecBuilder.fill(0.2, 0.2, 0.2));
+        odometry.setVisionMeasurementStdDevs(VecBuilder.fill(0.4, 0.4, 0.4));
         resetPose(new Pose2d());
         limelight = m_limelight;
     }
@@ -113,12 +121,27 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
         odometry.update(getHeading(), getModulePositions());
         if (!limelight.getDataAccessedBefore() &&
                 limelight.visionTargetsFound() &&
-                Math.abs(Timer.getFPGATimestamp() - (limelight.getLastTimestamp() / 1000.0)) < 1.0
+                abs(Timer.getFPGATimestamp() - (limelight.getLastTimestamp() / 1000.0)) < 1.0
         ) {
             Pose2d limelightPose = limelight.getPosition().toPose2d();
-//            if (limelightPose.minus(odometry.getEstimatedPosition()).getTranslation().getNorm() < 1.0) {
+            if (
+                    abs(limelightPose.getX()) < 0.1 &&
+                    abs(limelightPose.getY()) < 0.1 &&
+                    abs(limelightPose.getRotation().getRadians()) < 0.1
+            ) {
+                return;
+            }
+            double poseAvgX = visionPoseAverageX.calculate(limelightPose.getX());
+            double poseAvgY = visionPoseAverageY.calculate(limelightPose.getY());
+            double poseAvgT = visionPoseAverageT.calculate(limelightPose.getRotation().getRadians());
+            if (
+                    abs(poseAvgX - limelightPose.getX()) < 0.5 &&
+                    abs(poseAvgY - limelightPose.getY()) < 0.5 &&
+                    abs(poseAvgT - limelightPose.getRotation().getRadians()) < 10.0
+                    // limelightPose.minus(odometry.getEstimatedPosition()).getTranslation().getNorm() < 1.0
+            ) {
                 odometry.addVisionMeasurement(limelightPose, limelight.getLastTimestamp() / 1000.0);
-//            }
+            }
         }
     }
 
@@ -130,17 +153,20 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
 
         // If we are stopped (no wheel velocity commanded) then any number of wheel angles could be valid.
         // By default it would point all modules forward when stopped. Here, we override this.
-        if (Math.abs(speeds.vxMetersPerSecond) < 0.01
-                && Math.abs(speeds.vyMetersPerSecond) < 0.01
-                && Math.abs(speeds.omegaRadiansPerSecond) < 0.01) {
+        if (abs(speeds.vxMetersPerSecond) < 0.01
+                && abs(speeds.vyMetersPerSecond) < 0.01
+                && abs(speeds.omegaRadiansPerSecond) < 0.01) {
             states = getStoppedStates();
         } else {
             // make sure the wheels don't try to spin faster than the maximum speed possible
             states = m_kinematics.toSwerveModuleStates(speeds);
-            NomadMathUtil.normalizeDrive(states, speeds,
+            SwerveDriveKinematics.desaturateWheelSpeeds(
+                    states,
+                    speeds,
+                    DriveConstants.MAX_MODULE_SPEED_FPS,
                     DriveConstants.MAX_FWD_REV_SPEED_MPS,
-                    DriveConstants.MAX_ROTATE_SPEED_RAD_PER_SEC,
-                    DriveConstants.MAX_MODULE_SPEED_FPS);
+                    DriveConstants.MAX_ROTATE_SPEED_RAD_PER_SEC
+            );
         } 
         
         /* 
@@ -549,7 +575,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
                 this::drive,
                 (PathPlannerTrajectory traj) -> {
                 }, // empty output for current trajectory.
-                (startPose, endPose) -> DrivebaseS.generateTrajectoryToPose(startPose, endPose, getFieldRelativeLinearSpeedsMPS(), 0.5, 0.05),
+                (startPose, endPose) -> DrivebaseS.generateTrajectoryToPose(startPose, endPose, getFieldRelativeLinearSpeedsMPS(), 1, 0.3),
                 this);
     }
 
