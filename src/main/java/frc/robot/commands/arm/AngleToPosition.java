@@ -36,7 +36,6 @@ public class AngleToPosition extends CommandBase {
   @Override
   public void execute() {
     double currentAngle = m_elevator.getAnglePosition();
-    //double sigA = Math.signum(currentAngle-m_targetAngle);
     
     if(currentAngle < m_targetAngle){
       m_elevator.angleDown();
@@ -45,16 +44,6 @@ public class AngleToPosition extends CommandBase {
     } else{
       m_elevator.stopAngle();
     }
-
-
-    /*if(sigA == 1.0){
-      m_elevator.angleUp();
-    } else if (sigA == -1.0){
-      m_elevator.angleDown();
-    } else{
-      m_elevator.stopAngle();
-    }
-   */
   }
 
   // Called once the command ends or is interrupted.
@@ -68,7 +57,6 @@ public class AngleToPosition extends CommandBase {
   
   @Override
   public boolean isFinished() {
-    //no way to check if extend meets target extend?
     return Math.abs(m_elevator.getAnglePosition() - m_targetAngle) < .005;
   }
 }

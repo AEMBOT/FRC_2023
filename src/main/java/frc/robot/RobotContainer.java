@@ -8,7 +8,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static frc.robot.Constants.AutoConstants.ALLIANCE;
 import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
 import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
-import static frc.robot.Constants.ArmConstants.angleToFloor;
+import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
 import com.pathplanner.lib.PathPlanner;
@@ -38,11 +38,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
+import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.subsystems.DrivebaseS;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Limelight;
@@ -70,9 +70,10 @@ public class RobotContainer {
   private Docking m_docking = new Docking(drivebaseS, m_limelight);
   private DockingForceBalance m_dockingForceBalance = new DockingForceBalance(drivebaseS);
   private GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
-  private GoToPosition m_GoToPosition = new GoToPosition(m_armSubsystem);
-  private AngleToPosition m_AngleToPosition = new AngleToPosition(m_armSubsystem, angleToFloor);
-  //private AngleToPosition m_AngleToPositionFloor = new AngleToPosition(m_armSubsystem, angleToSubstation);
+  private GoToPosition m_GoToPosition = new GoToPosition(m_armSubsystem, extendTest);
+  private GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid);
+  private AngleToPosition m_AngleToPositionDeliver = new AngleToPosition(m_armSubsystem, angleToDelivery);
+  private AngleToPosition m_AngleToPositionFloor = new AngleToPosition(m_armSubsystem, angleToFloor);
 
   // Controllers
   private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
@@ -163,14 +164,13 @@ public class RobotContainer {
     // Secondary Controller
     // Clamp
     m_secondaryController.a().toggleOnTrue(new InstantCommand(
-      // Toggles the clamp
+        // Toggles the clamp
         m_armSubsystem::toggleClamp,
- // Requires the Arm subsystem
+        // Requires the Arm subsystem
       m_armSubsystem
     ));
 
     // Elevator
-    //
     // Angle Motor
     m_secondaryController.rightBumper().onFalse(new RunCommand(
             m_armSubsystem::stopAngle,
@@ -206,11 +206,8 @@ public class RobotContainer {
       m_armSubsystem));
 
     // Elevator go to Position
-    m_secondaryController.y().onTrue(m_GoToPosition);
-      //Fix this to incorporate different precise angle positions, only has one inaccurate angle at the moment
-    m_secondaryController.y().onTrue(m_AngleToPosition);
-    //m_secondaryController.a().WhileTrue(m_AngleToPositionFloor);
-
+    //m_secondaryController.y().onTrue(m_GoToPosition.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
+    m_secondaryController.y().onTrue(m_GoToPositionMid.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
     //Docking
     m_secondaryController.b().whileTrue(m_docking);
 

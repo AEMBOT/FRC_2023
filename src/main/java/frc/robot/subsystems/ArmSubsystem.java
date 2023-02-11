@@ -32,12 +32,11 @@ public class ArmSubsystem extends SubsystemBase {
 
     LinearFilter filter = LinearFilter.movingAverage(movingAverage);
 
-    PIDController pid = new PIDController(1, 0, 0);
+    PIDController pidExtend = new PIDController(582.62, 0, 10.198);
 
     @Override
     public void periodic() {
         //periodic method (called every 1/60th of a second)
-        SmartDashboard.putNumber("angleEncoder", angleEncoder.getPosition());
         SmartDashboard.putNumber("extendEncoder", extendEncoder.getPosition());
         SmartDashboard.putNumber("angleMotor", m_angleMotor.get());
         SmartDashboard.putNumber("extendMotor", m_extendMotor.get());
@@ -47,6 +46,9 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("AngleMotorOutput", m_angleMotor.getAppliedOutput());
         rawAngle = absoluteAngleEncoder.getAbsolutePosition() - angleEncoderOffset;
         SmartDashboard.putNumber("absoluteAngleEncoder", rawAngle);
+
+        m_extendMotor.setVoltage(Math.max(pidExtend.calculate(extendEncoder.getPosition()), 3));
+
     }
 
     public ArmSubsystem() {
@@ -61,21 +63,16 @@ public class ArmSubsystem extends SubsystemBase {
         // Set max current the extend motor can draw
         m_extendMotor.setSmartCurrentLimit(extendMotorCurrentLimit);
         m_angleMotor.setSmartCurrentLimit(angleMotorCurrentLimit);
+
+        extendEncoder.setPositionConversionFactor(Constants.ArmConstants.extendTickToMeter);
     }
 
-    /* 
-    public CommandBase angleToPosition(double targetPosition){
-        //make this later, after testing so encoder values are available
-        //use signum to find sign of difference from target and current position, use that to go up or down to target position
-        // return runEnd(() -> Math.signum(diff) * 0.1, () -> stop motor).until(close to or past position);
-    }
-*/
     public void resetExtendEncoder(){
         extendEncoder.setPosition(0);
     }
 
-    public void resetAngleEncoder(){
-        angleEncoder.setPosition(0);
+    public void setExtendMeter(double positionMeters){
+        pidExtend.setSetpoint(positionMeters);
     }
 
     public void stopAngle(){
@@ -87,7 +84,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void angleUp(){
-        m_angleMotor.set(0.5);
+        m_angleMotor.set(0.7);
     }
 
     public double getAnglePosition(){
@@ -95,7 +92,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void angleDown(){
-        m_angleMotor.set(-0.5);
+        m_angleMotor.set(-0.7);
     }
     
     public void extendArm(){

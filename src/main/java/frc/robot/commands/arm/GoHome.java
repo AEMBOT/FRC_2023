@@ -24,7 +24,6 @@ public class GoHome extends CommandBase{
     m_armSubsystem.stopExtend();
     m_armSubsystem.stopAngle();
     m_armSubsystem.resetExtendEncoder();
-    m_armSubsystem.resetAngleEncoder();
   }
 
   // Returns true when the command should end.
