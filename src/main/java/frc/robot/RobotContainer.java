@@ -52,6 +52,7 @@ public class RobotContainer {
   private final Limelight m_limelight = new Limelight();
   @Log
   private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
+  private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
 
   //Commands
   private Docking m_docking = new Docking(drivebaseS, m_limelight);
