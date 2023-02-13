@@ -47,6 +47,7 @@ import frc.robot.subsystems.DrivebaseS;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 import io.github.oblarg.oblog.annotations.Log;
 
 /**
