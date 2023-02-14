@@ -163,7 +163,7 @@ public final class Constants {
 
         public static final double extendOffset = 2.5;
         public static final double extendToFloor = -0.257175;
-        public static final double extendToMid = -0.3857625;
+        public static final double extendToMid = 0.3857625;
         public static final double extendToHigh = -0.6429375;
         public static final double extendToSubstation = -0.6429375;
 
