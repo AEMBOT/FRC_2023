@@ -29,6 +29,7 @@ public class ArmSubsystem extends SubsystemBase {
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
     public DutyCycleEncoder absoluteAngleEncoder = new DutyCycleEncoder(angleEncoderPort);
     private double rawAngle;
+    private boolean isReady = false; // Activates PID controller, false when zeroing
 
     LinearFilter filter = LinearFilter.movingAverage(movingAverage);
 
@@ -47,8 +48,10 @@ public class ArmSubsystem extends SubsystemBase {
         rawAngle = absoluteAngleEncoder.getAbsolutePosition() - angleEncoderOffset;
         SmartDashboard.putNumber("absoluteAngleEncoder", rawAngle);
 
-        m_extendMotor.setVoltage(Math.max(pidExtend.calculate(extendEncoder.getPosition()), 3));
-        pidExtend.setSetpoint(0);
+        if (isReady) {
+            pidExtend.setSetpoint(0);
+            m_extendMotor.setVoltage(Math.max(pidExtend.calculate(extendEncoder.getPosition()), 3));
+        }
 
     }
 
@@ -127,6 +130,10 @@ public class ArmSubsystem extends SubsystemBase {
     // Toggles the clamp
     public void toggleClamp() {
         m_clampSolenoid.set(!m_clampSolenoid.get());
+    }
+
+    public void setIsReady(boolean ready) {
+        isReady = ready;
     }
 
 }
