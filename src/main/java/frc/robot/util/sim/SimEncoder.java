@@ -1,11 +1,14 @@
 package frc.robot.util.sim;
 
-/** Add your docs here. */
+/**
+ * Add your docs here.
+ */
 public class SimEncoder {
     private double position = 0;
     private double velocity = 0;
 
-    public SimEncoder() {}
+    public SimEncoder() {
+    }
 
     public void setPosition(double position) {
         this.position = position;

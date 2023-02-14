@@ -40,12 +40,12 @@ public final class Constants {
         static public final double WHEEL_BASE_WIDTH_M = Units.inchesToMeters(25);
         static public final double WHEEL_RADIUS_M = 0.0508; //Units.inchesToMeters(4.0/2.0); //four inch (diameter) wheels
         static public final double ROBOT_MASS_kg = Units.lbsToKilograms(20.0);
-        static public final double ROBOT_MOI_KGM2 = 1.0/12.0 * ROBOT_MASS_kg * Math.pow((WHEEL_BASE_WIDTH_M*1.1),2) * 2; //Model moment of intertia as a square slab slightly bigger than wheelbase with axis through center
+        static public final double ROBOT_MOI_KGM2 = 1.0 / 12.0 * ROBOT_MASS_kg * Math.pow((WHEEL_BASE_WIDTH_M * 1.1), 2) * 2; //Model moment of intertia as a square slab slightly bigger than wheelbase with axis through center
         // Drivetrain Performance Mechanical limits
         static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(6);
         static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(6);
         static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI * 4;
-        static public final double MAX_TRANSLATE_ACCEL_MPS2 = MAX_FWD_REV_SPEED_MPS/0.125; //0-full time of 0.25 second
+        static public final double MAX_TRANSLATE_ACCEL_MPS2 = MAX_FWD_REV_SPEED_MPS / 0.125; //0-full time of 0.25 second
         static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC / 0.25; //0-full time of 0.25 second
 
         // HELPER ORGANIZATION CONSTANTS
@@ -57,13 +57,13 @@ public final class Constants {
 
         // Internal objects used to track where the modules are at relative to
         // the center of the robot, and all the implications that spacing has.
-        static private double HW = WHEEL_BASE_WIDTH_M/2.0;
+        static private final double HW = WHEEL_BASE_WIDTH_M / 2.0;
 
         public enum ModuleConstants {
             FL("FL", 9, 2, 12, 2.351588, HW, HW),
             FR("FR", 3, 4, 10, 2.109219, HW, -HW),
             BL("BL", 5, 6, 13, 0.971008, -HW, HW),
-            BR("BR", 7, 8, 11, 1.366774 , -HW, -HW);
+            BR("BR", 7, 8, 11, 1.366774, -HW, -HW);
 
             public final String name;
             public final int driveMotorID;
@@ -75,7 +75,8 @@ public final class Constants {
              */
             public final double magEncoderOffset;
             public final Translation2d centerOffset;
-            private ModuleConstants(String name, int driveMotorID, int rotationMotorID, int magEncoderID, double magEncoderOffset, double xOffset, double yOffset) {
+
+            ModuleConstants(String name, int driveMotorID, int rotationMotorID, int magEncoderID, double magEncoderOffset, double xOffset, double yOffset) {
                 this.name = name;
                 this.driveMotorID = driveMotorID;
                 this.rotationMotorID = rotationMotorID;
@@ -101,7 +102,9 @@ public final class Constants {
         public static final double rotationMotorMaxAccelRadPerSecSq = 1.0;
 
         //kv: (12 volts * 60 s/min * 1/5.14 WRevs/MRevs * wheel rad * 2pi  / (6000 MRPM *
-        /** ks, kv, ka */
+        /**
+         * ks, kv, ka
+         */
         //public static final double[] DRIVE_FF = {0.11452, 1.9844, 0.31123};
         public static final double[] DRIVE_FF = {0.055, 2.6826, 0.1188};
 
@@ -110,7 +113,7 @@ public final class Constants {
         public static final double rotationkP = 3;
         //public static final double rotationkD = 0.05 / 2.5;
         public static final double rotationkD = 0;
-    
+
         //public static final double drivekP = 4.6; // 0.06 w/measurement delay?
         public static final double drivekP = 3;
 
@@ -119,16 +122,16 @@ public final class Constants {
         public static final double MAX_TELEOP_TURN_RATE = Math.PI * 4; //Rate the robot will spin with full rotation command
 
         public static final int ENC_PULSE_PER_REV = 1;
-        public static final double WHEEL_ENC_COUNTS_PER_WHEEL_REV = ENC_PULSE_PER_REV/ WHEEL_REVS_PER_ENC_REV;  //Assume 1-1 gearing for now
+        public static final double WHEEL_ENC_COUNTS_PER_WHEEL_REV = ENC_PULSE_PER_REV / WHEEL_REVS_PER_ENC_REV;  //Assume 1-1 gearing for now
         public static final double AZMTH_ENC_COUNTS_PER_MODULE_REV = ENC_PULSE_PER_REV / AZMTH_REVS_PER_ENC_REV; //Assume 1-1 gearing for now
-        public static final double WHEEL_ENC_WHEEL_REVS_PER_COUNT  = 1.0/((double)(WHEEL_ENC_COUNTS_PER_WHEEL_REV));
-        public static final double AZMTH_ENC_MODULE_REVS_PER_COUNT = 1.0/((double)(AZMTH_ENC_COUNTS_PER_MODULE_REV));
+        public static final double WHEEL_ENC_WHEEL_REVS_PER_COUNT = 1.0 / WHEEL_ENC_COUNTS_PER_WHEEL_REV;
+        public static final double AZMTH_ENC_MODULE_REVS_PER_COUNT = 1.0 / AZMTH_ENC_COUNTS_PER_MODULE_REV;
 
         public static final TrapezoidProfile.Constraints X_DEFAULT_CONSTRAINTS = new TrapezoidProfile.Constraints(2, 2);
         public static final TrapezoidProfile.Constraints Y_DEFAULT_CONSTRAINTS = new TrapezoidProfile.Constraints(2, 2);
 
         public static final TrapezoidProfile.Constraints NO_CONSTRAINTS = new TrapezoidProfile.Constraints(Integer.MAX_VALUE, Integer.MAX_VALUE);
-        public static final TrapezoidProfile.Constraints THETA_DEFAULT_CONSTRAINTS = new TrapezoidProfile.Constraints(4*Math.PI, 16*Math.PI);
+        public static final TrapezoidProfile.Constraints THETA_DEFAULT_CONSTRAINTS = new TrapezoidProfile.Constraints(4 * Math.PI, 16 * Math.PI);
 
 
     }
@@ -215,6 +218,7 @@ public final class Constants {
             }
             return fieldLayout;
         }
+
         public static AprilTagFieldLayout APRILTAG_LAYOUT = getFieldLayout();
         public static final double FIELD_LENGTH = 16.54175;
         public static final double FIELD_WIDTH = 8.0137;
@@ -280,7 +284,9 @@ public final class Constants {
                 new Rotation2d()
         );
 
-        /** Convenience Pose to be used with Pose2d.plus() **/
+        /**
+         * Convenience Pose to be used with Pose2d.plus()
+         **/
         public static final Pose2d ONE_METER_BACK = new Pose2d(
                 -1,
                 0,

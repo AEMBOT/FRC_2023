@@ -13,32 +13,35 @@ import frc.robot.subsystems.Limelight;
 
 import java.util.function.Supplier;
 
-public class AutoScoring extends CommandBase{
+public class AutoScoring extends CommandBase {
     private final DrivebaseS drivetrain;
     private final Limelight limelight;
     private final ArmSubsystem arm;
     private Command moveCommand;
     private Supplier<Pose2d> targetPosition;
-    private boolean atPosition;
+    private final boolean atPosition;
     private boolean finished;
     private ArmCommand armCommand;
     private final TARGET_POSITION_X target_position_x;
     private final TARGET_POSITION_Y target_position_y;
-    public enum TARGET_POSITION_X{
+
+    public enum TARGET_POSITION_X {
         LEFT,
         CENTER,
         RIGHT
     }
-    public enum TARGET_POSITION_Y{
+
+    public enum TARGET_POSITION_Y {
         BOTTOM,
         CENTER,
         TOP
     }
+
     /**
      * Creates a new ExampleCommand.
      *
      * @param drivetrain The drivetrain
-     * @param limelight The limelight to read off of
+     * @param limelight  The limelight to read off of
      */
     public AutoScoring(DrivebaseS drivetrain, Limelight limelight, ArmSubsystem armSubsystem, TARGET_POSITION_X targetX, TARGET_POSITION_Y targetY) {
         this.drivetrain = drivetrain;
@@ -59,25 +62,25 @@ public class AutoScoring extends CommandBase{
     public void initialize() {
         int mainTag = limelight.getMainTag();
         Pose2d tempTarget = new Pose2d();
-        switch(mainTag){
+        switch (mainTag) {
             case 0:
                 // Use Odometry Pose Estimator
                 break;
             case 1:
-                tempTarget = new Pose2d(0,0,new Rotation2d(0));// Hardcoded position for the position of each Apriltag in front of the grid
+                tempTarget = new Pose2d(0, 0, new Rotation2d(0));// Hardcoded position for the position of each Apriltag in front of the grid
                 break;
             default:
                 //Again, Odometry
         }
-        switch (target_position_x){
+        switch (target_position_x) {
             case LEFT:
                 tempTarget.transformBy(new Transform2d(new Translation2d(), new Rotation2d()));
                 break;
             case CENTER:
-                tempTarget.transformBy(new Transform2d(new Translation2d(1,0), new Rotation2d()));
+                tempTarget.transformBy(new Transform2d(new Translation2d(1, 0), new Rotation2d()));
                 break;
             case RIGHT:
-                tempTarget.transformBy(new Transform2d(new Translation2d(2,0), new Rotation2d()));
+                tempTarget.transformBy(new Transform2d(new Translation2d(2, 0), new Rotation2d()));
                 break;
         }
         final Pose2d finalTempTarget = tempTarget;
@@ -95,7 +98,9 @@ public class AutoScoring extends CommandBase{
 
     // Called once the command ends or is interrupted.
     @Override
-    public void end(boolean interrupted) {finished = true;}
+    public void end(boolean interrupted) {
+        finished = true;
+    }
 
     // Returns true when the command should end.
     @Override

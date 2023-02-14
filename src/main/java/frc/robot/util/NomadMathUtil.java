@@ -1,4 +1,5 @@
 package frc.robot.util;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -21,7 +22,7 @@ public class NomadMathUtil {
         return getDirection(head.getTranslation().minus(tail.getTranslation()));
     }
 
-    public static double getDistance(Transform2d transform){
+    public static double getDistance(Transform2d transform) {
         return getDistance(transform.getTranslation());
     }
 
@@ -30,28 +31,28 @@ public class NomadMathUtil {
     }
 
     public static double subtractkS(double voltage, double kS) {
-        if(Math.abs(voltage) <= kS) {
+        if (Math.abs(voltage) <= kS) {
             voltage = 0;
-        }
-        else {
+        } else {
             voltage -= Math.copySign(kS, voltage);
         }
         return voltage;
     }
+
     /**
      * An improved desaturation algorithm that takes into account the desired chassis speeds
      */
     public static void normalizeDrive(SwerveModuleState[] desiredStates, ChassisSpeeds speeds,
-         double kMaxTranslationalVelocity, double kMaxRotationalVelocity, double kModuleMaxSpeedMetersPerSecond) {
+                                      double kMaxTranslationalVelocity, double kMaxRotationalVelocity, double kModuleMaxSpeedMetersPerSecond) {
         // Determine which of translation or rotation is closer to maximum
         double translationalK = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) / kMaxTranslationalVelocity;
         double rotationalK = Math.abs(speeds.omegaRadiansPerSecond) / kMaxRotationalVelocity;
         double k = Math.max(translationalK, rotationalK);
-      
+
         // Find the how fast the fastest spinning drive motor is spinning                                       
         double realMaxSpeed = 0.0;
         for (SwerveModuleState moduleState : desiredStates) {
-          realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speedMetersPerSecond));
+            realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speedMetersPerSecond));
         }
 
         if (realMaxSpeed < k * kModuleMaxSpeedMetersPerSecond) {
@@ -60,9 +61,9 @@ public class NomadMathUtil {
 
         double scale = Math.min(k * kModuleMaxSpeedMetersPerSecond / realMaxSpeed, 1);
         for (SwerveModuleState moduleState : desiredStates) {
-          moduleState.speedMetersPerSecond *= scale;
+            moduleState.speedMetersPerSecond *= scale;
         }
-      }
+    }
 
     public static SwerveModuleState optimize(
             SwerveModuleState desiredState, Rotation2d currentAngle, double flipThreshold

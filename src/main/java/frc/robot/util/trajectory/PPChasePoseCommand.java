@@ -43,7 +43,7 @@ import java.util.function.Supplier;
 public class PPChasePoseCommand extends CommandBase implements Loggable {
     @Log(methodName = "get")
     private final Timer m_timer = new Timer();
-    private Supplier<Pose2d> m_targetPose;
+    private final Supplier<Pose2d> m_targetPose;
     private PathPlannerTrajectory m_trajectory;
     private final Supplier<Pose2d> m_pose;
     private final PPHolonomicDriveController m_controller;
@@ -51,27 +51,28 @@ public class PPChasePoseCommand extends CommandBase implements Loggable {
     private final Consumer<PathPlannerTrajectory> m_outputTrajectory;
     private final BiFunction<Pose2d, Pose2d, PathPlannerTrajectory> m_trajectoryGenerator;
     private Pose2d m_lastRegenTarget;
-    private DrivebaseS m_drive;
+    private final DrivebaseS m_drive;
 
     /**
      * Constructs a command to follow a moving target pose. Uses PathPlanner trajectories when the target is more than 0.2 m away.
-     * @param targetPose A Supplier for the target pose.
-     * @param pose A Supplier for the current pose.
-     * @param driveController The PPHolonomicDriveController to use.
+     *
+     * @param targetPose                       A Supplier for the target pose.
+     * @param pose                             A Supplier for the current pose.
+     * @param driveController                  The PPHolonomicDriveController to use.
      * @param outputChassisSpeedsFieldRelative
      * @param trajectoryDebugOutput
      * @param trajectoryGenerator
      * @param drive
      */
     public PPChasePoseCommand(
-        Supplier<Pose2d> targetPose,
-        Supplier<Pose2d> pose,
-        PPHolonomicDriveController driveController,
-        Consumer<ChassisSpeeds> outputChassisSpeedsFieldRelative,
-        Consumer<PathPlannerTrajectory> trajectoryDebugOutput,
-        BiFunction<Pose2d, Pose2d, PathPlannerTrajectory> trajectoryGenerator,
-        DrivebaseS drive) {
-        
+            Supplier<Pose2d> targetPose,
+            Supplier<Pose2d> pose,
+            PPHolonomicDriveController driveController,
+            Consumer<ChassisSpeeds> outputChassisSpeedsFieldRelative,
+            Consumer<PathPlannerTrajectory> trajectoryDebugOutput,
+            BiFunction<Pose2d, Pose2d, PathPlannerTrajectory> trajectoryGenerator,
+            DrivebaseS drive) {
+
         m_targetPose = targetPose;
         m_pose = pose;
         m_lastRegenTarget = m_targetPose.get();
@@ -82,7 +83,7 @@ public class PPChasePoseCommand extends CommandBase implements Loggable {
         m_outputChassisSpeedsRobotRelative = outputChassisSpeedsFieldRelative;
         m_drive = drive;
         addRequirements(m_drive);
-        }
+    }
 
 
     @Override
@@ -93,7 +94,7 @@ public class PPChasePoseCommand extends CommandBase implements Loggable {
     private void regenTrajectory() {
         m_timer.reset();
         m_timer.start();
-        m_lastRegenTarget  = m_targetPose.get();
+        m_lastRegenTarget = m_targetPose.get();
         m_trajectory = m_trajectoryGenerator.apply(m_pose.get(), m_targetPose.get());
         m_outputTrajectory.accept(m_trajectory);
     }
@@ -102,10 +103,10 @@ public class PPChasePoseCommand extends CommandBase implements Loggable {
     @SuppressWarnings("LocalVariableName")
     public void execute() {
         // If the target's moved more than 0.2 m since the last regen, generate the trajectory again.
-        if(m_targetPose.get().getTranslation().getDistance(m_lastRegenTarget.getTranslation()) > 0.2) {
+        if (m_targetPose.get().getTranslation().getDistance(m_lastRegenTarget.getTranslation()) > 0.2) {
             regenTrajectory();
         }
-        
+
         PathPlannerState desiredState;
         // Make sure the trajectory is not empty
         // Make sure it's still time to be following the trajectory.
@@ -120,9 +121,9 @@ public class PPChasePoseCommand extends CommandBase implements Loggable {
             desiredState.poseMeters = m_targetPose.get();
             desiredState.holonomicAngularVelocityRadPerSec = 0;
         }
-            // By passing in the desired state velocity and, we allow the controller to 
-            var targetChassisSpeeds = m_controller.calculate(m_pose.get(), desiredState);
-            m_outputChassisSpeedsRobotRelative.accept(targetChassisSpeeds);
+        // By passing in the desired state velocity and, we allow the controller to
+        var targetChassisSpeeds = m_controller.calculate(m_pose.get(), desiredState);
+        m_outputChassisSpeedsRobotRelative.accept(targetChassisSpeeds);
     }
 
     @Override

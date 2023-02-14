@@ -36,7 +36,6 @@ import frc.robot.util.trajectory.PPChasePoseCommand;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
-import javax.sound.sampled.Line;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -52,7 +51,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
 
 
     private final AHRS navx = new AHRS(Port.kMXP);
-    private SimGyroSensorModel simNavx = new SimGyroSensorModel();
+    private final SimGyroSensorModel simNavx = new SimGyroSensorModel();
     private final Limelight limelight;
 
     public final PIDController xController = new PIDController(3.0, 0, 0);
@@ -84,13 +83,13 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
             );
 
     @Log
-    private SwerveModule fl = new SwerveModule(ModuleConstants.FL);
+    private final SwerveModule fl = new SwerveModule(ModuleConstants.FL);
     @Log
-    private SwerveModule fr = new SwerveModule(ModuleConstants.FR);
+    private final SwerveModule fr = new SwerveModule(ModuleConstants.FR);
     @Log
-    private SwerveModule bl = new SwerveModule(ModuleConstants.BL);
+    private final SwerveModule bl = new SwerveModule(ModuleConstants.BL);
     @Log
-    private SwerveModule br = new SwerveModule(ModuleConstants.BR);
+    private final SwerveModule br = new SwerveModule(ModuleConstants.BR);
     @Log.Exclude
     private final List<SwerveModule> modules = List.of(
             fl, fr, bl, br
@@ -126,8 +125,8 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
             Pose2d limelightPose = limelight.getPosition().toPose2d();
             if (
                     abs(limelightPose.getX()) < 0.1 &&
-                    abs(limelightPose.getY()) < 0.1 &&
-                    abs(limelightPose.getRotation().getRadians()) < 0.1
+                            abs(limelightPose.getY()) < 0.1 &&
+                            abs(limelightPose.getRotation().getRadians()) < 0.1
             ) {
                 return;
             }
@@ -136,9 +135,9 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
             double poseAvgT = visionPoseAverageT.calculate(limelightPose.getRotation().getRadians());
             if (
                     abs(poseAvgX - limelightPose.getX()) < 0.5 &&
-                    abs(poseAvgY - limelightPose.getY()) < 0.5 &&
-                    abs(poseAvgT - limelightPose.getRotation().getRadians()) < 10.0
-                    // limelightPose.minus(odometry.getEstimatedPosition()).getTranslation().getNorm() < 1.0
+                            abs(poseAvgY - limelightPose.getY()) < 0.5 &&
+                            abs(poseAvgT - limelightPose.getRotation().getRadians()) < 10.0
+                // limelightPose.minus(odometry.getEstimatedPosition()).getTranslation().getNorm() < 1.0
             ) {
                 odometry.addVisionMeasurement(limelightPose, limelight.getLastTimestamp() / 1000.0);
             }

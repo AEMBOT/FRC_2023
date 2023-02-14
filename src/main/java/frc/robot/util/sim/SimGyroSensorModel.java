@@ -6,14 +6,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 
-public class SimGyroSensorModel{
+public class SimGyroSensorModel {
 
     SimDeviceSim gyroSim;
     SimDouble rateSimDouble;
     SimDouble yawSimDouble;
     double gyroPosReading_deg;
 
-    public SimGyroSensorModel(){
+    public SimGyroSensorModel() {
         if (RobotBase.isSimulation()) {
             gyroSim = new SimDeviceSim("navX-Sensor[0]");
             rateSimDouble = gyroSim.getDouble("Rate");
@@ -21,7 +21,7 @@ public class SimGyroSensorModel{
         }
     }
 
-    public void resetToPose(Pose2d resetPose){
+    public void resetToPose(Pose2d resetPose) {
         if (RobotBase.isSimulation()) {
             yawSimDouble.set(resetPose.getRotation().getDegrees() * -1.0);
         }

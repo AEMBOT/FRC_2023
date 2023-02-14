@@ -2,7 +2,6 @@ package frc.robot.commands.drivetrain;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
@@ -23,7 +22,7 @@ public class OperatorControlC extends CommandBase {
 
     /**
      * Joysticks return DoubleSuppliers when the get methods are called
-     * This is so that joystick getter methods can be passed in as a parameter but will continuously update, 
+     * This is so that joystick getter methods can be passed in as a parameter but will continuously update,
      * versus using a double which would only update when the constructor is called
      */
     private final DoubleSupplier forwardX;
@@ -38,10 +37,10 @@ public class OperatorControlC extends CommandBase {
     private final double JOYSTICK_DEADBAND = 0.07;
 
     public OperatorControlC(
-        DoubleSupplier fwdX, 
-        DoubleSupplier fwdY, 
-        DoubleSupplier rot,
-        DrivebaseS subsystem
+            DoubleSupplier fwdX,
+            DoubleSupplier fwdY,
+            DoubleSupplier rot,
+            DrivebaseS subsystem
     ) {
 
         drive = subsystem;
@@ -59,7 +58,7 @@ public class OperatorControlC extends CommandBase {
         yRateLimiter.reset(0);
         thetaRateLimiter.reset(0);
     }
-    
+
     @Override
     public void execute() {
         /**
@@ -87,15 +86,15 @@ public class OperatorControlC extends CommandBase {
         //PROGRAMMING MODE
         fwdX = driveMagnitude * Math.cos(driveDirectionRadians) * 0.2;
         fwdY = driveMagnitude * Math.sin(driveDirectionRadians) * 0.2;
-      
+
 
         double rot = -rotation.getAsDouble();
-        
+
         //rot = Math.copySign(rot * rot, rot);
         rot = applyDeadband(rot, JOYSTICK_DEADBAND);
         rot = thetaRateLimiter.calculate(rot);
         rot *= DriveConstants.MAX_TELEOP_TURN_RATE * 0.2;
-        
+
 
         drive.driveFieldRelative(new ChassisSpeeds(fwdX, fwdY, rot));
 //        drive.drive(new ChassisSpeeds(fwdX, fwdY, rot));
