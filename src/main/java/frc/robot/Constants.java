@@ -154,6 +154,11 @@ public final class Constants {
         //Arm stuff below this is untested, needs accuracy
         public static final double angleToSubstation = 3;
         public static final double angleToFloor = 2;
+
+        // Arm Constants that need measuring
+        public static final double pivotPointHeight = 0; // Height of pivot point of arm above point where belt separates from belt wheel
+        public static final double pivotPointDistance = 0; // Distance of pivot point of arm behind point where belt separates from belt wheel
+        public static final double pivotRadius = 0; // Distance from belt connection to pivot point of arm
     }
 
     public static final class VisionConstants {

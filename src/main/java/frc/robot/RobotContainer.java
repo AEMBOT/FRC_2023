@@ -47,6 +47,7 @@ import frc.robot.subsystems.DrivebaseS;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 import io.github.oblarg.oblog.annotations.Log;
 
 /**
@@ -65,6 +66,7 @@ public class RobotContainer {
   private final Limelight m_limelight = new Limelight();
   @Log
   private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
+  private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
 
   //Commands
   private Docking m_docking = new Docking(drivebaseS, m_limelight);
