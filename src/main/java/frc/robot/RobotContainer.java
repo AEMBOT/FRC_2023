@@ -212,6 +212,12 @@ public class RobotContainer {
       //Fix this to incorporate different precise angle positions, only has one inaccurate angle at the moment
     m_secondaryController.a().whileTrue(m_AngleToPosition);
     //m_secondaryController.a().WhileTrue(m_AngleToPositionFloor);
+/* 
+    m_secondaryController.a().onTrue(
+        new SequentialCommandGroup(
+                new InstantCommand(drivebaseS.generateTrajectoryToPose(, CHARGE_STATION_CENTER, null)),
+                new Docking(drivebaseS, m_limelight))
+    );*/
 
     //Docking
     m_secondaryController.b().whileTrue(m_docking);

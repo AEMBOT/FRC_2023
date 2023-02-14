@@ -10,6 +10,7 @@ import frc.robot.subsystems.DrivebaseS;
 import frc.robot.subsystems.Limelight;
 import io.github.oblarg.oblog.Loggable;
 import edu.wpi.first.hal.util.HalHandleException;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -135,6 +136,7 @@ public class Docking extends CommandBase implements Loggable{
         double prevTiltValue = tilt(navx.getRoll(), navx.getPitch());
 
         double AngularY = navx.getRawGyroY();
+        double kv  = navx.getVelocityY();
         
         //if (AngularY > 10)
         if (AngularY < -8){
@@ -142,7 +144,20 @@ public class Docking extends CommandBase implements Loggable{
             stop = true;
         }
         else{
-            m_drivebase.drive(new ChassisSpeeds(-0.4,0,0));
+            m_drivebase.drive(new ChassisSpeeds(0.4,0,0));
+        }
+        if (AngularY > 10){
+            //derivative + feedback control angle
+            m_drivebase.drive(new ChassisSpeeds(0,0,0));
+            stop = true;
+        }
+        else{           
+            SimpleMotorFeedforward angleFeedForward = new SimpleMotorFeedforward(0.5,1,0.6);
+            double deltaDrive = angleFeedForward.calculate(kv, AngularY);
+            if (Math.abs(deltaDrive) > 0.3){
+                deltaDrive = 0.3;
+            }
+            m_drivebase.drive(new ChassisSpeeds(-deltaDrive,0,0));
         }
         if (stop){
             m_drivebase.drive(new ChassisSpeeds(0.0,0,0));
