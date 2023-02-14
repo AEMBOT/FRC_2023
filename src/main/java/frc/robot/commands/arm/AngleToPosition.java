@@ -4,8 +4,12 @@
 
 package frc.robot.commands.arm;
 
+import java.lang.Character.Subset;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.MiscellaneousFunctions;
 
 /**
  * An example command that uses an example subsystem.
@@ -31,7 +35,22 @@ public class AngleToPosition extends CommandBase {
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
     }
+        PIDController pidController = new PIDController(0.2, 0.5, 0.5);
 
+    public double MathMovementAngleToDist(double radians){
+        //1:15 gear ratio
+        //rev neo
+        m_elevator.angleEncoder.setPositionConversionFactor(radians);
+        pidController.setSetpoint(MiscellaneousFunctions.ArmAngleToDistance(radians));
+        return pidController.calculate(/*measurement goes here*/ m_elevator.angleEncoder.getPosition());
+    }
+
+    public double MathMovementDistToangle(double radians){
+        double distance = radians * 2 * Math.PI;
+        m_elevator.angleEncoder.setPositionConversionFactor(distance);
+        pidController.setSetpoint(MiscellaneousFunctions.DistanceToArmAngle(distance));
+        return pidController.calculate(m_elevator.angleEncoder.getPosition());
+    }
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {

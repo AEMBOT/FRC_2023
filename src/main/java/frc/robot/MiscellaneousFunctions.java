@@ -20,6 +20,7 @@ public class MiscellaneousFunctions {
         double c = Math.sqrt(-Math.pow(pivotPointDistance,2) * Math.pow(Math.sin(radians), 2) + 2 * pivotPointDistance * pivotPointHeight
         * Math.sin(radians) * Math.cos(radians) - Math.pow(pivotPointHeight,2) * Math.pow(Math.cos(radians),2) + Math.pow(pivotRadius,2));
         return a + b + c;
-        
     }
+
+    
 }
