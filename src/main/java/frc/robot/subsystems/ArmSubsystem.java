@@ -33,7 +33,9 @@ public class ArmSubsystem extends SubsystemBase {
 
     LinearFilter filter = LinearFilter.movingAverage(movingAverage);
 
-    PIDController pidExtend = new PIDController(582.62, 0, 10.198);
+    //PIDController pidExtend = new PIDController(582.62, 0, 10.198);
+    PIDController pidExtend = new PIDController(1, 0, 0);
+
 
     @Override
     public void periodic() {
@@ -49,8 +51,7 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("absoluteAngleEncoder", rawAngle);
 
         if (isReady) {
-            pidExtend.setSetpoint(0);
-            m_extendMotor.setVoltage(Math.max(pidExtend.calculate(extendEncoder.getPosition()), 3));
+            m_extendMotor.setVoltage(Math.max(pidExtend.calculate(extendEncoder.getPosition()), 1));
         }
 
     }
@@ -71,6 +72,8 @@ public class ArmSubsystem extends SubsystemBase {
         m_extendMotor.setInverted(true);
 
         extendEncoder.setPositionConversionFactor(extendTickToMeter);
+
+        pidExtend.setSetpoint(0);
     }
 
     public void resetExtendEncoder(){

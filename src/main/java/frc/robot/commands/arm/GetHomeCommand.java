@@ -11,6 +11,12 @@ public class GetHomeCommand extends CommandBase{
         m_armSubsystem = armSubsystem;
     }
     
+
+  @Override
+  public void initialize() {
+    m_armSubsystem.setIsReady(false);
+  }
+
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
