@@ -223,29 +223,44 @@ public final class Constants {
         public static final double FIELD_LENGTH = 16.54175;
         public static final double FIELD_WIDTH = 8.0137;
 
-        public static final Pose2d GRID_OUTER = new Pose2d(
-                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
-                Units.feetToMeters(6.25 / 2.0),
-                new Rotation2d(0)
-        ).relativeTo(
-                ALLIANCE == DriverStation.Alliance.Red ? new Pose2d(0, FIELD_WIDTH, new Rotation2d(Math.PI)) : new Pose2d()
-        );
+        public static final Pose2d GRID_OUTER =
+                ALLIANCE == DriverStation.Alliance.Red ?
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                FIELD_WIDTH - Units.feetToMeters(6.25 / 2.0),
+                                new Rotation2d(Math.PI)
+                        ) :
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                Units.feetToMeters(6.25 / 2.0),
+                                new Rotation2d(Math.PI)
+                        );
 
-        public static final Pose2d GRID_COOP = new Pose2d(
-                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
-                Units.feetToMeters(6.25) + Units.feetToMeters(5.5 / 2.0),
-                new Rotation2d(0)
-        ).relativeTo(
-                ALLIANCE == DriverStation.Alliance.Red ? new Pose2d(0, FIELD_WIDTH, new Rotation2d(Math.PI)) : new Pose2d()
-        );
+        public static final Pose2d GRID_COOP =
+                ALLIANCE == DriverStation.Alliance.Red ?
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                FIELD_WIDTH - (Units.feetToMeters(6.25 / 2.0) + Units.feetToMeters(5.5 / 2.0)),
+                                new Rotation2d(Math.PI)
+                        ) :
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                Units.feetToMeters(6.25 / 2.0) + Units.feetToMeters(5.5 / 2.0),
+                                new Rotation2d(Math.PI)
+                        );
 
-        public static final Pose2d GRID_INNER = new Pose2d(
-                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
-                Units.feetToMeters(6.25) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0),
-                new Rotation2d(0)
-        ).relativeTo(
-                ALLIANCE == DriverStation.Alliance.Red ? new Pose2d(0, FIELD_WIDTH, new Rotation2d(Math.PI)) : new Pose2d()
-        );
+        public static final Pose2d GRID_INNER =
+                ALLIANCE == DriverStation.Alliance.Red ?
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                FIELD_WIDTH - (Units.feetToMeters(6.25 / 2.0) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0)),
+                                new Rotation2d(Math.PI)
+                        ) :
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                Units.feetToMeters(6.25 / 2.0) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0),
+                                new Rotation2d(Math.PI)
+                        );
 
         public static final Pose2d CONE_OFFSET_LEFT = new Pose2d(
                 0,
@@ -259,13 +274,18 @@ public final class Constants {
                 new Rotation2d()
         );
 
-        public static final Pose2d CHARGE_STATION_CENTER = new Pose2d(
-                Units.feetToMeters(4) + Units.inchesToMeters(8.25) + Units.inchesToMeters(96.75),
-                Units.feetToMeters(6.25) + Units.feetToMeters(5.5 / 2),
-                new Rotation2d(0)
-        ).relativeTo(
-                ALLIANCE == DriverStation.Alliance.Red ? new Pose2d(0, FIELD_WIDTH, new Rotation2d(Math.PI)) : new Pose2d()
-        );
+        public static final Pose2d CHARGE_STATION_CENTER =
+                ALLIANCE == DriverStation.Alliance.Red ?
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25) + Units.inchesToMeters(96.75),
+                                Units.feetToMeters(6.25) + Units.feetToMeters(5.5 / 2),
+                                new Rotation2d(0)
+                        ) :
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25) + Units.inchesToMeters(96.75),
+                                FIELD_WIDTH - (Units.feetToMeters(6.25) + Units.feetToMeters(5.5 / 2)),
+                                new Rotation2d(Math.PI)
+                        );
 
         public static final Pose2d DOUBLE_SUBSTATION =
                 ALLIANCE == DriverStation.Alliance.Red ?
