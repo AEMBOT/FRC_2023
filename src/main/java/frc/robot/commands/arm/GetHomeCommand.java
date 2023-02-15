@@ -14,7 +14,7 @@ public class GetHomeCommand extends CommandBase{
 
   @Override
   public void initialize() {
-    m_armSubsystem.setIsReady(false);
+    m_armSubsystem.setExtendPIDState(false);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -28,7 +28,7 @@ public class GetHomeCommand extends CommandBase{
   public void end(boolean interrupted) {
     m_armSubsystem.stopExtend();
     m_armSubsystem.resetExtendEncoder();
-    m_armSubsystem.setIsReady(true);
+    m_armSubsystem.setExtendPIDState(true);
   }
 
   // Returns true when the command should end.

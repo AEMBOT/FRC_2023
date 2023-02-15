@@ -1,11 +1,9 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
-import com.revrobotics.SparkMaxAbsoluteEncoder;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -13,8 +11,6 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.PIDController;
-import frc.robot.Constants;
-import frc.robot.util.sim.SparkMaxEncoderWrapper;
 
 import static frc.robot.Constants.ArmConstants.*;
 
@@ -29,12 +25,12 @@ public class ArmSubsystem extends SubsystemBase {
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
     public DutyCycleEncoder absoluteAngleEncoder = new DutyCycleEncoder(angleEncoderPort);
     private double rawAngle;
-    private boolean isReady = false; // Activates PID controller, false when zeroing
+    private boolean activateExtendPID = false; // Activates PID controller, false when zeroing
 
     LinearFilter filter = LinearFilter.movingAverage(movingAverage);
 
-    //PIDController pidExtend = new PIDController(582.62, 0, 10.198);
-    PIDController pidExtend = new PIDController(1, 0, 0);
+    PIDController pidExtend = new PIDController(582.62, 0, 10.198);
+//    PIDController pidExtend = new PIDController(1, 0, 0);
 
 
     @Override
@@ -49,9 +45,11 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("AngleMotorOutput", m_angleMotor.getAppliedOutput());
         rawAngle = absoluteAngleEncoder.getAbsolutePosition() - angleEncoderOffset;
         SmartDashboard.putNumber("absoluteAngleEncoder", rawAngle);
+        SmartDashboard.putNumber("ExtendMotorEncoder", extendEncoder.getPosition());
+        SmartDashboard.putNumber("AngleMotorEncoder", angleEncoder.getPosition());
 
-        if (isReady) {
-            m_extendMotor.setVoltage(Math.max(pidExtend.calculate(extendEncoder.getPosition()), 1));
+        if (activateExtendPID) {
+            m_extendMotor.setVoltage(Math.min(pidExtend.calculate(extendEncoder.getPosition()), 1));
         }
 
     }
@@ -60,7 +58,7 @@ public class ArmSubsystem extends SubsystemBase {
         // Restore motors to factory defaults for settings to be consistent
         m_angleMotor.restoreFactoryDefaults();
         m_extendMotor.restoreFactoryDefaults();
-        
+
         // Lift shouldn't drift, so set it to brake mode
         m_extendMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
         m_angleMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -135,8 +133,8 @@ public class ArmSubsystem extends SubsystemBase {
         m_clampSolenoid.set(!m_clampSolenoid.get());
     }
 
-    public void setIsReady(boolean ready) {
-        isReady = ready;
+    public void setExtendPIDState(boolean ready) {
+        activateExtendPID = ready;
     }
 
 }
