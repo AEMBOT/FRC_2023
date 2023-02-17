@@ -156,7 +156,7 @@ public final class Constants {
         public static final int angleMotorCurrentLimit = 35;
         //Arm stuff below this is untested, needs accuracy
         public static final double angleToSubstation = 3;
-        public static final double angleToFloor = 2;
+        public static final double angleToFloor = .36;
 
         // Arm Constants that need measuring
         public static final double pivotPointHeight = 0; // Height of pivot point of arm above point where belt separates from belt wheel

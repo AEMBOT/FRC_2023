@@ -111,7 +111,7 @@ public class Docking extends CommandBase implements Loggable {
         //Translation2d robotLimelightdist = m_drivebase.getPose().getTranslation()
         //.minus(VisionConstants.TAG_FIELD_LAYOUT.getTagPose(2).get().toPose2d().getTranslation());
         Pose3d robotLimelightdist = m_limelight.getPosition();
-        double robotLimelightX = robotLimelightdist.getX();
+        double robotLimelightX = m_drivebase.getPose().getX();
         SmartDashboard.putNumber("AbiralLook", robotLimelightX);
         double robotLimelighytY = robotLimelightdist.getY();
         double robotLLDist = Math.sqrt(Math.pow(robotLimelightX, 2) + Math.pow(robotLimelighytY, 2));
@@ -123,25 +123,28 @@ public class Docking extends CommandBase implements Loggable {
 
         double AngularY = navx.getRawGyroY();
         double kv = navx.getVelocityY();
-
+        
         //if (AngularY > 10)
-        if (AngularY < -8) {
+        //greater than 4.5 at start, go front
+        //less than 3.5 at start, go backwards (depending on rotation)
+        //if within 3.8, stop
+        if (AngularY < -8 && robotLimelightX > 12.5) {
             m_drivebase.drive(new ChassisSpeeds(0, 0, 0));
             stop = true;
-        } else {
-            m_drivebase.drive(new ChassisSpeeds(0.4, 0, 0));
+        } else if(robotLimelightX > 13){
+            m_drivebase.drive(new ChassisSpeeds(-0.3, 0, 0));
         }
-        if (AngularY > 10) {
+        else if (AngularY > 10 && robotLimelightX < 13) {
             //derivative + feedback control angle
             m_drivebase.drive(new ChassisSpeeds(0, 0, 0));
             stop = true;
-        } else {
+        } else if (robotLimelightX < 13){
             SimpleMotorFeedforward angleFeedForward = new SimpleMotorFeedforward(0.5, 1, 0.6);
             double deltaDrive = angleFeedForward.calculate(kv, AngularY);
             if (Math.abs(deltaDrive) > 0.3) {
                 deltaDrive = 0.3;
             }
-            m_drivebase.drive(new ChassisSpeeds(-deltaDrive, 0, 0));
+            m_drivebase.drive(new ChassisSpeeds(deltaDrive, 0, 0));
         }
         if (stop) {
             m_drivebase.drive(new ChassisSpeeds(0.0, 0, 0));

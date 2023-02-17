@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.server.PathPlannerServer;
+
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.SPI.Port;
@@ -14,7 +16,9 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.docking.Docking;
+import frc.robot.subsystems.DrivebaseS;
 import frc.robot.subsystems.Limelight;
 import io.github.oblarg.oblog.Logger;
 
@@ -29,6 +33,7 @@ public class Robot extends TimedRobot {
 
     private RobotContainer m_robotContainer;
     private Limelight m_Limelight;
+    private DrivebaseS m_drivebase;
     AHRS navx = new AHRS(Port.kMXP);
 
     /**
@@ -129,6 +134,8 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Yaw", navx.getYaw());
         SmartDashboard.putNumber("Tilt", Docking.tilt(navx.getRoll(), navx.getPitch()));
         SmartDashboard.putNumber("RawGyroY", navx.getRawGyroY());
+        SmartDashboard.putNumber("VelocityY ", navx.getVelocityY());
+    
     }
 
 

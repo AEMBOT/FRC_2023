@@ -100,5 +100,6 @@ public class OperatorControlC extends CommandBase {
 //        drive.drive(new ChassisSpeeds(fwdX, fwdY, rot));
 
         SmartDashboard.putNumber("GetPose", drive.getPose().getX());
+
     }
 }

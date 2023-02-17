@@ -140,7 +140,7 @@ public class Limelight extends SubsystemBase {
      *
      * @return A list of GamePiece objects, each representing a unique game piece. Returns an empty list if using the wrong pipeline
      */
-    private GamePiece[] getGamePiecePositions() {
+    public GamePiece[] getGamePiecePositions() {
         if (getPipeline() != Pipeline.GAMEPIECE) {
             return new GamePiece[]{}; // return empty if not detecting game pieces
         }
