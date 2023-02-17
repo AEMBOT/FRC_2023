@@ -70,11 +70,9 @@ public class RobotContainer {
   private Docking m_docking = new Docking(drivebaseS, m_limelight);
   private DockingForceBalance m_dockingForceBalance = new DockingForceBalance(drivebaseS);
   private GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
-  private GoToPosition m_GoToPosition = new GoToPosition(m_armSubsystem, extendTest);
-  private GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid);
-  private AngleToPosition m_AngleToPositionDeliver = new AngleToPosition(m_armSubsystem, angleToDelivery);
-  private AngleToPosition m_AngleToPositionFloor = new AngleToPosition(m_armSubsystem, angleToFloor);
-
+  //private GoToPosition m_GoToPosition = new GoToPosition(m_armSubsystem, extendTest);
+  private GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid, angleToDelivery);
+  
   // Controllers
   private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
   private final CommandXboxController m_secondaryController = new CommandXboxController(SECONDARY_CONTROLLER_PORT);
@@ -207,7 +205,7 @@ public class RobotContainer {
 
     // Elevator go to Position
     //m_secondaryController.y().onTrue(m_GoToPosition.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
-    m_secondaryController.y().onTrue(m_GoToPositionMid.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
+    m_secondaryController.y().onTrue(m_GoToPositionMid.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
     //Docking
     m_secondaryController.b().whileTrue(m_docking);
 

@@ -60,7 +60,7 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("relativeAngleEncoderPosition", relativeAngleEncoder.getDistance());
         SmartDashboard.putNumber("relativeAngleEncoderVelocity", relativeAngleEncoder.getRate());
 
-        if (activateExtendPID && false) {
+        if (activateExtendPID) {
             m_extendMotor.setVoltage(Math.min(pidExtend.calculate(extendEncoder.getPosition()), 1));
         }
 
@@ -88,6 +88,7 @@ public class ArmSubsystem extends SubsystemBase {
         m_angleMotor.setSmartCurrentLimit(angleMotorCurrentLimit);
 
         m_extendMotor.setInverted(true);
+        m_angleMotor.setInverted(true);
 
         extendEncoder.setPositionConversionFactor(extendTickToMeter);
         absoluteAngleEncoder.setPositionOffset(0.346);
