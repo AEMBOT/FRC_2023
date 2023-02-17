@@ -28,7 +28,6 @@ public class GetHomeCommand extends CommandBase{
   public void end(boolean interrupted) {
     m_armSubsystem.stopExtend();
     m_armSubsystem.resetExtendEncoder();
-    m_armSubsystem.setExtendPIDState(true);
   }
 
   // Returns true when the command should end.

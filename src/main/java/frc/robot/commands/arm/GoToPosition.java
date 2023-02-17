@@ -16,6 +16,7 @@ public class GoToPosition extends CommandBase{
 
 @Override
 public void initialize(){
+  m_armSubsystem.setExtendPIDState(true);
   m_armSubsystem.setExtendMeter(m_targetExtend);
 }
 
@@ -45,6 +46,7 @@ public void initialize(){
  @Override
   public void end(boolean interrupted) {
     m_armSubsystem.stopExtend();
+    m_armSubsystem.setExtendPIDState(false);
   }
 
   @Override
