@@ -153,19 +153,18 @@ public final class Constants {
         public static final int angleMotorCurrentLimit = 35;
 
         //Angle and Extend arm Constants
-        public static final double angleToDelivery = .24;
-        public static final double angleToFloor = .36;
-        public static final double extendTest = -40;
+        public static final double angleToDelivery = -.24;
+        public static final double angleToFloor = -.36;
         //All of these need testing...
         //meter value * tick conversion
 
         public static final double extendTickToMeter = 0.01285875;
 
         public static final double extendOffset = 2.5;
-        public static final double extendToFloor = -0.257175;
+        public static final double extendToFloor = 0.257175;
         public static final double extendToMid = 0.3857625;
-        public static final double extendToHigh = -0.6429375;
-        public static final double extendToSubstation = -0.6429375;
+        public static final double extendToHigh = 0.6429375;
+        public static final double extendToSubstation = 0.6429375;
 
     }
 
