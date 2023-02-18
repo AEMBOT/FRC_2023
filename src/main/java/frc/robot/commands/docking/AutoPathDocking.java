@@ -93,13 +93,13 @@ public class AutoPathDocking extends CommandBase implements Loggable {
             return 0.2;
         }*/
        
-        else if (velAvg > 6 || velAvg < -7){
+        else if (velAvg > 6 || velAvg < -6){
                 //m_drivebase.drive(new ChassisSpeeds(0,0,0));
             return 0;
         }
         else{
                 //m_drivebase.drive(new ChassisSpeeds(0.3,0,0));
-            return 0.25;
+            return 0.2;
         }
     }
 
