@@ -195,7 +195,7 @@ public class RobotContainer {
         //m_secondaryController.y().onTrue(m_GoToPosition.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
         m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
         //Docking
-        m_secondaryController.b().whileTrue(m_docking);
+        m_secondaryController.b().onTrue(m_newDocking);
 
         m_primaryController.a().whileTrue(m_dockingForceBalance);
 
