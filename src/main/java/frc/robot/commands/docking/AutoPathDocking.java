@@ -84,20 +84,22 @@ public class AutoPathDocking extends CommandBase implements Loggable {
         if (poseBegin > 0){
             greater = true;
         }
-        if (poseBegin > poseAvg && greater){
+        if (poseBegin > poseAvg){
                 //m_drivebase.drive(new ChassisSpeeds(0.2,0,0));
                 return 0.2;
         }
+        /* 
         if (poseBegin < poseAvg && !greater){
             return 0.2;
-        }
-        else if (velAvg > 0){
+        }*/
+       
+        else if (velAvg > 6 || velAvg < -6){
                 //m_drivebase.drive(new ChassisSpeeds(0,0,0));
             return 0;
         }
         else{
                 //m_drivebase.drive(new ChassisSpeeds(0.3,0,0));
-            return 0.3;
+            return 0.2;
         }
     }
 
@@ -111,10 +113,10 @@ public class AutoPathDocking extends CommandBase implements Loggable {
         //14
         double poseAvg = rollData.calculate(navx.getRoll());
         double velAvg = vel.calculate(navx.getRawGyroY());
-        if (poseAvg < 16 &&  poseAvg > -4){
+        if (navx.getRoll() < 16 && navx.getRoll() > -4 ){
             behindMiddle = true;
         }
-        if (poseAvg < -8){
+        if (navx.getRoll() < -8){
             frontMiddle = true;
         }
         double currentRawAngle = navx.getRawGyroY();
@@ -139,8 +141,8 @@ public class AutoPathDocking extends CommandBase implements Loggable {
             
             if (yaw > -45 && yaw < 45){
                 //facing forward
-                poseStart = 10;
-                m_drivebase.drive(new ChassisSpeeds(DockSpeed(poseAvg, poseStart, velAvg),0,0));
+                poseStart = 13;
+                m_drivebase.drive(new ChassisSpeeds(DockSpeed(navx.getRoll(), poseStart, velAvg),0,0));
             }
             if (yaw > -135 && yaw < 135){
                 //facing backward
@@ -160,8 +162,7 @@ public class AutoPathDocking extends CommandBase implements Loggable {
             }*/
         }
          
-        if (frontMiddle){
-            
+        if (frontMiddle){  
             if (yaw > -135 && yaw < 135){
                 //facing forward 
                 poseStart = -14.3;
@@ -170,7 +171,7 @@ public class AutoPathDocking extends CommandBase implements Loggable {
             if (yaw > -45 && yaw < 45){
                 //facing backward
                 poseStart = 10;
-                m_drivebase.drive(new ChassisSpeeds(-DockSpeed(poseAvg, poseStart, velAvg),0,0));
+                m_drivebase.drive(new ChassisSpeeds(-DockSpeed(navx.getRoll(), poseStart, velAvg),0,0));
             }
             }
         }
@@ -216,11 +217,15 @@ public class AutoPathDocking extends CommandBase implements Loggable {
     @Override
     public boolean isFinished() {
         // TODO Auto-generated method stub
+        frontMiddle = false;
+        behindMiddle = false;
         return (m_drivebase.getFieldRelativeLinearSpeedsMPS().getX() > -0.3 && m_drivebase.getFieldRelativeLinearSpeedsMPS().getX() < .3) 
          && (navx.getRoll() > -8 && navx.getRoll() < 8);
     }
     @Override
     public void end(boolean _interrupted) {
+        frontMiddle = false;
+        behindMiddle = false;
         /* 
         if (Math.abs(navx.getPitch()) > pitchUpper){
             m_drivebase.arcadeDrive(0,0, false);

@@ -47,7 +47,7 @@ public class DockingForceBalance extends CommandBase implements Loggable {
     }
 
     public double omegaToDriveSpeed(double theta, double omega) {
-        double kp = 1 / 50; //increaese until enough to go
+        double kp = 1 / 20; //increaese until enough to go
         //value = angle of ramp * kp, multiply estimated desired kp by around 1.5
         double kd = 1 / 50; //have dampening term do most work
         double retSpeed = theta * kp + omega * kd;
@@ -77,11 +77,6 @@ public class DockingForceBalance extends CommandBase implements Loggable {
 
     @Override
     public void end(boolean _interrupted) {
-        /* 
-        if (Math.abs(navx.getPitch()) > pitchUpper){
-            m_drivebase.arcadeDrive(0,0, false);
-        }*/
-
     }
 }
 
