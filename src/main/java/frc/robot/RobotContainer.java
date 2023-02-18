@@ -4,6 +4,14 @@
 
 package frc.robot;
 
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import static frc.robot.Constants.AutoConstants.ALLIANCE;
+import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
+import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
+import static frc.robot.Constants.ArmConstants.*;
+import static frc.robot.Constants.VisionConstants.*;
+import static frc.robot.subsystems.ArmSubsystem.*;
+
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.*;
@@ -213,11 +221,13 @@ public class RobotContainer {
         return autoSelector.getSelected(); // Autos.exampleAuto(m_exampleSubsystem);
     }
 
-    public void periodic() {
-        SmartDashboard.putString("Alliance", ALLIANCE.toString());
-        drivebaseS.drawRobotOnField(field);
-        field3d.setRobotPose(new Pose3d(drivebaseS.getPose()));
-    }
+  public void periodic() {
+    SmartDashboard.putString("Alliance", ALLIANCE.toString());
+    drivebaseS.drawRobotOnField(field);
+    field3d.setRobotPose(new Pose3d(drivebaseS.getPose()));
+    //Put LED stuff here
+
+  }
 
     public void onEnabled() {
         CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
