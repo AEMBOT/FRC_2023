@@ -209,7 +209,7 @@ public class RobotContainer {
         //Docking
         //m_secondaryController.b().whileTrue(m_docking);
 
-        m_secondaryController.b().whileTrue(m_newDocking);
+        m_secondaryController.b().onTrue(m_newDocking);
 
         m_primaryController.a().whileTrue(m_dockingForceBalance);
 
