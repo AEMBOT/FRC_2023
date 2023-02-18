@@ -68,9 +68,9 @@ public class RobotContainer {
     private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS, m_limelight);
     private final DockingForceBalance m_dockingForceBalance = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
-    private final GoToPosition m_GoToPosition = new GoToPosition(m_armSubsystem);
     private final AngleToPosition m_AngleToPosition = new AngleToPosition(m_armSubsystem, angleToFloor);
     //private AngleToPosition m_AngleToPositionFloor = new AngleToPosition(m_armSubsystem, angleToSubstation);
+    private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
 
     // Controllers
     private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
