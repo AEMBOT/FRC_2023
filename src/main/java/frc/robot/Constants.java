@@ -150,7 +150,7 @@ public final class Constants {
         public static final int clampSolenoidID = 0;
         public static final int movingAverage = 5;
         public static final int extendMotorCurrentLimit = 35;
-        public static final int angleMotorCurrentLimit = 35;
+        public static final int angleMotorCurrentLimit = 40;
 
         //Angle and Extend arm Constants
         public static final double angleToDelivery = -.24;

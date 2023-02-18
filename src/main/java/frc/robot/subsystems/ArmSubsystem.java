@@ -15,11 +15,12 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.PIDController;
+import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
 import static frc.robot.Constants.ArmConstants.*;
 
-public class ArmSubsystem extends SubsystemBase {
+public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     // Elevator
     private CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
@@ -38,10 +39,10 @@ public class ArmSubsystem extends SubsystemBase {
     @Log
     PIDController pidExtend = new PIDController(582.62, 0, 10.198);
     @Log
-    ProfiledPIDController pidTheta = new ProfiledPIDController(5, 0, 2, new TrapezoidProfile.Constraints(0.25, 2));
+    PIDController pidTheta = new PIDController(20, 0, 2);
 
-    ArmFeedforward thetaDown = new ArmFeedforward(0.8, 0.5, 50, 0);
-    ArmFeedforward thetaUp = new ArmFeedforward(-0.8, 0.5, 40, 0); // 0.08 at 4v,
+    ArmFeedforward thetaDown = new ArmFeedforward(0.5, 0.5, 50, 0);
+    ArmFeedforward thetaUp = new ArmFeedforward(-0.5, 0.5, 40, 0);
 
 
     @Override
@@ -64,13 +65,24 @@ public class ArmSubsystem extends SubsystemBase {
             m_extendMotor.setVoltage(Math.min(pidExtend.calculate(extendEncoder.getPosition()), 1));
         }
 
+        double thetaDownFeedforward = thetaDown.calculate(pidTheta.getSetpoint(), 0);
+        double thetaUpFeedforward = thetaUp.calculate(pidTheta.getSetpoint(), 0);
+        double pidThetaValue = pidTheta.calculate(getAnglePosition());
+
         m_angleMotor.setVoltage(
-                (pidTheta.getGoal().position > absoluteAngleEncoder.getAbsolutePosition() ?
-                        thetaDown.calculate(pidTheta.getSetpoint().position, pidTheta.getSetpoint().velocity) :
-                        thetaUp.calculate(pidTheta.getSetpoint().position, pidTheta.getSetpoint().velocity)
+                (pidTheta.getSetpoint() > getAnglePosition() ?
+                        thetaDownFeedforward :
+                        thetaUpFeedforward
                 ) +
-                        pidTheta.calculate(absoluteAngleEncoder.getAbsolutePosition())
+                        pidThetaValue
         );
+
+        SmartDashboard.putNumber("thetaDownFeedForward", thetaDownFeedforward);
+        SmartDashboard.putNumber("thetaUpFeedForward", thetaUpFeedforward);
+        SmartDashboard.putNumber("pidThetaValue", pidThetaValue);
+//        SmartDashboard.putNumber("thetaGoal", pidTheta.getGoal().position);
+//        SmartDashboard.putNumber("thetaSetpointPos", pidTheta.getSetpoint().position);
+//        SmartDashboard.putNumber("thetaSetpointVel", pidTheta.getSetpoint().velocity);
 
     }
 
@@ -95,7 +107,7 @@ public class ArmSubsystem extends SubsystemBase {
         relativeAngleEncoder.setDistancePerPulse(2 * Math.PI / 8192.0);
 
         pidExtend.setSetpoint(0);
-        pidTheta.setGoal(absoluteAngleEncoder.getAbsolutePosition());
+        pidTheta.setSetpoint(0);
     }
 
     public void resetExtendEncoder(){
@@ -107,12 +119,12 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void setTheta(double positionRadians){
-        pidTheta.setGoal(positionRadians);
+        pidTheta.setSetpoint(positionRadians);
     }
 
     public void setArmPosition(double r, double theta) {
         pidExtend.setSetpoint(r);
-        pidTheta.setGoal(theta);
+        pidTheta.setSetpoint(theta);
     }
 
     public void stopAngle(){

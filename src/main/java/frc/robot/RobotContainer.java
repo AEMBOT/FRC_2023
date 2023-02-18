@@ -72,7 +72,8 @@ public class RobotContainer {
   private GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
   //private GoToPosition m_GoToPosition = new GoToPosition(m_armSubsystem, extendTest);
   private GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid, angleToDelivery);
-  
+  private GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, -0.2);
+
   // Controllers
   private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
   private final CommandXboxController m_secondaryController = new CommandXboxController(SECONDARY_CONTROLLER_PORT);
@@ -205,7 +206,7 @@ public class RobotContainer {
 
     // Elevator go to Position
     //m_secondaryController.y().onTrue(m_GoToPosition.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
-    m_secondaryController.y().onTrue(m_GoToPositionMid.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
+    m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
     //Docking
     m_secondaryController.b().whileTrue(m_docking);
 
