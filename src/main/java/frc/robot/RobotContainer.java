@@ -10,6 +10,7 @@ import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
 import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
 import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
+import static frc.robot.subsystems.ArmSubsystem.*;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -230,6 +231,8 @@ public class RobotContainer {
     SmartDashboard.putString("Alliance", ALLIANCE.toString());
     drivebaseS.drawRobotOnField(field);
     field3d.setRobotPose(new Pose3d(drivebaseS.getPose()));
+    //Put LED stuff here
+
   }
 
   public void onEnabled() {

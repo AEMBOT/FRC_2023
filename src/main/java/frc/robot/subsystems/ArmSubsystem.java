@@ -68,12 +68,12 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         double thetaUpFeedforward = thetaUp.calculate(pidTheta.getSetpoint(), 0);
         double pidThetaValue = pidTheta.calculate(getAnglePosition());
 
-       if(isGamePieceThere()){
+      /*  if(isGamePieceThere()){
             m_clampSolenoid.set(false);
 
         }
 
-
+*/
         if (activateExtendPID) {
             m_extendMotor.setVoltage(Math.min(pidExtend.calculate(extendEncoder.getPosition()), 1));
             m_angleMotor.setVoltage(
