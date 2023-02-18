@@ -3,36 +3,51 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.math.controller.PIDController;
+
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.controller.PIDController;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 
 import static frc.robot.Constants.ArmConstants.*;
 
-public class ArmSubsystem extends SubsystemBase {
+public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     // Elevator
-    private final CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
-    private final CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
-    private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, clampSolenoidID);
+    private CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
+    private CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
+    private Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, clampSolenoidID);
 
     public RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
     public DutyCycleEncoder absoluteAngleEncoder = new DutyCycleEncoder(angleEncoderPort);
+    public Encoder relativeAngleEncoder = new Encoder(1, 2);
     private double rawAngle;
+    private boolean activateExtendPID = false; // Activates PID controller, false when zeroing
 
     LinearFilter filter = LinearFilter.movingAverage(movingAverage);
 
-    PIDController pid = new PIDController(1, 0, 0);
+    @Log
+    PIDController pidExtend = new PIDController(582.62, 0, 10.198);
+    @Log
+    PIDController pidTheta = new PIDController(20, 0, 2);
+
+    ArmFeedforward thetaDown = new ArmFeedforward(0.5, 0.5, 50, 0);
+    ArmFeedforward thetaUp = new ArmFeedforward(-0.5, 0.5, 40, 0);
+
 
     @Override
     public void periodic() {
         //periodic method (called every 1/60th of a second)
-        SmartDashboard.putNumber("angleEncoder", angleEncoder.getPosition());
         SmartDashboard.putNumber("extendEncoder", extendEncoder.getPosition());
         SmartDashboard.putNumber("angleMotor", m_angleMotor.get());
         SmartDashboard.putNumber("extendMotor", m_extendMotor.get());
@@ -40,8 +55,35 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("AngleMotorCurrent", m_angleMotor.getOutputCurrent());
         SmartDashboard.putNumber("ExtendMotorOutput", m_extendMotor.getAppliedOutput());
         SmartDashboard.putNumber("AngleMotorOutput", m_angleMotor.getAppliedOutput());
-        rawAngle = absoluteAngleEncoder.getAbsolutePosition() - angleEncoderOffset;
-        SmartDashboard.putNumber("absoluteAngleEncoder", rawAngle);
+        SmartDashboard.putNumber("absoluteAngleEncoder", getAnglePosition());
+        SmartDashboard.putNumber("ExtendMotorEncoder", extendEncoder.getPosition());
+        SmartDashboard.putNumber("AngleMotorEncoder", angleEncoder.getPosition());
+        SmartDashboard.putNumber("relativeAngleEncoderPosition", relativeAngleEncoder.getDistance());
+        SmartDashboard.putNumber("relativeAngleEncoderVelocity", relativeAngleEncoder.getRate());
+
+        if (activateExtendPID) {
+            m_extendMotor.setVoltage(Math.min(pidExtend.calculate(extendEncoder.getPosition()), 1));
+        }
+
+        double thetaDownFeedforward = thetaDown.calculate(pidTheta.getSetpoint(), 0);
+        double thetaUpFeedforward = thetaUp.calculate(pidTheta.getSetpoint(), 0);
+        double pidThetaValue = pidTheta.calculate(getAnglePosition());
+
+        m_angleMotor.setVoltage(
+                (pidTheta.getSetpoint() > getAnglePosition() ?
+                        thetaDownFeedforward :
+                        thetaUpFeedforward
+                ) +
+                        pidThetaValue
+        );
+
+        SmartDashboard.putNumber("thetaDownFeedForward", thetaDownFeedforward);
+        SmartDashboard.putNumber("thetaUpFeedForward", thetaUpFeedforward);
+        SmartDashboard.putNumber("pidThetaValue", pidThetaValue);
+//        SmartDashboard.putNumber("thetaGoal", pidTheta.getGoal().position);
+//        SmartDashboard.putNumber("thetaSetpointPos", pidTheta.getSetpoint().position);
+//        SmartDashboard.putNumber("thetaSetpointVel", pidTheta.getSetpoint().velocity);
+
     }
 
     public ArmSubsystem() {
@@ -56,52 +98,68 @@ public class ArmSubsystem extends SubsystemBase {
         // Set max current the extend motor can draw
         m_extendMotor.setSmartCurrentLimit(extendMotorCurrentLimit);
         m_angleMotor.setSmartCurrentLimit(angleMotorCurrentLimit);
+
+        m_extendMotor.setInverted(true);
+        m_angleMotor.setInverted(true);
+
+        extendEncoder.setPositionConversionFactor(extendTickToMeter);
+        absoluteAngleEncoder.setPositionOffset(0.346);
+        relativeAngleEncoder.setDistancePerPulse(2 * Math.PI / 8192.0);
+
+        pidExtend.setSetpoint(0);
+        pidTheta.setSetpoint(0);
     }
 
-    /* 
-    public CommandBase angleToPosition(double targetPosition){
-        //make this later, after testing so encoder values are available
-        //use signum to find sign of difference from target and current position, use that to go up or down to target position
-        // return runEnd(() -> Math.signum(diff) * 0.1, () -> stop motor).until(close to or past position);
-    }
-*/
-    public void resetExtendEncoder() {
+    public void resetExtendEncoder(){
         extendEncoder.setPosition(0);
     }
 
-    public void resetAngleEncoder() {
-        angleEncoder.setPosition(0);
+    public void setExtendMeter(double positionMeters){
+        pidExtend.setSetpoint(positionMeters);
     }
 
-    public void stopAngle() {
+    public void setTheta(double positionRadians){
+        pidTheta.setSetpoint(positionRadians);
+    }
+
+    public void setArmPosition(double r, double theta) {
+        pidExtend.setSetpoint(r);
+        pidTheta.setSetpoint(theta);
+    }
+
+    public void stopAngle(){
         m_angleMotor.set(0);
     }
 
-    public void stopExtend() {
+    public void stopExtend(){
         m_extendMotor.set(0);
     }
 
-    public void angleUp() {
-        m_angleMotor.set(0.5);
+    public void angleUp(){
+        m_angleMotor.setVoltage(7.0);
     }
 
-    public double getAnglePosition() {
-        return angleEncoder.getPosition();
+    public double getAnglePosition(){
+        return (absoluteAngleEncoder.getAbsolutePosition() - absoluteAngleEncoder.getPositionOffset()) * Math.PI * 2;
     }
 
-    public void angleDown() {
-        m_angleMotor.set(-0.5);
+    public void angleDown(){
+        m_angleMotor.setVoltage(-7.0);
     }
 
-    public void extendArm() {
-        m_extendMotor.set(-0.5);
-    }
-
-    public void retractArm() {
+    public void extendArm(){
         m_extendMotor.set(0.5);
     }
 
-    public boolean isCurrentLimited() {
+    public void retractArm(){
+        m_extendMotor.set(-0.5);
+    }
+
+    public double getExtendPosition(){
+        return extendEncoder.getPosition();
+    }
+
+    public boolean isCurrentLimited(){
         return filter.calculate(m_extendMotor.getOutputCurrent()) >= 35;
     }
 
@@ -114,4 +172,14 @@ public class ArmSubsystem extends SubsystemBase {
     public void retractClamp() {
         m_clampSolenoid.set(false);
     }
+
+    // Toggles the clamp
+    public void toggleClamp() {
+        m_clampSolenoid.set(!m_clampSolenoid.get());
+    }
+
+    public void setExtendPIDState(boolean ready) {
+        activateExtendPID = ready;
+    }
+
 }

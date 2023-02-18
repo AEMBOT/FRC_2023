@@ -4,6 +4,13 @@
 
 package frc.robot;
 
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import static frc.robot.Constants.AutoConstants.ALLIANCE;
+import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
+import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
+import static frc.robot.Constants.ArmConstants.*;
+import static frc.robot.Constants.VisionConstants.*;
+
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.*;
@@ -19,10 +26,16 @@ import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.docking.AutoPathDocking;
+import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.DrivebaseS;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.VisionSubsystem;
 import io.github.oblarg.oblog.annotations.Log;
 
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
@@ -149,17 +162,14 @@ public class RobotContainer {
 
         // Secondary Controller
         // Clamp
-        m_secondaryController.a().toggleOnTrue(new StartEndCommand(
-                // Extends the clamp
-                m_armSubsystem::extendClamp,
-                // Retracts the clamp
-                m_armSubsystem::retractClamp,
+        m_secondaryController.a().toggleOnTrue(new InstantCommand(
+                // Toggles the clamp
+                m_armSubsystem::toggleClamp,
                 // Requires the Arm subsystem
                 m_armSubsystem
         ));
 
         // Elevator
-        //
         // Angle Motor
         m_secondaryController.rightBumper().onFalse(new RunCommand(
                 m_armSubsystem::stopAngle,
@@ -194,22 +204,11 @@ public class RobotContainer {
                 m_armSubsystem::retractArm,
                 m_armSubsystem));
 
-        // Elevator go to Position
-        m_secondaryController.y().onTrue(m_GoToPosition);
-        //Fix this to incorporate different precise angle positions, only has one inaccurate angle at the moment
-        m_secondaryController.a().whileTrue(m_AngleToPosition);
-        //m_secondaryController.a().WhileTrue(m_AngleToPositionFloor);
-/* 
-    m_secondaryController.a().onTrue(
-        new SequentialCommandGroup(
-                new InstantCommand(drivebaseS.generateTrajectoryToPose(, CHARGE_STATION_CENTER, null)),
-                new Docking(drivebaseS, m_limelight))
-    );*/
-
-        //Docking
-        //m_secondaryController.b().whileTrue(m_docking);
-
-        m_secondaryController.b().whileTrue(m_newDocking);
+    // Elevator go to Position
+    //m_secondaryController.y().onTrue(m_GoToPosition.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
+    m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
+    //Docking
+    m_secondaryController.b().whileTrue(m_docking);
 
         m_primaryController.a().whileTrue(m_dockingForceBalance);
 
