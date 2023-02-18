@@ -152,6 +152,9 @@ public final class Constants {
         public static final int extendMotorCurrentLimit = 35;
         public static final int angleMotorCurrentLimit = 40;
 
+        public static final int ultrasonicPingPort = 4;
+        public static final int ultrasonicEchoPort = 3;
+
         //Angle and Extend arm Constants
         public static final double angleToDelivery = -.24;
         public static final double angleToFloor = -.36;

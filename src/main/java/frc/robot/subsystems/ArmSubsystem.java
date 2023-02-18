@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.PIDController;
@@ -31,8 +32,9 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
     public DutyCycleEncoder absoluteAngleEncoder = new DutyCycleEncoder(angleEncoderPort);
     public Encoder relativeAngleEncoder = new Encoder(1, 2);
-    private double rawAngle;
+    private Ultrasonic objectSensor = new Ultrasonic(ultrasonicPingPort, ultrasonicEchoPort);
     private boolean activateExtendPID = false; // Activates PID controller, false when zeroing
+
 
     LinearFilter filter = LinearFilter.movingAverage(movingAverage);
 
@@ -61,21 +63,29 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         SmartDashboard.putNumber("relativeAngleEncoderPosition", relativeAngleEncoder.getDistance());
         SmartDashboard.putNumber("relativeAngleEncoderVelocity", relativeAngleEncoder.getRate());
 
-        if (activateExtendPID) {
-            m_extendMotor.setVoltage(Math.min(pidExtend.calculate(extendEncoder.getPosition()), 1));
-        }
 
         double thetaDownFeedforward = thetaDown.calculate(pidTheta.getSetpoint(), 0);
         double thetaUpFeedforward = thetaUp.calculate(pidTheta.getSetpoint(), 0);
         double pidThetaValue = pidTheta.calculate(getAnglePosition());
 
-        m_angleMotor.setVoltage(
+       if(isGamePieceThere()){
+            m_clampSolenoid.set(false);
+
+        }
+
+
+        if (activateExtendPID) {
+            m_extendMotor.setVoltage(Math.min(pidExtend.calculate(extendEncoder.getPosition()), 1));
+            m_angleMotor.setVoltage(
                 (pidTheta.getSetpoint() > getAnglePosition() ?
                         thetaDownFeedforward :
                         thetaUpFeedforward
                 ) +
                         pidThetaValue
         );
+        }
+
+        
 
         SmartDashboard.putNumber("thetaDownFeedForward", thetaDownFeedforward);
         SmartDashboard.putNumber("thetaUpFeedForward", thetaUpFeedforward);
@@ -109,6 +119,11 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         pidExtend.setSetpoint(0);
         pidTheta.setSetpoint(0);
     }
+
+    public boolean isGamePieceThere(){
+        return objectSensor.getRangeInches() <=4;
+    }
+
 
     public void resetExtendEncoder(){
         extendEncoder.setPosition(0);
