@@ -6,8 +6,6 @@ package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.server.PathPlannerServer;
-
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.SPI.Port;
@@ -16,7 +14,6 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.docking.Docking;
 import frc.robot.subsystems.DrivebaseS;
 import frc.robot.subsystems.Limelight;
@@ -135,7 +132,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Tilt", Docking.tilt(navx.getRoll(), navx.getPitch()));
         SmartDashboard.putNumber("RawGyroY", navx.getRawGyroY());
         SmartDashboard.putNumber("VelocityY ", navx.getVelocityY());
-    
+
     }
 
 

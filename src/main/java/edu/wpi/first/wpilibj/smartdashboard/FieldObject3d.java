@@ -12,6 +12,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.networktables.DoubleArrayEntry;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -85,9 +86,7 @@ public class FieldObject3d implements AutoCloseable {
      */
     public synchronized void setPoses(Pose3d... poses) {
         m_poses.clear();
-        for (Pose3d pose : poses) {
-            m_poses.add(pose);
-        }
+        Collections.addAll(m_poses, poses);
         updateEntry();
     }
 
@@ -128,7 +127,7 @@ public class FieldObject3d implements AutoCloseable {
         for (Pose3d pose : m_poses) {
             Translation3d translation = pose.getTranslation();
             Quaternion quat = pose.getRotation().getQuaternion();
-            arr[ndx + 0] = translation.getX();
+            arr[ndx] = translation.getX();
             arr[ndx + 1] = translation.getY();
             arr[ndx + 2] = translation.getZ();
             arr[ndx + 3] = quat.getW();

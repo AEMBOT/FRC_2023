@@ -55,9 +55,9 @@ public class RobotContainer {
     private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS, m_limelight);
     private final DockingForceBalance m_dockingForceBalance = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
-    private final GoToPosition m_GoToPosition = new GoToPosition(m_armSubsystem);
     private final AngleToPosition m_AngleToPosition = new AngleToPosition(m_armSubsystem, angleToFloor);
     //private AngleToPosition m_AngleToPositionFloor = new AngleToPosition(m_armSubsystem, angleToSubstation);
+    private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
 
     // Controllers
     private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
@@ -149,17 +149,14 @@ public class RobotContainer {
 
         // Secondary Controller
         // Clamp
-        m_secondaryController.a().toggleOnTrue(new StartEndCommand(
-                // Extends the clamp
-                m_armSubsystem::extendClamp,
-                // Retracts the clamp
-                m_armSubsystem::retractClamp,
+        m_secondaryController.a().toggleOnTrue(new InstantCommand(
+                // Toggles the clamp
+                m_armSubsystem::toggleClamp,
                 // Requires the Arm subsystem
                 m_armSubsystem
         ));
 
         // Elevator
-        //
         // Angle Motor
         m_secondaryController.rightBumper().onFalse(new RunCommand(
                 m_armSubsystem::stopAngle,
@@ -195,21 +192,10 @@ public class RobotContainer {
                 m_armSubsystem));
 
         // Elevator go to Position
-        m_secondaryController.y().onTrue(m_GoToPosition);
-        //Fix this to incorporate different precise angle positions, only has one inaccurate angle at the moment
-        m_secondaryController.a().whileTrue(m_AngleToPosition);
-        //m_secondaryController.a().WhileTrue(m_AngleToPositionFloor);
-/* 
-    m_secondaryController.a().onTrue(
-        new SequentialCommandGroup(
-                new InstantCommand(drivebaseS.generateTrajectoryToPose(, CHARGE_STATION_CENTER, null)),
-                new Docking(drivebaseS, m_limelight))
-    );*/
-
+        //m_secondaryController.y().onTrue(m_GoToPosition.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
+        m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
         //Docking
-        //m_secondaryController.b().whileTrue(m_docking);
-
-        m_secondaryController.b().onTrue(m_newDocking);
+        m_secondaryController.b().whileTrue(m_docking);
 
         m_primaryController.a().whileTrue(m_dockingForceBalance);
 

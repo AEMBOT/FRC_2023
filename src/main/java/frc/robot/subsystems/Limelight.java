@@ -195,9 +195,7 @@ public class Limelight extends SubsystemBase {
             NetworkTableInstance.getDefault().getTable("LimelightTesting").getEntry("rawPose").setValue(rawPosition);
             if (rawPosition.length < 6) {
                 double[] newRawPosition = new double[]{0, 0, 0, 0, 0, 0};
-                for (int i = 0; i < rawPosition.length; i++) {
-                    newRawPosition[i] = rawPosition[i];
-                }
+                System.arraycopy(rawPosition, 0, newRawPosition, 0, rawPosition.length);
                 rawPosition = newRawPosition;
             }
             for (int i = 3; i < rawPosition.length; i++) {
@@ -208,9 +206,7 @@ public class Limelight extends SubsystemBase {
             NetworkTableInstance.getDefault().getTable("LimelightTesting").getEntry("rawCamTran").setValue(rawPosition);
             if (rawPosition.length < 6) {
                 double[] newRawPosition = new double[]{0, 0, 0, 0, 0, 0};
-                for (int i = 0; i < rawPosition.length; i++) {
-                    newRawPosition[i] = rawPosition[i];
-                }
+                System.arraycopy(rawPosition, 0, newRawPosition, 0, rawPosition.length);
                 rawPosition = newRawPosition;
             }
             rawPosition[0] = rawPosition[0] + (FIELD_LENGTH / 2);

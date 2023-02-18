@@ -146,18 +146,28 @@ public final class Constants {
 
     public static final class ArmConstants {
 
-        public static final int angleMotorCanID = 15;
+        public static final int angleMotorCanID = 10;
         public static final int angleEncoderPort = 0;
         public static final int angleEncoderOffset = 0;
-        public static final int extendMotorCanID = 14;
+        public static final int extendMotorCanID = 11;
         public static final int clampSolenoidID = 0;
         public static final int movingAverage = 5;
         public static final int extendMotorCurrentLimit = 35;
-        public static final int angleMotorCurrentLimit = 35;
-        //Arm stuff below this is untested, needs accuracy
-        public static final double angleToSubstation = 3;
-        public static final double angleToFloor = .36;
+        public static final int angleMotorCurrentLimit = 40;
 
+        //Angle and Extend arm Constants
+        public static final double angleToDelivery = -.24;
+        public static final double angleToFloor = -.36;
+        //All of these need testing...
+        //meter value * tick conversion
+
+        public static final double extendTickToMeter = 0.01285875;
+
+        public static final double extendOffset = 2.5;
+        public static final double extendToFloor = 0.257175;
+        public static final double extendToMid = 0.3857625;
+        public static final double extendToHigh = 0.6429375;
+        public static final double extendToSubstation = 0.6429375;
         // Arm Constants that need measuring
         public static final double pivotPointHeight = 0; // Height of pivot point of arm above point where belt separates from belt wheel
         public static final double pivotPointDistance = 0; // Distance of pivot point of arm behind point where belt separates from belt wheel
