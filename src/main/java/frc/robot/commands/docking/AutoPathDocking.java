@@ -99,7 +99,7 @@ public class AutoPathDocking extends CommandBase implements Loggable {
         }
         else{
                 //m_drivebase.drive(new ChassisSpeeds(0.3,0,0));
-            return 0.2;
+            return 0.25;
         }
     }
 
