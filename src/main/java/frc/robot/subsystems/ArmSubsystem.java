@@ -3,18 +3,15 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.controller.PIDController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -23,9 +20,9 @@ import static frc.robot.Constants.ArmConstants.*;
 public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     // Elevator
-    private CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
-    private CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
-    private Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, clampSolenoidID);
+    private final CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
+    private final CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
+    private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, clampSolenoidID);
 
     public RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
@@ -110,15 +107,15 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         pidTheta.setSetpoint(0);
     }
 
-    public void resetExtendEncoder(){
+    public void resetExtendEncoder() {
         extendEncoder.setPosition(0);
     }
 
-    public void setExtendMeter(double positionMeters){
+    public void setExtendMeter(double positionMeters) {
         pidExtend.setSetpoint(positionMeters);
     }
 
-    public void setTheta(double positionRadians){
+    public void setTheta(double positionRadians) {
         pidTheta.setSetpoint(positionRadians);
     }
 
@@ -127,39 +124,39 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         pidTheta.setSetpoint(theta);
     }
 
-    public void stopAngle(){
+    public void stopAngle() {
         m_angleMotor.set(0);
     }
 
-    public void stopExtend(){
+    public void stopExtend() {
         m_extendMotor.set(0);
     }
 
-    public void angleUp(){
+    public void angleUp() {
         m_angleMotor.setVoltage(7.0);
     }
 
-    public double getAnglePosition(){
+    public double getAnglePosition() {
         return (absoluteAngleEncoder.getAbsolutePosition() - absoluteAngleEncoder.getPositionOffset()) * Math.PI * 2;
     }
 
-    public void angleDown(){
+    public void angleDown() {
         m_angleMotor.setVoltage(-7.0);
     }
 
-    public void extendArm(){
+    public void extendArm() {
         m_extendMotor.set(0.5);
     }
 
-    public void retractArm(){
+    public void retractArm() {
         m_extendMotor.set(-0.5);
     }
 
-    public double getExtendPosition(){
+    public double getExtendPosition() {
         return extendEncoder.getPosition();
     }
 
-    public boolean isCurrentLimited(){
+    public boolean isCurrentLimited() {
         return filter.calculate(m_extendMotor.getOutputCurrent()) >= 35;
     }
 

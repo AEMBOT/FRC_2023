@@ -1,12 +1,10 @@
 package frc.robot.commands.docking;
+
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI.Port;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DrivebaseS;
 import frc.robot.subsystems.Limelight;
@@ -25,7 +23,7 @@ public class AutoPathDocking extends CommandBase implements Loggable {
     private final LinearFilter vel = LinearFilter.movingAverage(20);
     private final AHRS navx = new AHRS(Port.kMXP);
 
-    private boolean stop = false;
+    private final boolean stop = false;
 
     private final DrivebaseS m_drivebase;
 
@@ -72,9 +70,9 @@ public class AutoPathDocking extends CommandBase implements Loggable {
         return (omega / 10);
     }
 
-    public double distToMiddle(double distance){
+    public double distToMiddle(double distance) {
         double robotLimelightX = m_drivebase.getPose().getX();
-        return Math.abs(3.8 -robotLimelightX);
+        return Math.abs(3.8 - robotLimelightX);
     }
 
     //assuumes intial if(navx.getPitch() > pitchUpper || navx.getPitch() < pitchLower when called
@@ -87,23 +85,21 @@ public class AutoPathDocking extends CommandBase implements Loggable {
         //14
         double poseAvg = rollData.calculate(navx.getRoll());
         double velAvg = vel.calculate(navx.getRawGyroY());
-        if (poseAvg < 15 &&  poseAvg > -4){
+        if (poseAvg < 15 && poseAvg > -4) {
             behindMiddle = true;
         }
-        if (poseAvg < -8){
+        if (poseAvg < -8) {
             frontMiddle = true;
         }
         double currentRawAngle = navx.getRawGyroY();
         double angle = navx.getRoll();
         double kv = navx.getRawGyroY();
-        if (poseAvg > 12.7){
-            m_drivebase.drive(new ChassisSpeeds(0,0,0));
-        }
-        else if (velAvg > 0){
-            m_drivebase.drive(new ChassisSpeeds(0,0,0)); 
-        }
-        else{
-            m_drivebase.drive(new ChassisSpeeds(0.3,0,0));
+        if (poseAvg > 12.7) {
+            m_drivebase.drive(new ChassisSpeeds(0, 0, 0));
+        } else if (velAvg > 0) {
+            m_drivebase.drive(new ChassisSpeeds(0, 0, 0));
+        } else {
+            m_drivebase.drive(new ChassisSpeeds(0.3, 0, 0));
         }
         /* 
         if (behindMiddle){
@@ -137,9 +133,9 @@ public class AutoPathDocking extends CommandBase implements Loggable {
                 m_drivebase.drive(new ChassisSpeeds(-0.3,0,0));
             }
         }*/
-        
-        }
-    
+
+    }
+
 
     @Override
     public void end(boolean _interrupted) {

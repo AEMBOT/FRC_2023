@@ -4,13 +4,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
-import static frc.robot.Constants.AutoConstants.ALLIANCE;
-import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
-import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
-import static frc.robot.Constants.ArmConstants.*;
-import static frc.robot.Constants.VisionConstants.*;
-
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.*;
@@ -26,16 +19,10 @@ import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.docking.AutoPathDocking;
-import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.DrivebaseS;
-import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.Limelight;
-import frc.robot.subsystems.VisionSubsystem;
 import io.github.oblarg.oblog.annotations.Log;
 
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
@@ -204,11 +191,11 @@ public class RobotContainer {
                 m_armSubsystem::retractArm,
                 m_armSubsystem));
 
-    // Elevator go to Position
-    //m_secondaryController.y().onTrue(m_GoToPosition.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
-    m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
-    //Docking
-    m_secondaryController.b().whileTrue(m_docking);
+        // Elevator go to Position
+        //m_secondaryController.y().onTrue(m_GoToPosition.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
+        m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
+        //Docking
+        m_secondaryController.b().whileTrue(m_docking);
 
         m_primaryController.a().whileTrue(m_dockingForceBalance);
 

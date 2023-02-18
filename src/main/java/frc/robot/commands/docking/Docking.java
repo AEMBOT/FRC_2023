@@ -123,7 +123,7 @@ public class Docking extends CommandBase implements Loggable {
 
         double AngularY = navx.getRawGyroY();
         double kv = navx.getVelocityY();
-        
+
         //if (AngularY > 10)
         //greater than 4.5 at start, go front
         //less than 3.5 at start, go backwards (depending on rotation)
@@ -131,14 +131,13 @@ public class Docking extends CommandBase implements Loggable {
         if (AngularY < -8 && robotLimelightX > 12.5) {
             m_drivebase.drive(new ChassisSpeeds(0, 0, 0));
             stop = true;
-        } else if(robotLimelightX > 13){
+        } else if (robotLimelightX > 13) {
             m_drivebase.drive(new ChassisSpeeds(-0.3, 0, 0));
-        }
-        else if (AngularY > 10 && robotLimelightX < 13) {
+        } else if (AngularY > 10 && robotLimelightX < 13) {
             //derivative + feedback control angle
             m_drivebase.drive(new ChassisSpeeds(0, 0, 0));
             stop = true;
-        } else if (robotLimelightX < 13){
+        } else if (robotLimelightX < 13) {
             SimpleMotorFeedforward angleFeedForward = new SimpleMotorFeedforward(0.5, 1, 0.6);
             double deltaDrive = angleFeedForward.calculate(kv, AngularY);
             if (Math.abs(deltaDrive) > 0.3) {
