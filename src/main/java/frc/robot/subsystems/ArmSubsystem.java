@@ -117,10 +117,13 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         pidTheta.setSetpoint(0);
     }
 
-    public boolean isGamePieceThere(){
-        return objectSensor.getRangeInches() <=4;
-    }
+    public int SensorReading(){
 
+        MedianFilter filter = new MedianFilter(5);
+        return filter.calculate(SensorDataTable);
+
+        //return objectSensor.getDistanceCentimeters();
+    }
 
     public void resetExtendEncoder(){
         extendEncoder.setPosition(0);
@@ -200,25 +203,26 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     public void ClawStateMachine() {
 
         //To Do: Add two different thresholds for grab activation and object dropping.
+        int SensorReading = SensorReading();
 
         if (aTriggered && autoActive && state == "ClampOpen") { //Disable automatic grabbing while claw is open.
             autoActive = false;
         }
 
-        if ((state == "ClampOpen") && ((gamePiecePresent && autoActive && !PreviousObjectPresent) || (aTriggered))) { //Close clamp
+        if ((state == "ClampOpen") && ((autoActive && SensorReading <= 4 && !PreviousObjectPresent) || (aTriggered))) { //Close clamp
 
             state = "ClampClosed";
             //ArmSubsystem.closeClamp();
         }
 
-        if ((state == "ClampClosed") && (aTriggered || (!gamePiecePresent && autoActive))) { //Open clamp
+        if ((state == "ClampClosed") && (aTriggered || (SensorReading >= 8 && autoActive))) { //Open clamp
 
             state = "ClampOpen";
             PreviousObjectPresent = true;
             //ArmSubsystem.openClamp();
          }
 
-        if (PreviousObjectPresent && !gamePiecePresent && autoActive) {
+        if (autoActive && PreviousObjectPresent && SensorReading >= 12) { //Reset previousObjectPresent when no object is detected.
 
             PreviousObjectPresent = false;
 
