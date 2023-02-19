@@ -221,6 +221,24 @@ public class RobotContainer {
         return autoSelector.getSelected(); // Autos.exampleAuto(m_exampleSubsystem);
     }
 
+    public void ClawStateMachine() {
+        /*
+         * Be able to have the driver override Ultrasonic stuck on or off
+         * DPad Up - Disengage auto claw actuation, close claw
+         * DPad Down - Disengage auto claw actuation, open claw
+         * DPad Left/Right - Engage auto claw actuation.
+         * 
+         * int getMedian(arr) { //Assuming an array of 5 datapoints
+         *      Arrays.sort(arr);
+         *      return arr[2];
+         * }
+         * 
+         * 
+         * 
+         */
+        // Needs to
+    }
+
   public void periodic() {
     SmartDashboard.putString("Alliance", ALLIANCE.toString());
     drivebaseS.drawRobotOnField(field);
