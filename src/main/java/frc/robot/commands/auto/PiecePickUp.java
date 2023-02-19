@@ -59,7 +59,7 @@ public class PiecePickUp extends CommandBase {
         //public final double xPos;
         //public final double yPos;
         m_AngleToPositionFloor = new AngleToPosition(m_elevator, ArmConstants.angleToFloor);
-        //m_elevator.extendClamp;
+       
         //1280 x 960
 
     }

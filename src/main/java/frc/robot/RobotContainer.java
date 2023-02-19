@@ -164,11 +164,17 @@ public class RobotContainer {
 
         // Secondary Controller
         // Clamp
-        m_secondaryController.a().toggleOnTrue(new InstantCommand(
+        m_secondaryController.a().onTrue(new InstantCommand(
                 // Toggles the clamp
                 m_armSubsystem::toggleClamp,
                 // Requires the Arm subsystem
                 m_armSubsystem
+        ));
+
+        m_secondaryController.povCenter().onFalse(new InstantCommand(
+                m_armSubsystem::toggleAutoGrab,
+                m_armSubsystem
+
         ));
 
         // Elevator
@@ -207,8 +213,8 @@ public class RobotContainer {
                 m_armSubsystem));
 
         // Elevator go to Position
-        //m_secondaryController.y().onTrue(m_GoToPosition.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
-        m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
+        //m_secondaryController.y().onTrue(m_GoToPosition.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::closeClamp)));
+        m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::closeClamp)));
         //Docking
         m_secondaryController.b().onTrue(m_newDocking);
 
@@ -228,24 +234,6 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         // An example command will be run in autonomous
         return autoSelector.getSelected(); // Autos.exampleAuto(m_exampleSubsystem);
-    }
-
-    public void ClawStateMachine() {
-        /*
-         * Be able to have the driver override Ultrasonic stuck on or off
-         * DPad Up - Disengage auto claw actuation, close claw
-         * DPad Down - Disengage auto claw actuation, open claw
-         * DPad Left/Right - Engage auto claw actuation.
-         * 
-         * int getMedian(arr) { //Assuming an array of 5 datapoints
-         *      Arrays.sort(arr);
-         *      return arr[2];
-         * }
-         * 
-         * 
-         * 
-         */
-        // Needs to
     }
 
   public void periodic() {

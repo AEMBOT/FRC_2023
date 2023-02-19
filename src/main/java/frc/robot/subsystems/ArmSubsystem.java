@@ -176,18 +176,56 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     // Extends the clamp
-    public void extendClamp() {
+    public void closeClamp() {
         m_clampSolenoid.set(true);
     }
 
     // Retracts the clamp
-    public void retractClamp() {
+    public void openClamp() {
         m_clampSolenoid.set(false);
     }
 
     // Toggles the clamp
     public void toggleClamp() {
-        m_clampSolenoid.set(!m_clampSolenoid.get());
+        aTriggered = true
+
+        //m_clampSolenoid.set(!m_clampSolenoid.get());
+    }
+
+    public void toggleAutoGrab() {
+        autoActive = !autoActive;
+
+    }
+    
+    public void ClawStateMachine() {
+
+        //To Do: Add two different thresholds for grab activation and object dropping.
+
+        if (aTriggered && autoActive && state == "ClampOpen") { //Disable automatic grabbing while claw is open.
+            autoActive = false;
+        }
+
+        if ((state == "ClampOpen") && ((gamePiecePresent && autoActive && !PreviousObjectPresent) || (aTriggered))) { //Close clamp
+
+            state = "ClampClosed";
+            //ArmSubsystem.closeClamp();
+        }
+
+        if ((state == "ClampClosed") && (aTriggered || (!gamePiecePresent && autoActive))) { //Open clamp
+
+            state = "ClampOpen";
+            PreviousObjectPresent = true;
+            //ArmSubsystem.openClamp();
+         }
+
+        if (PreviousObjectPresent && !gamePiecePresent && autoActive) {
+
+            PreviousObjectPresent = false;
+
+        }
+
+        aTriggered = false;
+
     }
 
     public void setExtendPIDState(boolean ready) {
