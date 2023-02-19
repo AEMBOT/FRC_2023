@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.SetLEDColor;
 import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
@@ -34,7 +35,8 @@ import frc.robot.subsystems.*;
 import io.github.oblarg.oblog.annotations.Log;
 
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
-import static frc.robot.Constants.ArmConstants.angleToFloor;
+import static frc.robot.Constants.ArmConstants.*;
+import static frc.robot.Constants.LedConstants.*;
 import static frc.robot.Constants.AutoConstants.ALLIANCE;
 import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
 import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
@@ -54,9 +56,9 @@ public class RobotContainer {
     private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
     private final VisionSubsystem visionSubsystem = new VisionSubsystem(new Limelight[]{new Limelight("limelight")});
     private final Limelight m_limelight = new Limelight();
+    private final LEDSubsystem m_LedSubsystem = new LEDSubsystem();
     @Log
     private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
-    private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
 
     //Commands
     private final Docking m_docking = new Docking(drivebaseS, m_limelight);
@@ -64,8 +66,13 @@ public class RobotContainer {
     private final DockingForceBalance m_dockingForceBalance = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
     private final AngleToPosition m_AngleToPosition = new AngleToPosition(m_armSubsystem, angleToFloor);
-    //private AngleToPosition m_AngleToPositionFloor = new AngleToPosition(m_armSubsystem, angleToSubstation);
+    private final GoToPosition m_GoToPositionPickUp = new GoToPosition(m_armSubsystem, 0, angleToSubstation);
+    private final GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid, angleToDelivery);
+    private final GoToPosition m_GoToPositionHigh = new GoToPosition(m_armSubsystem, extendToHigh, angleToDelivery);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
+    private final SetLEDColor m_SetLEDColorYellow = new SetLEDColor(m_LedSubsystem, colorYellow);
+    private final SetLEDColor m_SetLEDColorPurple = new SetLEDColor(m_LedSubsystem, colorPurple);
+
 
     // Controllers
     private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
@@ -209,7 +216,9 @@ public class RobotContainer {
 
         m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 
-    }
+        m_secondaryController.start().onTrue(m_SetLEDColorPurple);
+        m_secondaryController.back().onTrue(m_SetLEDColorYellow);       
+        }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.

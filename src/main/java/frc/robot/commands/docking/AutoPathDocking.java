@@ -84,20 +84,22 @@ public class AutoPathDocking extends CommandBase implements Loggable {
         if (poseBegin > 0){
             greater = true;
         }
-        if (poseBegin > poseAvg && greater){
+        if (poseBegin > poseAvg){
                 //m_drivebase.drive(new ChassisSpeeds(0.2,0,0));
                 return 0.2;
         }
+        /* 
         if (poseBegin < poseAvg && !greater){
             return 0.2;
-        }
-        else if (velAvg > 6 || velAvg < -7){
+        }*/
+       
+        else if (velAvg > 6 || velAvg < -6){
                 //m_drivebase.drive(new ChassisSpeeds(0,0,0));
             return 0;
         }
         else{
                 //m_drivebase.drive(new ChassisSpeeds(0.3,0,0));
-            return 0.3;
+            return 0.2;
         }
     }
 
@@ -139,7 +141,7 @@ public class AutoPathDocking extends CommandBase implements Loggable {
             
             if (yaw > -45 && yaw < 45){
                 //facing forward
-                poseStart = 10;
+                poseStart = 13;
                 m_drivebase.drive(new ChassisSpeeds(DockSpeed(navx.getRoll(), poseStart, velAvg),0,0));
             }
             if (yaw > -135 && yaw < 135){

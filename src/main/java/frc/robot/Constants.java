@@ -144,6 +144,17 @@ public final class Constants {
 
     }
 
+    public static final class LedConstants {
+        public static final int[] colorRed = {64, 3, 3}; //red
+        public static final int[] colorBlue = {0,0,64}; //blue
+        public static final int[] colorYellow = {64,32,0}; //yellow
+        public static final int[] colorPurple = {64,0,64}; //purple
+        //These show up as rainbow... 
+        public static final int[] color = {64,36,0}; //orange
+        public static final int[] colorGreen = {0,64,0}; //green    
+    }
+    
+    
     public static final class ArmConstants {
 
         public static final int angleMotorCanID = 10;
@@ -161,6 +172,7 @@ public final class Constants {
         //Angle and Extend arm Constants
         public static final double angleToDelivery = -.24;
         public static final double angleToFloor = -.36;
+        public static final double angleToSubstation = -.2;
         //All of these need testing...
         //meter value * tick conversion
 
