@@ -5,6 +5,7 @@ import java.nio.Buffer;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.LedConstants;
 
 public class LEDSubsystem extends SubsystemBase {
 
@@ -12,14 +13,23 @@ public class LEDSubsystem extends SubsystemBase {
     private final AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(30);
     public boolean rainbowYes = true;
     //how many pixels before it goes full bright again
-    int DarkPix = 6;
+    final int DarkPix = 6;
+    //the variable that 'moves' the pixels by simulating a different index
+    int add = 0;
+    //keeping track of time
+    long last_time = 0;
+    long time;
+    final int increment = 50;
 
    
     //declare the red, green, and blue values, and declare the SubtractVal array.
     int red;
     int green;
     int blue;
-    int[] SubtractVal = {0, 0, 0};
+    int[] SubtractVal = {0,0,0};
+    
+    // Current color that we want to display on the LEDs
+    int[] color = LedConstants.colorBlue;
 
 
     public LEDSubsystem() {
@@ -28,20 +38,14 @@ public class LEDSubsystem extends SubsystemBase {
 
     }
 
+
+    private int map(int x, int in_min, int in_max, int out_min, int out_max) {
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    }
+
+
     public void setColor(int[] Color){
-        for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-            //set all of the subtraction values to a mapped value
-            SubtractVal[0] = map((i % DarkPix), 0, (DarkPix), 0, Color[0]);
-            SubtractVal[1] = map((i % DarkPix), 0, (DarkPix), 0, Color[1]);
-            SubtractVal[2] = map((i % DarkPix), 0, (DarkPix), 0, Color[2]);
-            //set the modified red, green, and blue values
-            red = Math.round(Color[0] - SubtractVal[0]);
-            green = Math.round(Color[1] - SubtractVal[1]);
-            blue = Math.round(Color[2] - SubtractVal[2]);
-            // Sets the specified LED to the RGB values
-            m_ledBuffer.setRGB(i, red, green, blue);
-        }
-        m_led.setData(m_ledBuffer);
+        color = Color;
     }
 
 
@@ -71,17 +75,29 @@ public class LEDSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if(rainbowYes){
-            rainbow();
+        displayColors();
+    }
+    
+    private void displayColors() {       
+        time = System.currentTimeMillis();
+        if (time >= (last_time + increment)) {
+            add = (add+1)%DarkPix;
+            last_time = time;
         }
-    }
 
-    @Override
-    public void simulationPeriodic() {
-        // This method will be called once per scheduler run during simulation
-    }
-
-    private int map(int x, int in_min, int in_max, int out_min, int out_max) {
-        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+            //set all of the subtraction values to a mapped value
+            SubtractVal[0] = map(((i+add) % DarkPix), 0, (DarkPix), 0, color[0]);
+            SubtractVal[1] = map(((i+add) % DarkPix), 0, (DarkPix), 0, color[1]);
+            SubtractVal[2] = map(((i+add) % DarkPix), 0, (DarkPix), 0, color[2]);
+            //set the modified red, green, and blue values
+            red = Math.round(color[0] - SubtractVal[0]);
+            green = Math.round(color[1] - SubtractVal[1]);
+            blue = Math.round(color[2] - SubtractVal[2]);
+            // Sets the specified LED to the RGB values
+            m_ledBuffer.setRGB(i, red, green, blue);
+        }
+        m_led.setData(m_ledBuffer);
     }
 }
+    

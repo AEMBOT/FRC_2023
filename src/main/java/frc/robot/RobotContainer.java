@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SetLEDColor;
+import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.auto.gamePieceCheck;
@@ -71,8 +72,6 @@ public class RobotContainer {
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
     private final SetLEDColor m_SetLEDColorYellow = new SetLEDColor(m_LedSubsystem, colorYellow);
     private final SetLEDColor m_SetLEDColorPurple = new SetLEDColor(m_LedSubsystem, colorPurple);
-    
-    private final gamePieceCheck m_GamePieceCheck = new gamePieceCheck(m_limelight);
 
 
     // Controllers
@@ -207,8 +206,8 @@ public class RobotContainer {
                 m_armSubsystem
         ));
 
-        // Elevator go to Position
-        //m_secondaryController.y().onTrue(m_GoToPosition.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
+        // Elevator go to Position\
+        //y will be replaced with numpad buttons 
         m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
         //Docking
         m_secondaryController.b().onTrue(m_newDocking);
@@ -218,8 +217,8 @@ public class RobotContainer {
 
         m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 
-        m_secondaryController.start().onTrue(m_SetLEDColorPurple);
-        m_secondaryController.back().onTrue(m_SetLEDColorYellow);
+        m_secondaryController.start().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorYellow), m_LedSubsystem));
+        m_secondaryController.back().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorPurple), m_LedSubsystem));
         }
 
     /**
