@@ -6,7 +6,6 @@ package frc.robot.commands.scoring;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.subsystems.ArmSubsystem;
 
@@ -17,7 +16,7 @@ public class ArmCommand extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final ArmSubsystem m_subsystem;
     private final AutoScoring.TARGET_POSITION_Y target_position_y;
-    private AngleToPosition angleToPosition;
+    private GoToPosition angleToPosition;
     private GoToPosition goToPosition;
 
     /**
@@ -38,15 +37,15 @@ public class ArmCommand extends CommandBase {
         //TODO: Change values for go to posistion 
         switch (target_position_y) {
             case TOP:
-                angleToPosition = new AngleToPosition(m_subsystem, 0.0);
+                angleToPosition = new GoToPosition(m_subsystem, 0.0,0);
                 goToPosition = new GoToPosition(m_subsystem,0,0);
                 break;
             case CENTER:
-                angleToPosition = new AngleToPosition(m_subsystem, 0.0);
+                angleToPosition = new GoToPosition(m_subsystem, 0.0,0);
                 goToPosition = new GoToPosition(m_subsystem,0,0);
                 break;
             case BOTTOM:
-                angleToPosition = new AngleToPosition(m_subsystem, 0.0);
+                angleToPosition = new GoToPosition(m_subsystem, 0.0,0);
                 goToPosition = new GoToPosition(m_subsystem,0,0);
                 break;
         }

@@ -5,22 +5,20 @@
 package frc.robot.commands.auto;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.Limelight.Pipeline;
 
 /**
  * An example command that uses an example subsystem.
  */
-public class PiecePickUp extends CommandBase {
+public class gamePieceCheck extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final ArmSubsystem m_elevator;
-    private final double m_targetPos; //Get targetPosition from controller??
     private final Limelight m_Limelight;
-    private GoToPosition m_AngleToPositionFloor;
-
     //private final double m_angleMotorRotation;
     //private final double m_angle;
 
@@ -29,18 +27,13 @@ public class PiecePickUp extends CommandBase {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public PiecePickUp(ArmSubsystem subsystem, Limelight limelight,/*double angleMotorRotation, double angle, */ double targetPosition) {
-        m_elevator = subsystem;
-        m_targetPos = targetPosition;
+    public gamePieceCheck(Limelight limelight) {
         m_Limelight = limelight;
 
         //m_angleMotorRotation = angleMotorRotation;
         //m_angle = angle;
         // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(subsystem);
     }
-
-    PIDController pidController = new PIDController(0.2, 0.5, 0.5);
 
     // for now assuming that half and half for left or right placement of game piece
     //algorithm for later for relative to distance, which side it is on
@@ -58,7 +51,10 @@ public class PiecePickUp extends CommandBase {
         //public final boolean isCube;
         //public final double xPos;
         //public final double yPos;
-        m_AngleToPositionFloor = new GoToPosition(m_elevator, ArmConstants.angleToFloor,0);
+        m_Limelight.setPipeline(Pipeline.GAMEPIECE);
+        SmartDashboard.putNumber("gamepieceauto1", m_Limelight.getGamePiecePositions()[0].xPos);
+        SmartDashboard.putNumber("gamepieceauto2", m_Limelight.getGamePiecePositions()[0].yPos);
+        SmartDashboard.putBoolean("gamepieceauto3", m_Limelight.getGamePiecePositions()[0].isCube);
         //m_elevator.extendClamp;
         //1280 x 960
 
@@ -67,15 +63,6 @@ public class PiecePickUp extends CommandBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        m_elevator.stopAngle();
-    }
-
-    // Returns true when the command should end.
-
-
-    @Override
-    public boolean isFinished() {
-        return Math.abs(m_elevator.getAnglePosition() - m_targetPos) < .05;
     }
 }
 

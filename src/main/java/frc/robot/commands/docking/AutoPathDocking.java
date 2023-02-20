@@ -36,6 +36,8 @@ public class AutoPathDocking extends CommandBase implements Loggable {
     private boolean behindMiddle = false;
     private boolean frontMiddle = false;
 
+    private double appliedSpeed;
+
     private boolean finished = false;
 
     public AutoPathDocking(DrivebaseS drive, Limelight limelight) {
@@ -62,6 +64,7 @@ public class AutoPathDocking extends CommandBase implements Loggable {
     @Override
     public void initialize() {
         // Make sure motors are running in brake mode to avoid overshooting
+        appliedSpeed = 0;
         brakeRobot();
     }
 
@@ -112,12 +115,16 @@ public class AutoPathDocking extends CommandBase implements Loggable {
 
     @Override
     public void execute() {
-        double appliedSpeed  = 0.05 * (navx.getRoll() + 12);
-        if (Math.abs(appliedSpeed) > 0.4){
-            appliedSpeed = 0.4 * Math.signum(appliedSpeed);   
+       // double appliedSpeed  = 0.05* (navx.getRoll() + 12)  + 0.0025 * navx.getRawGyroY();
+        double appliedSpeed  = 0.1* (navx.getRoll() + 12);
+        if (Math.abs(appliedSpeed) > 0.5){
+            appliedSpeed = 0.5 * Math.signum(appliedSpeed);   
         }
         if (navx.getRoll() < 12 && navx.getRoll() > -12){
             appliedSpeed = 0;
+        }
+        if (tilt(navx.getRoll(), navx.getPitch()) < 5){
+            appliedSpeed =0;
         }
         m_drivebase.drive(new ChassisSpeeds(appliedSpeed,0,0));
 

@@ -23,9 +23,11 @@ import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.SetLEDColor;
 import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
+import frc.robot.commands.auto.gamePieceCheck;
 import frc.robot.commands.docking.AutoPathDocking;
 import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
@@ -68,6 +70,8 @@ public class RobotContainer {
     private final GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid, angleToDelivery);
     private final GoToPosition m_GoToPositionHigh = new GoToPosition(m_armSubsystem, extendToHigh, angleToDelivery);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
+    private final SetLEDColor m_SetLEDColorYellow = new SetLEDColor(m_LedSubsystem, colorYellow);
+    private final SetLEDColor m_SetLEDColorPurple = new SetLEDColor(m_LedSubsystem, colorPurple);
 
 
     // Controllers
@@ -124,8 +128,8 @@ public class RobotContainer {
                                 new GoToPosition(m_armSubsystem, 0, -0.5),
                                 new SequentialCommandGroup(
                                         new InstantCommand(() -> drivebaseS.resetPose(pathPlannerTrajectory.getInitialHolonomicPose())),
-                                        drivebaseS.pathPlannerCommand(pathPlannerTrajectory),
-                                        m_newDocking
+                                        drivebaseS.pathPlannerCommand(pathPlannerTrajectory)
+                                        //m_newDocking
                                 )
                         )
                 )
@@ -208,7 +212,8 @@ public class RobotContainer {
         //Docking
         m_secondaryController.b().onTrue(m_newDocking);
 
-        m_primaryController.a().whileTrue(m_dockingForceBalance);
+        //m_primaryController.a().whileTrue(m_dockingForceBalance);
+        m_primaryController.a().whileTrue(m_GamePieceCheck);
 
         m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 
