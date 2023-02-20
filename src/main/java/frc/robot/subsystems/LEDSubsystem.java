@@ -25,7 +25,7 @@ public class LEDSubsystem extends SubsystemBase {
     int red;
     int green;
     int blue;
-    int[] SubtractVal = {0, 0, 0};
+    int[] SubtractVal;
 
 
     public LEDSubsystem() {
@@ -34,10 +34,19 @@ public class LEDSubsystem extends SubsystemBase {
 
     }
 
+
+    private int map(int x, int in_min, int in_max, int out_min, int out_max) {
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    }
+
+
     public void setColor(int[] Color){
         time = System.currentTimeMillis();
         if (time >= (last_time + increment)) {
             displayColors(add,DarkPix,Color);
+        rainbowYes = false;
+        int[] SubtractVal = {0, 0, 0};
+
             add = (add+1)%DarkPix;
             last_time = time;
         }
@@ -84,9 +93,6 @@ public class LEDSubsystem extends SubsystemBase {
     public void simulationPeriodic() {
         // This method will be called once per scheduler run during simulation
     }
-
-    private int map(int x, int in_min, int in_max, int out_min, int out_max) {
-        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
     private void displayColors(int add, int DarkPix, int[] Color) {
@@ -103,5 +109,5 @@ public class LEDSubsystem extends SubsystemBase {
             m_ledBuffer.setRGB(i, red, green, blue);
         }
         m_led.setData(m_ledBuffer);
-    }
 }
+    

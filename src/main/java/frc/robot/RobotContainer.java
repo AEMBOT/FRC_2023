@@ -65,13 +65,10 @@ public class RobotContainer {
     private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS, m_limelight);
     private final DockingForceBalance m_dockingForceBalance = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
-    private final AngleToPosition m_AngleToPosition = new AngleToPosition(m_armSubsystem, angleToFloor);
     private final GoToPosition m_GoToPositionPickUp = new GoToPosition(m_armSubsystem, 0, angleToSubstation);
     private final GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid, angleToDelivery);
     private final GoToPosition m_GoToPositionHigh = new GoToPosition(m_armSubsystem, extendToHigh, angleToDelivery);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
-    private final SetLEDColor m_SetLEDColorYellow = new SetLEDColor(m_LedSubsystem, colorYellow);
-    private final SetLEDColor m_SetLEDColorPurple = new SetLEDColor(m_LedSubsystem, colorPurple);
 
 
     // Controllers
@@ -206,8 +203,8 @@ public class RobotContainer {
                 m_armSubsystem
         ));
 
-        // Elevator go to Position
-        //m_secondaryController.y().onTrue(m_GoToPosition.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
+        // Elevator go to Position\
+        //y will be replaced with numpad buttons 
         m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
         //Docking
         m_secondaryController.b().onTrue(m_newDocking);
@@ -216,8 +213,8 @@ public class RobotContainer {
 
         m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 
-        m_secondaryController.start().onTrue(m_SetLEDColorPurple);
-        m_secondaryController.back().onTrue(m_SetLEDColorYellow);
+        m_secondaryController.start().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorYellow), m_LedSubsystem));
+        m_secondaryController.back().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorPurple), m_LedSubsystem));
         }
 
     /**
