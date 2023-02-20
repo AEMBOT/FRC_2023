@@ -5,6 +5,8 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.VecBuilder;
@@ -39,6 +41,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static frc.robot.Constants.AutoConstants.eventMap;
 import static frc.robot.Constants.DriveConstants.*;
 import static java.lang.Math.abs;
 
@@ -500,6 +503,20 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
                 this
         );
         return command;
+    }
+
+    public SwerveAutoBuilder getSwerveAutoBuilder() {
+        return new SwerveAutoBuilder(
+                this::getPose,
+                this::resetPose,
+                m_kinematics,
+                new PIDConstants(3.0, 0.0, 0.0),
+                new PIDConstants(3.0, 0.0, 0.1),
+                this::setModuleStates,
+                eventMap,
+                true,
+                this
+        );
     }
 
 

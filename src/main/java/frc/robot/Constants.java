@@ -12,7 +12,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static frc.robot.Constants.AutoConstants.ALLIANCE;
@@ -142,6 +144,7 @@ public final class Constants {
         public static final double maxVelMetersPerSec = 2;
         public static final double maxAccelMetersPerSecondSq = 1;
 
+        public static HashMap<String, Command> eventMap = new HashMap<String, Command>();
     }
 
     public static final class LedConstants {
@@ -174,8 +177,8 @@ public final class Constants {
         public static final double angleToFloor = -.36;
         public static final double angleToSubstation = -.2;
 
-        public static final double maxAngleHardStop = -0.81;
-        public static final double minAngleSoftStop = 0.35;
+        public static final double maxAngleHardStop = -0.78;
+        public static final double minAngleSoftStop = 0.25;
 
         public static final double minExtendHardStop = -0.02;
         public static final double maxExtendSoftStop = 1.10;
@@ -272,12 +275,12 @@ public final class Constants {
                 ALLIANCE == DriverStation.Alliance.Red ?
                         new Pose2d(
                                 Units.feetToMeters(4) + Units.inchesToMeters(8.25),
-                                FIELD_WIDTH - (Units.feetToMeters(6.25 / 2.0) + Units.feetToMeters(5.5 / 2.0)),
+                                FIELD_WIDTH - (Units.feetToMeters(6.25) + Units.feetToMeters(5.5 / 2.0)),
                                 new Rotation2d(Math.PI)
                         ) :
                         new Pose2d(
                                 Units.feetToMeters(4) + Units.inchesToMeters(8.25),
-                                Units.feetToMeters(6.25 / 2.0) + Units.feetToMeters(5.5 / 2.0),
+                                Units.feetToMeters(6.25) + Units.feetToMeters(5.5 / 2.0),
                                 new Rotation2d(Math.PI)
                         );
 
@@ -285,24 +288,28 @@ public final class Constants {
                 ALLIANCE == DriverStation.Alliance.Red ?
                         new Pose2d(
                                 Units.feetToMeters(4) + Units.inchesToMeters(8.25),
-                                FIELD_WIDTH - (Units.feetToMeters(6.25 / 2.0) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0)),
+                                FIELD_WIDTH - (Units.feetToMeters(6.25) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0)),
                                 new Rotation2d(Math.PI)
                         ) :
                         new Pose2d(
                                 Units.feetToMeters(4) + Units.inchesToMeters(8.25),
-                                Units.feetToMeters(6.25 / 2.0) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0),
+                                Units.feetToMeters(6.25) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0),
                                 new Rotation2d(Math.PI)
                         );
 
-        public static final Pose2d CONE_OFFSET_LEFT = new Pose2d(
-                0,
-                Units.feetToMeters(1) + Units.inchesToMeters(6.5),
+        public static final Transform2d CONE_OFFSET_LEFT = new Transform2d(
+                new Translation2d(
+                        0,
+                        Units.feetToMeters(1) + Units.inchesToMeters(6.5)
+                ),
                 new Rotation2d()
         );
 
-        public static final Pose2d CONE_OFFSET_RIGHT = new Pose2d(
-                0,
-                -(Units.feetToMeters(1) + Units.inchesToMeters(6.5)),
+        public static final Transform2d CONE_OFFSET_RIGHT = new Transform2d(
+                new Translation2d(
+                        0,
+                        -(Units.feetToMeters(1) + Units.inchesToMeters(6.5))
+                ),
                 new Rotation2d()
         );
 
@@ -324,24 +331,30 @@ public final class Constants {
                         APRILTAG_LAYOUT.getTagPose(5).get().toPose2d() :
                         APRILTAG_LAYOUT.getTagPose(4).get().toPose2d();
 
-        public static final Pose2d DOUBLE_SUBSTATION_OFFSET_LEFT = new Pose2d(
-                0,
-                Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0),
-                new Rotation2d()
+        public static final Transform2d DOUBLE_SUBSTATION_OFFSET_LEFT = new Transform2d(
+                new Translation2d(
+                        1.0,
+                        Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0)
+                ),
+                new Rotation2d(Math.PI)
         );
 
-        public static final Pose2d DOUBLE_SUBSTATION_OFFSET_RIGHT = new Pose2d(
-                0,
-                -(Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0)),
-                new Rotation2d()
+        public static final Transform2d DOUBLE_SUBSTATION_OFFSET_RIGHT = new Transform2d(
+                new Translation2d(
+                        1.0,
+                        -(Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0))
+                ),
+                new Rotation2d(Math.PI)
         );
 
         /**
          * Convenience Pose to be used with Pose2d.plus()
          **/
-        public static final Pose2d ONE_METER_BACK = new Pose2d(
-                -1,
-                0,
+        public static final Transform2d ONE_METER_BACK = new Transform2d(
+                new Translation2d(
+                        -1,
+                        0
+                ),
                 new Rotation2d()
         );
     }

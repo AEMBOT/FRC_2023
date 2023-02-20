@@ -17,14 +17,14 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.SetLEDColor;
-import frc.robot.commands.arm.AngleToPosition;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.auto.gamePieceCheck;
@@ -52,6 +52,9 @@ import static frc.robot.Constants.VisionConstants.APRILTAG_LAYOUT;
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
 
+    @Log(methodName="getTotalCurrent")
+    private PowerDistribution power = new PowerDistribution();
+
     // Subsystems
     private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
     private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
@@ -70,13 +73,12 @@ public class RobotContainer {
     private final GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid, angleToDelivery);
     private final GoToPosition m_GoToPositionHigh = new GoToPosition(m_armSubsystem, extendToHigh, angleToDelivery);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
-    private final SetLEDColor m_SetLEDColorYellow = new SetLEDColor(m_LedSubsystem, colorYellow);
-    private final SetLEDColor m_SetLEDColorPurple = new SetLEDColor(m_LedSubsystem, colorPurple);
 
 
     // Controllers
     private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
     private final CommandXboxController m_secondaryController = new CommandXboxController(SECONDARY_CONTROLLER_PORT);
+    private final CommandGenericHID m_numpad = new CommandGenericHID(3);
 
     @Log
     private final Field2d field = new Field2d();
@@ -121,11 +123,11 @@ public class RobotContainer {
 
         autoSelector.addOption("twopiece",
                 new SequentialCommandGroup(
-                        new InstantCommand(m_armSubsystem::extendClamp),
-                        m_GoToPositionHigh,
-                        new InstantCommand(m_armSubsystem::retractClamp),
+//                        new InstantCommand(m_armSubsystem::extendClamp),
+//                        m_GoToPositionHigh,
+//                        new InstantCommand(m_armSubsystem::retractClamp),
                         new ParallelCommandGroup(
-                                new GoToPosition(m_armSubsystem, 0, -0.5),
+//                                new GoToPosition(m_armSubsystem, 0, -0.5),
                                 new SequentialCommandGroup(
                                         new InstantCommand(() -> drivebaseS.resetPose(pathPlannerTrajectory.getInitialHolonomicPose())),
                                         drivebaseS.pathPlannerCommand(pathPlannerTrajectory)
@@ -167,6 +169,32 @@ public class RobotContainer {
                         () -> drivebaseS.setRotationState(
                                 Units.degreesToRadians(m_primaryController.getHID().getPOV()))
                 ));
+
+        m_primaryController.back().whileTrue(drivebaseS.chasePoseC(
+                () -> DOUBLE_SUBSTATION.plus(DOUBLE_SUBSTATION_OFFSET_LEFT)
+        ));
+
+        m_primaryController.start().whileTrue(drivebaseS.chasePoseC(
+                () -> DOUBLE_SUBSTATION.plus(DOUBLE_SUBSTATION_OFFSET_RIGHT)
+        ));
+
+        m_numpad.button(7).whileTrue(
+                drivebaseS.chasePoseC(
+                        () -> GRID_COOP.plus(CONE_OFFSET_LEFT).plus(ONE_METER_BACK.times(0.5))
+                )
+        );
+
+        m_numpad.button(8).whileTrue(
+                drivebaseS.chasePoseC(
+                        () -> GRID_COOP.plus(ONE_METER_BACK.times(0.5))
+                )
+        );
+
+        m_numpad.button(9).whileTrue(
+                drivebaseS.chasePoseC(
+                        () -> GRID_COOP.plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))
+                )
+        );
 
         //m_primaryController.a().toggleOnTrue(drivebaseS.chasePoseC(target::getPose));
 
@@ -213,7 +241,6 @@ public class RobotContainer {
         m_secondaryController.b().onTrue(m_newDocking);
 
         //m_primaryController.a().whileTrue(m_dockingForceBalance);
-        m_primaryController.a().whileTrue(m_GamePieceCheck);
 
         m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 

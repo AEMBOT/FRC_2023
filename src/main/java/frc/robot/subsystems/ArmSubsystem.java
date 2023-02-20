@@ -33,6 +33,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     private Ultrasonic objectSensor = new Ultrasonic(ultrasonicPingPort, ultrasonicEchoPort);
     @Log
     private boolean activateExtendPID = false; // Activates PID controller, false when zeroing
+    @Log
     private boolean extendZeroed = false;
 
 
