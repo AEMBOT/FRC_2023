@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.docking.Docking;
 import frc.robot.subsystems.DrivebaseS;
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.Limelight.Pipeline;
 import io.github.oblarg.oblog.Logger;
 
 /**
@@ -132,7 +133,6 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Tilt", Docking.tilt(navx.getRoll(), navx.getPitch()));
         SmartDashboard.putNumber("RawGyroY", navx.getRawGyroY());
         SmartDashboard.putNumber("VelocityY ", navx.getVelocityY());
-
     }
 
 
