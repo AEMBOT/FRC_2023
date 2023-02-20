@@ -170,7 +170,7 @@ public final class Constants {
         public static final int ultrasonicEchoPort = 3;
 
         //Angle and Extend arm Constants
-        public static final double angleToDelivery = -.24;
+        public static final double angleToDelivery = -.48;
         public static final double angleToFloor = -.36;
         public static final double angleToSubstation = -.2;
 

@@ -121,8 +121,17 @@ public class RobotContainer {
 
         autoSelector.addOption("twopiece",
                 new SequentialCommandGroup(
-                        //new InstantCommand(() -> drivebaseS.resetPose(pathPlannerTrajectory.getInitialHolonomicPose())),
-                        drivebaseS.pathPlannerCommand(pathPlannerTrajectory)
+                        new InstantCommand(m_armSubsystem::extendClamp),
+                        m_GoToPositionHigh,
+                        new InstantCommand(m_armSubsystem::retractClamp),
+                        new ParallelCommandGroup(
+                                new GoToPosition(m_armSubsystem, 0, -0.5),
+                                new SequentialCommandGroup(
+                                        new InstantCommand(() -> drivebaseS.resetPose(pathPlannerTrajectory.getInitialHolonomicPose())),
+                                        drivebaseS.pathPlannerCommand(pathPlannerTrajectory),
+                                        m_newDocking
+                                )
+                        )
                 )
         );
 //    autoSelector.addOption("apriltag",
@@ -173,38 +182,29 @@ public class RobotContainer {
 
         // Elevator
         // Angle Motor
-        m_secondaryController.rightBumper().onFalse(new RunCommand(
-                m_armSubsystem::stopAngle,
-                m_armSubsystem));
-
-        m_secondaryController.leftBumper().onFalse(new RunCommand(
-                m_armSubsystem::stopAngle,
-                m_armSubsystem));
-
-        m_secondaryController.rightBumper().whileTrue(new RunCommand(
-                m_armSubsystem::angleUp,
-                m_armSubsystem));
-
-        m_secondaryController.leftBumper().whileTrue(new RunCommand(
+        m_secondaryController.leftBumper().whileTrue(new StartEndCommand(
                 m_armSubsystem::angleDown,
-                m_armSubsystem));
-        //
+                m_armSubsystem::stopAngle,
+                m_armSubsystem
+        ));
+
+        m_secondaryController.rightBumper().whileTrue(new StartEndCommand(
+                m_armSubsystem::angleUp,
+                m_armSubsystem::stopAngle,
+                m_armSubsystem
+        ));
         // Extend Motor
-        m_secondaryController.rightTrigger().onFalse(new RunCommand(
-                m_armSubsystem::stopExtend,
-                m_armSubsystem));
-
-        m_secondaryController.leftTrigger().onFalse(new RunCommand(
-                m_armSubsystem::stopExtend,
-                m_armSubsystem));
-
-        m_secondaryController.rightTrigger().whileTrue(new RunCommand(
-                m_armSubsystem::extendArm,
-                m_armSubsystem));
-
-        m_secondaryController.leftTrigger().whileTrue(new RunCommand(
+        m_secondaryController.leftTrigger().whileTrue(new StartEndCommand(
                 m_armSubsystem::retractArm,
-                m_armSubsystem));
+                m_armSubsystem::stopExtend,
+                m_armSubsystem
+        ));
+
+        m_secondaryController.rightTrigger().whileTrue(new StartEndCommand(
+                m_armSubsystem::extendArm,
+                m_armSubsystem::stopExtend,
+                m_armSubsystem
+        ));
 
         // Elevator go to Position
         //m_secondaryController.y().onTrue(m_GoToPosition.alongWith(m_AngleToPositionDeliver).andThen(new InstantCommand(m_armSubsystem::extendClamp)));
@@ -217,7 +217,7 @@ public class RobotContainer {
         m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 
         m_secondaryController.start().onTrue(m_SetLEDColorPurple);
-        m_secondaryController.back().onTrue(m_SetLEDColorYellow);       
+        m_secondaryController.back().onTrue(m_SetLEDColorYellow);
         }
 
     /**
@@ -236,14 +236,14 @@ public class RobotContainer {
          * DPad Up - Disengage auto claw actuation, close claw
          * DPad Down - Disengage auto claw actuation, open claw
          * DPad Left/Right - Engage auto claw actuation.
-         * 
+         *
          * int getMedian(arr) { //Assuming an array of 5 datapoints
          *      Arrays.sort(arr);
          *      return arr[2];
          * }
-         * 
-         * 
-         * 
+         *
+         *
+         *
          */
         // Needs to
     }

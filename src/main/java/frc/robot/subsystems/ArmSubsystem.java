@@ -31,6 +31,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     public DutyCycleEncoder absoluteAngleEncoder = new DutyCycleEncoder(angleEncoderPort);
     public Encoder relativeAngleEncoder = new Encoder(1, 2);
     private Ultrasonic objectSensor = new Ultrasonic(ultrasonicPingPort, ultrasonicEchoPort);
+    @Log
     private boolean activateExtendPID = false; // Activates PID controller, false when zeroing
     private boolean extendZeroed = false;
 
@@ -38,9 +39,9 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     LinearFilter filter = LinearFilter.movingAverage(movingAverage);
 
     @Log
-    PIDController pidExtend = new PIDController(582.62, 0, 10.198);
+    PIDController pidExtend = new PIDController(120, 0, 2); // p = 582.62, d = 10.198
     @Log
-    PIDController pidTheta = new PIDController(20, 0, 2);
+    PIDController pidTheta = new PIDController(150, 0, 2);
 
     ArmFeedforward thetaDown = new ArmFeedforward(0.5, 0.5, 50, 0);
     ArmFeedforward thetaUp = new ArmFeedforward(-0.5, 0.5, 40, 0);
@@ -66,6 +67,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         double thetaDownFeedforward = thetaDown.calculate(pidTheta.getSetpoint(), 0);
         double thetaUpFeedforward = thetaUp.calculate(pidTheta.getSetpoint(), 0);
         double pidThetaValue = pidTheta.calculate(getAnglePosition());
+        double pidExtendValue = pidExtend.calculate(extendEncoder.getPosition());
 
       /*  if(isGamePieceThere()){
             m_clampSolenoid.set(false);
@@ -74,7 +76,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
 */
         if (activateExtendPID) {
-            setExtendMotorVoltage(Math.min(pidExtend.calculate(extendEncoder.getPosition()), 1));
+            setExtendMotorVoltage(pidExtendValue);
             setAngleMotorVoltage(
                     (pidTheta.getSetpoint() > getAnglePosition() ?
                             thetaDownFeedforward :
@@ -88,6 +90,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         SmartDashboard.putNumber("thetaDownFeedForward", thetaDownFeedforward);
         SmartDashboard.putNumber("thetaUpFeedForward", thetaUpFeedforward);
         SmartDashboard.putNumber("pidThetaValue", pidThetaValue);
+        SmartDashboard.putNumber("pidExtendValue", pidExtendValue);
 //        SmartDashboard.putNumber("thetaGoal", pidTheta.getGoal().position);
 //        SmartDashboard.putNumber("thetaSetpointPos", pidTheta.getSetpoint().position);
 //        SmartDashboard.putNumber("thetaSetpointVel", pidTheta.getSetpoint().velocity);
