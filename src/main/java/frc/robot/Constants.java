@@ -173,6 +173,13 @@ public final class Constants {
         public static final double angleToDelivery = -.24;
         public static final double angleToFloor = -.36;
         public static final double angleToSubstation = -.2;
+
+        public static final double maxAngleHardStop = -0.81;
+        public static final double minAngleSoftStop = 0.35;
+
+        public static final double minExtendHardStop = -0.02;
+        public static final double maxExtendSoftStop = 1.10;
+
         //All of these need testing...
         //meter value * tick conversion
 

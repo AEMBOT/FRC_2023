@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -31,6 +32,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     public Encoder relativeAngleEncoder = new Encoder(1, 2);
     private Ultrasonic objectSensor = new Ultrasonic(ultrasonicPingPort, ultrasonicEchoPort);
     private boolean activateExtendPID = false; // Activates PID controller, false when zeroing
+    private boolean extendZeroed = false;
 
 
     LinearFilter filter = LinearFilter.movingAverage(movingAverage);
@@ -72,16 +74,15 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
 */
         if (activateExtendPID) {
-            m_extendMotor.setVoltage(Math.min(pidExtend.calculate(extendEncoder.getPosition()), 1));
-            m_angleMotor.setVoltage(
-                (pidTheta.getSetpoint() > getAnglePosition() ?
-                        thetaDownFeedforward :
-                        thetaUpFeedforward
-                ) +
-                        pidThetaValue
-        );
+            setExtendMotorVoltage(Math.min(pidExtend.calculate(extendEncoder.getPosition()), 1));
+            setAngleMotorVoltage(
+                    (pidTheta.getSetpoint() > getAnglePosition() ?
+                            thetaDownFeedforward :
+                            thetaUpFeedforward
+                    ) +
+                            pidThetaValue
+            );
         }
-
 
 
         SmartDashboard.putNumber("thetaDownFeedForward", thetaDownFeedforward);
@@ -117,12 +118,12 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         pidTheta.setSetpoint(0);
     }
 
-    public boolean isGamePieceThere(){
-        return objectSensor.getRangeInches() <=4;
+    public boolean isGamePieceThere() {
+        return objectSensor.getRangeInches() <= 4;
     }
 
 
-    public void resetExtendEncoder(){
+    public void resetExtendEncoder() {
         extendEncoder.setPosition(0);
     }
 
@@ -139,16 +140,36 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         pidTheta.setSetpoint(theta);
     }
 
+    private void setAngleMotorVoltage(double voltage) {
+        if (getAnglePosition() < maxAngleHardStop) {
+            m_angleMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));
+        } else if (getAnglePosition() > minAngleSoftStop) {
+            m_angleMotor.setVoltage(MathUtil.clamp(voltage, -12, 0));
+        } else {
+            m_angleMotor.setVoltage(voltage);
+        }
+    }
+
+    private void setExtendMotorVoltage(double voltage) {
+        if (getExtendPosition() < minExtendHardStop && extendZeroed) {
+            m_extendMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));
+        } else if (getExtendPosition() > maxExtendSoftStop && extendZeroed) {
+            m_extendMotor.setVoltage(MathUtil.clamp(voltage, -12, 0));
+        } else {
+            m_extendMotor.setVoltage(voltage);
+        }
+    }
+
     public void stopAngle() {
-        m_angleMotor.set(0);
+        setAngleMotorVoltage(0);
     }
 
     public void stopExtend() {
-        m_extendMotor.set(0);
+        setExtendMotorVoltage(0);
     }
 
     public void angleUp() {
-        m_angleMotor.setVoltage(7.0);
+        setAngleMotorVoltage(7.0);
     }
 
     public double getAnglePosition() {
@@ -156,15 +177,15 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     public void angleDown() {
-        m_angleMotor.setVoltage(-7.0);
+        setAngleMotorVoltage(-7.0);
     }
 
     public void extendArm() {
-        m_extendMotor.set(0.5);
+        setExtendMotorVoltage(0.5);
     }
 
     public void retractArm() {
-        m_extendMotor.set(-0.5);
+        setExtendMotorVoltage(-0.5);
     }
 
     public double getExtendPosition() {
@@ -192,6 +213,10 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     public void setExtendPIDState(boolean ready) {
         activateExtendPID = ready;
+    }
+
+    public void setExtendZeroed(boolean zeroed) {
+        extendZeroed = zeroed;
     }
 
 }

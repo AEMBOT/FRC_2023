@@ -11,6 +11,11 @@ public class GoHome extends CommandBase {
         m_armSubsystem = armSubsystem;
     }
 
+    @Override
+    public void initialize() {
+        m_armSubsystem.setExtendZeroed(false);
+    }
+
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
@@ -24,6 +29,7 @@ public class GoHome extends CommandBase {
         m_armSubsystem.stopExtend();
         m_armSubsystem.stopAngle();
         m_armSubsystem.resetExtendEncoder();
+        m_armSubsystem.setExtendZeroed(true);
     }
 
     // Returns true when the command should end.
