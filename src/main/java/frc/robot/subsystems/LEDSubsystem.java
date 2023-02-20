@@ -1,10 +1,11 @@
 package frc.robot.subsystems;
 
-import java.nio.Buffer;
-
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.LedConstants;
 
 public class LEDSubsystem extends SubsystemBase {
@@ -20,6 +21,8 @@ public class LEDSubsystem extends SubsystemBase {
     long last_time = 0;
     long time;
     final int increment = 50;
+    //getting alliance color
+    
 
    
     //declare the red, green, and blue values, and declare the SubtractVal array.
@@ -29,10 +32,15 @@ public class LEDSubsystem extends SubsystemBase {
     int[] SubtractVal = {0,0,0};
     
     // Current color that we want to display on the LEDs
-    int[] color = LedConstants.colorBlue;
+    int[] color = {0,64,0};
 
 
     public LEDSubsystem() {
+        if (DriverStation.getAlliance() == Alliance.Red) {
+            setColor(Constants.LedConstants.colorRed);
+        } else {
+            setColor(Constants.LedConstants.colorBlue);
+        }
         m_led.setLength(m_ledBuffer.getLength());
         m_led.start();
 
