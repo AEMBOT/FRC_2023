@@ -13,6 +13,12 @@ public class LEDSubsystem extends SubsystemBase {
     public boolean rainbowYes = true;
     //how many pixels before it goes full bright again
     int DarkPix = 6;
+    //the variable that 'moves' the pixels by simulating a different index
+    int add = 0;
+    //keeping track of time
+    long last_time = 0;
+    long time;
+    int increment = 50;
 
    
     //declare the red, green, and blue values, and declare the SubtractVal array.
@@ -29,19 +35,14 @@ public class LEDSubsystem extends SubsystemBase {
     }
 
     public void setColor(int[] Color){
-        for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-            //set all of the subtraction values to a mapped value
-            SubtractVal[0] = map((i % DarkPix), 0, (DarkPix), 0, Color[0]);
-            SubtractVal[1] = map((i % DarkPix), 0, (DarkPix), 0, Color[1]);
-            SubtractVal[2] = map((i % DarkPix), 0, (DarkPix), 0, Color[2]);
-            //set the modified red, green, and blue values
-            red = Math.round(Color[0] - SubtractVal[0]);
-            green = Math.round(Color[1] - SubtractVal[1]);
-            blue = Math.round(Color[2] - SubtractVal[2]);
-            // Sets the specified LED to the RGB values
-            m_ledBuffer.setRGB(i, red, green, blue);
+        time = System.currentTimeMillis();
+        if (time >= (last_time + increment)) {
+            displayColors(add,DarkPix,Color);
+            add = (add+1)%DarkPix;
+            last_time = time;
         }
-        m_led.setData(m_ledBuffer);
+        
+        
     }
 
 
@@ -71,9 +72,12 @@ public class LEDSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if(rainbowYes){
-            rainbow();
-        }
+        int[] tempColor = {255, 0, 0};
+        setColor(tempColor);
+        //if(rainbowYes){
+            //rainbow();
+            
+        //}
     }
 
     @Override
@@ -83,5 +87,21 @@ public class LEDSubsystem extends SubsystemBase {
 
     private int map(int x, int in_min, int in_max, int out_min, int out_max) {
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    }
+
+    private void displayColors(int add, int DarkPix, int[] Color) {
+        for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+            //set all of the subtraction values to a mapped value
+            SubtractVal[0] = map(((i+add) % DarkPix), 0, (DarkPix), 0, Color[0]);
+            SubtractVal[1] = map(((i+add) % DarkPix), 0, (DarkPix), 0, Color[1]);
+            SubtractVal[2] = map(((i+add) % DarkPix), 0, (DarkPix), 0, Color[2]);
+            //set the modified red, green, and blue values
+            red = Math.round(Color[0] - SubtractVal[0]);
+            green = Math.round(Color[1] - SubtractVal[1]);
+            blue = Math.round(Color[2] - SubtractVal[2]);
+            // Sets the specified LED to the RGB values
+            m_ledBuffer.setRGB(i, red, green, blue);
+        }
+        m_led.setData(m_ledBuffer);
     }
 }
