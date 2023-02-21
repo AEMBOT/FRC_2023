@@ -21,6 +21,9 @@ public class PiecePickUp extends CommandBase {
     private final Limelight m_Limelight;
     private GoToPosition m_AngleToPositionFloor;
 
+    //use ultrasonic sensor to close as approaching game piece
+    //hold down button when approaching to auto pick up
+
     //private final double m_angleMotorRotation;
     //private final double m_angle;
 

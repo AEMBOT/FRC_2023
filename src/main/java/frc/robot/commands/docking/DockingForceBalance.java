@@ -72,7 +72,16 @@ public class DockingForceBalance extends CommandBase implements Loggable {
     @Override
     public void execute() {
         //m_drivebase.drive(new ChassisSpeeds(-omegaToDriveSpeed(navx.getRawGyroY()), 0,0));
-        m_drivebase.drive(new ChassisSpeeds(omegaToDriveSpeed(navx.getRoll(), navx.getRawGyroY()), 0, 0));
+        //m_drivebase.drive(new ChassisSpeeds(omegaToDriveSpeed(navx.getRoll(), navx.getRawGyroY()), 0, 0));
+        //turn robot orientation x forward or backward (no yaw value)
+        if  (Math.abs(navx.getYaw()) > 10){
+            m_drivebase.drive(new ChassisSpeeds(0,0,0.3 * Math.signum(navx.getYaw())));
+        }
+        double appliedSpeed  = 0.05* (navx.getRoll()) - 0.005 * navx.getRawGyroY() * Math.signum(navx.getRoll());
+        if (Math.abs(appliedSpeed) > 0.25){
+            appliedSpeed = 0.25 * Math.signum(appliedSpeed);   
+        }
+        m_drivebase.drive(new ChassisSpeeds(appliedSpeed,0,0));
     }
 
     @Override
