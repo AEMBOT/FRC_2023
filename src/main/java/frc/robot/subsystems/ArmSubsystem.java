@@ -185,11 +185,11 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     public void extendArm() {
-        setExtendMotorVoltage(0.5);
+        setExtendMotorVoltage(7.0);
     }
 
     public void retractArm() {
-        setExtendMotorVoltage(-0.5);
+        setExtendMotorVoltage(-7.0);
     }
 
     public double getExtendPosition() {
