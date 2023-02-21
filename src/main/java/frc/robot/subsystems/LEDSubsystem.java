@@ -11,7 +11,7 @@ import frc.robot.Constants.LedConstants;
 public class LEDSubsystem extends SubsystemBase {
 
     private final AddressableLED m_led = new AddressableLED(9);
-    private final AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(30);
+    private final AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(58);
     public boolean rainbowYes = true;
     //how many pixels before it goes full bright again
     final int DarkPix = 6;
