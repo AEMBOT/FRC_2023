@@ -595,4 +595,16 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
                 this);
     }
 
+    public Command chasePoseC(Supplier<Pose2d> targetSupplier, double maxVelocity, double maxAcceleration) {
+        return new PPChasePoseCommand(
+                targetSupplier,
+                this::getPose,
+                holonomicDriveController,
+                this::drive,
+                (PathPlannerTrajectory traj) -> {
+                }, // empty output for current trajectory.
+                (startPose, endPose) -> DrivebaseS.generateTrajectoryToPose(startPose, endPose, getFieldRelativeLinearSpeedsMPS(), maxVelocity, maxAcceleration),
+                this);
+    }
+
 }

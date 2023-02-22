@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -13,6 +14,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.DrivebaseS;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,9 +46,9 @@ public final class Constants {
         static public final double ROBOT_MASS_kg = Units.lbsToKilograms(20.0);
         static public final double ROBOT_MOI_KGM2 = 1.0 / 12.0 * ROBOT_MASS_kg * Math.pow((WHEEL_BASE_WIDTH_M * 1.1), 2) * 2; //Model moment of intertia as a square slab slightly bigger than wheelbase with axis through center
         // Drivetrain Performance Mechanical limits
-        static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(6);
-        static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(6);
-        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI * 4;
+        static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(12);
+        static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(12);
+        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI * 8;
         static public final double MAX_TRANSLATE_ACCEL_MPS2 = MAX_FWD_REV_SPEED_MPS / 0.125; //0-full time of 0.25 second
         static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC / 0.25; //0-full time of 0.25 second
 
@@ -120,7 +122,7 @@ public final class Constants {
         public static final double drivekP = 3;
 
 
-        public static final double MAX_MODULE_SPEED_FPS = Units.feetToMeters(6);
+        public static final double MAX_MODULE_SPEED_FPS = Units.feetToMeters(12);
         public static final double MAX_TELEOP_TURN_RATE = Math.PI * 4; //Rate the robot will spin with full rotation command
 
         public static final int ENC_PULSE_PER_REV = 1;
@@ -139,7 +141,7 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final DriverStation.Alliance ALLIANCE = DriverStation.getAlliance();
+        public static DriverStation.Alliance ALLIANCE = DriverStation.getAlliance();
 
         public static final double maxVelMetersPerSec = 2;
         public static final double maxAccelMetersPerSecondSq = 1;
@@ -334,7 +336,7 @@ public final class Constants {
         public static final Transform2d DOUBLE_SUBSTATION_OFFSET_LEFT = new Transform2d(
                 new Translation2d(
                         1.0,
-                        Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0)
+                        -(Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0))
                 ),
                 new Rotation2d(Math.PI)
         );
@@ -342,7 +344,7 @@ public final class Constants {
         public static final Transform2d DOUBLE_SUBSTATION_OFFSET_RIGHT = new Transform2d(
                 new Translation2d(
                         1.0,
-                        -(Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0))
+                        Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0)
                 ),
                 new Rotation2d(Math.PI)
         );

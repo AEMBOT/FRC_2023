@@ -111,6 +111,9 @@ public class SwerveModule extends SubsystemBase implements Loggable {
         driveMotor.setInverted(true);
         rotationMotor.setInverted(true);
 
+        driveMotor.setSmartCurrentLimit(40);
+        rotationMotor.setSmartCurrentLimit(30);
+
         // Config the pid controllers
 
         // For a position controller we use a P loop on the position error

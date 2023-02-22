@@ -10,16 +10,12 @@ import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
 import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
 import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
-import static frc.robot.subsystems.ArmSubsystem.*;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -27,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
-import frc.robot.commands.auto.gamePieceCheck;
 import frc.robot.commands.docking.AutoPathDocking;
 import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
@@ -35,12 +30,7 @@ import frc.robot.commands.drivetrain.OperatorControlC;
 import frc.robot.subsystems.*;
 import io.github.oblarg.oblog.annotations.Log;
 
-import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
-import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.LedConstants.*;
-import static frc.robot.Constants.AutoConstants.ALLIANCE;
-import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
-import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
 import static frc.robot.Constants.VisionConstants.APRILTAG_LAYOUT;
 
 /**
@@ -80,6 +70,11 @@ public class RobotContainer {
     private final CommandXboxController m_secondaryController = new CommandXboxController(SECONDARY_CONTROLLER_PORT);
     private final CommandGenericHID m_numpad = new CommandGenericHID(3);
 
+    // Path Planner Trajectories
+    private final PathPlannerTrajectory twoPiecePath = PathPlanner.loadPath("twopiece", 1.0, 0.5);
+
+
+
     @Log
     private final Field2d field = new Field2d();
     @Log
@@ -89,15 +84,13 @@ public class RobotContainer {
     @Log
     SendableChooser<Command> autoSelector = new SendableChooser<Command>();
 
-    PathPlannerTrajectory pathPlannerTrajectory;
-
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
         target.setPose(new Pose2d(0, 0, new Rotation2d()));
 
-
+        // Subsystem Default Commands
         drivebaseS.setDefaultCommand(
                 new OperatorControlC(
                         m_primaryController::getLeftY,
@@ -109,17 +102,19 @@ public class RobotContainer {
         // Configure the button bindings
         configureBindings();
 
-        autoSelector.setDefaultOption("pathPlanner", new InstantCommand());
-        autoSelector.addOption("1 Meter Forward",
-                drivebaseS.pathPlannerCommand(
-                        DrivebaseS.generateTrajectoryToPose(
-                                drivebaseS.getPose(),
-                                drivebaseS.getPose().plus(new Transform2d(new Translation2d(1.0, 0.0), drivebaseS.getPoseHeading())),
-                                drivebaseS.getFieldRelativeLinearSpeedsMPS()
+        // Build Autos
+        autoSelector.setDefaultOption("No-op", new InstantCommand());
+        autoSelector.addOption("Leave Immediately",
+                new ProxyCommand(
+                        () -> drivebaseS.pathPlannerCommand(
+                                DrivebaseS.generateTrajectoryToPose(
+                                        drivebaseS.getPose(),
+                                        drivebaseS.getPose().plus(ONE_METER_BACK.times(5.0)),
+                                        drivebaseS.getFieldRelativeLinearSpeedsMPS()
+                                )
                         )
                 )
         );
-        pathPlannerTrajectory = PathPlanner.loadPath("twopiece", 1.0, 0.5);
 
         autoSelector.addOption("twopiece",
                 new SequentialCommandGroup(
@@ -129,8 +124,8 @@ public class RobotContainer {
                         new ParallelCommandGroup(
 //                                new GoToPosition(m_armSubsystem, 0, -0.5),
                                 new SequentialCommandGroup(
-                                        new InstantCommand(() -> drivebaseS.resetPose(pathPlannerTrajectory.getInitialHolonomicPose())),
-                                        drivebaseS.pathPlannerCommand(pathPlannerTrajectory)
+                                        new InstantCommand(() -> drivebaseS.resetPose(twoPiecePath.getInitialHolonomicPose())),
+                                        drivebaseS.pathPlannerCommand(twoPiecePath)
                                         //m_newDocking
                                 )
                         )
@@ -279,6 +274,7 @@ public class RobotContainer {
 
     public void onEnabled() {
         CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
+        ALLIANCE = DriverStation.getAlliance();
     }
 
     public void onInit() {
