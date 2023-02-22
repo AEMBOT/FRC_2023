@@ -210,29 +210,22 @@ public class RobotContainer {
 
         // Elevator
         // Angle Motor
-        m_secondaryController.leftBumper().whileTrue(new StartEndCommand(
-                m_armSubsystem::angleDown,
-                m_armSubsystem::stopAngle,
-                m_armSubsystem
-        ));
+        m_secondaryController.leftBumper().whileTrue(
+                new RunCommand(m_armSubsystem::angleDown).finallyDo((interrupted) -> m_armSubsystem.stopAngle())
+        );
 
-        m_secondaryController.rightBumper().whileTrue(new StartEndCommand(
-                m_armSubsystem::angleUp,
-                m_armSubsystem::stopAngle,
-                m_armSubsystem
-        ));
+        m_secondaryController.rightBumper().whileTrue(
+                new RunCommand(m_armSubsystem::angleUp).finallyDo((interrupted) -> m_armSubsystem.stopAngle())
+        );
+
         // Extend Motor
-        m_secondaryController.leftTrigger().whileTrue(new StartEndCommand(
-                m_armSubsystem::retractArm,
-                m_armSubsystem::stopExtend,
-                m_armSubsystem
-        ));
+        m_secondaryController.leftTrigger().whileTrue(
+                new RunCommand(m_armSubsystem::retractArm).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
+        );
 
-        m_secondaryController.rightTrigger().whileTrue(new StartEndCommand(
-                m_armSubsystem::extendArm,
-                m_armSubsystem::stopExtend,
-                m_armSubsystem
-        ));
+        m_secondaryController.rightTrigger().whileTrue(
+                new RunCommand(m_armSubsystem::extendArm).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
+        );
 
         // Elevator go to Position\
         //y will be replaced with numpad buttons 

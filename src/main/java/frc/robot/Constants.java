@@ -180,8 +180,8 @@ public final class Constants {
         public static final double maxAngleHardStop = -0.78;
         public static final double minAngleSoftStop = 0.25;
 
-        public static final double minExtendHardStop = -0.02;
-        public static final double maxExtendSoftStop = 1.10;
+        public static final double minExtendHardStop = 0.00;
+        public static final double maxExtendSoftStop = 1.25;
 
         //All of these need testing...
         //meter value * tick conversion
