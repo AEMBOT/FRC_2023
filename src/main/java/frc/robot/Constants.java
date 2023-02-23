@@ -156,7 +156,11 @@ public final class Constants {
         public static final int[] colorPurple = {64,0,64}; //purple
         //These show up as rainbow... 
         public static final int[] color = {64,36,0}; //orange
-        public static final int[] colorGreen = {0,64,0}; //green    
+        public static final int[] colorGreen = {0,64,0}; //green 
+        
+        public static final double slowStrobe = 3;
+        public static final double mediumStrobe = 2;
+        public static final double highStrobe = 1;
     }
     
     

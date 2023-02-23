@@ -1,12 +1,31 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.ArmConstants.angleEncoderPort;
+import static frc.robot.Constants.ArmConstants.angleMotorCanID;
+import static frc.robot.Constants.ArmConstants.angleMotorCurrentLimit;
+import static frc.robot.Constants.ArmConstants.clampSolenoidID;
+import static frc.robot.Constants.ArmConstants.extendMotorCanID;
+import static frc.robot.Constants.ArmConstants.extendMotorCurrentLimit;
+import static frc.robot.Constants.ArmConstants.extendTickToMeter;
+import static frc.robot.Constants.ArmConstants.maxAngleHardStop;
+import static frc.robot.Constants.ArmConstants.maxExtendSoftStop;
+import static frc.robot.Constants.ArmConstants.minAngleSoftStop;
+import static frc.robot.Constants.ArmConstants.minExtendHardStop;
+import static frc.robot.Constants.ArmConstants.movingAverage;
+import static frc.robot.Constants.ArmConstants.ultrasonicEchoPort;
+import static frc.robot.Constants.ArmConstants.ultrasonicPingPort;
+
+import frc.robot.subsystems.LEDSubsystem;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -16,8 +35,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-
-import static frc.robot.Constants.ArmConstants.*;
 
 public class ArmSubsystem extends SubsystemBase implements Loggable {
 
@@ -30,14 +47,18 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
     public DutyCycleEncoder absoluteAngleEncoder = new DutyCycleEncoder(angleEncoderPort);
     public Encoder relativeAngleEncoder = new Encoder(1, 2);
-    private Ultrasonic objectSensor = new Ultrasonic(ultrasonicPingPort, ultrasonicEchoPort);
+    private Ultrasonic ultrasonicSensor = new Ultrasonic(ultrasonicPingPort, ultrasonicEchoPort);
     @Log
     private boolean activateExtendPID = false; // Activates PID controller, false when zeroing
     @Log
     private boolean extendZeroed = false;
 
+    boolean previousObjectThere = false;
+
 
     LinearFilter filter = LinearFilter.movingAverage(movingAverage);
+    MedianFilter filterUltrasonic = new MedianFilter(5);
+
 
     @Log
     PIDController pidExtend = new PIDController(120, 0, 2); // p = 582.62, d = 10.198
@@ -70,12 +91,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         double pidThetaValue = pidTheta.calculate(getAnglePosition());
         double pidExtendValue = pidExtend.calculate(extendEncoder.getPosition());
 
-      /*  if(isGamePieceThere()){
-            m_clampSolenoid.set(false);
 
-        }
-
-*/
         if (activateExtendPID) {
             setExtendMotorVoltage(pidExtendValue);
             setAngleMotorVoltage(
@@ -96,6 +112,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 //        SmartDashboard.putNumber("thetaSetpointPos", pidTheta.getSetpoint().position);
 //        SmartDashboard.putNumber("thetaSetpointVel", pidTheta.getSetpoint().velocity);
 
+    clampSense();
     }
 
     public ArmSubsystem() {
@@ -120,10 +137,11 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
         pidExtend.setSetpoint(0);
         pidTheta.setSetpoint(0);
+
     }
 
     public boolean isGamePieceThere() {
-        return objectSensor.getRangeInches() <= 4;
+        return ultrasonicSensor.getRangeInches() <= 4;
     }
 
 
@@ -214,6 +232,39 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     public void toggleClamp() {
         m_clampSolenoid.set(!m_clampSolenoid.get());
     }
+
+     public boolean isClampOpen(){
+        return (m_clampSolenoid.get() == true);
+    }
+
+    public double sensorReading(){
+        return filterUltrasonic.calculate(ultrasonicSensor.getRangeInches());
+    }
+
+    public void clampSense(){
+        if(isClampOpen() && sensorReading() <= 4 && previousObjectThere == false){
+            //solid light: it's ready to be picked up
+        }
+        if(isClampOpen() && sensorReading() > 5){
+            if(sensorReading() < 6){
+                //medium strobing
+            } else if(sensorReading() < 7){
+                //low strobing
+            } else if(sensorReading() < 8){
+                //super low strobing
+            }else{
+                //turn lights off or switch to rainbow-- way too far to determine anything
+            }
+        }
+        if(!isClampOpen() && sensorReading() <= 4){
+            previousObjectThere = true;
+            //solid light
+        }
+        if(previousObjectThere && sensorReading() >= 8){
+            previousObjectThere = false;
+        }
+    }
+
 
     public void setExtendPIDState(boolean ready) {
         activateExtendPID = ready;

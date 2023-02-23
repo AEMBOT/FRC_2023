@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.Constants.LedConstants;
 
@@ -19,6 +20,7 @@ public class LEDSubsystem extends SubsystemBase {
     int add = 0;
     //keeping track of time
     long last_time = 0;
+    boolean blinkYes = true;
     long time;
     final int increment = 50;
     //getting alliance color
@@ -56,6 +58,27 @@ public class LEDSubsystem extends SubsystemBase {
         color = Color;
     }
 
+    public boolean blinkIsYes(){
+        return blinkYes = true;
+    }
+
+    //Probably doesn't work while periodic display colors is going
+    public void BlinkTime(float downTime){
+        double remainder = Timer.getFPGATimestamp() % downTime;
+        blinkYes = false;
+            for(int i=0; i <m_ledBuffer.getLength(); i++){
+                m_ledBuffer.setRGB(i, 0, 0, 0);
+                }
+                m_led.setData(m_ledBuffer);
+            }
+        } else{
+            blinkIsYes();
+        }
+    }
+
+    public int setBlink(int blinkTime){
+        return blinkTime;
+    }
 
     public void rainbow(){
         int m_rainbowFirstPixelHue = 2;
@@ -84,6 +107,7 @@ public class LEDSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         displayColors();
+
     }
     
     private void displayColors() {       
