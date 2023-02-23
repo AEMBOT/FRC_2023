@@ -38,6 +38,8 @@ import io.github.oblarg.oblog.annotations.Log;
 
 public class ArmSubsystem extends SubsystemBase implements Loggable {
 
+    private LEDSubsystem m_LedSubsystem;
+
     // Elevator
     private final CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
     private final CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
@@ -115,7 +117,9 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     clampSense();
     }
 
-    public ArmSubsystem() {
+    public ArmSubsystem(LEDSubsystem led) {
+        m_LedSubsystem = led;
+        
         // Restore motors to factory defaults for settings to be consistent
         m_angleMotor.restoreFactoryDefaults();
         m_extendMotor.restoreFactoryDefaults();
@@ -244,16 +248,22 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     public void clampSense(){
         if(isClampOpen() && sensorReading() <= 4 && previousObjectThere == false){
             //solid light: it's ready to be picked up
+            m_LedSubsystem.setBlink(0);
         }
         if(isClampOpen() && sensorReading() > 5){
             if(sensorReading() < 6){
                 //medium strobing
+                m_LedSubsystem.setBlink(2);
             } else if(sensorReading() < 7){
                 //low strobing
+                m_LedSubsystem.setBlink(4);
             } else if(sensorReading() < 8){
                 //super low strobing
+                m_LedSubsystem.setBlink(6);
             }else{
                 //turn lights off or switch to rainbow-- way too far to determine anything
+                m_LedSubsystem.setBlink(10);
+
             }
         }
         if(!isClampOpen() && sensorReading() <= 4){

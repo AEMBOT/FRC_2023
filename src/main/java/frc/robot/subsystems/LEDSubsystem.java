@@ -19,9 +19,9 @@ public class LEDSubsystem extends SubsystemBase {
     //the variable that 'moves' the pixels by simulating a different index
     int add = 0;
     //keeping track of time
-    long last_time = 0;
-    boolean blinkYes = true;
-    long time;
+    double last_time = 0;
+    float downTime = 0;
+    double time;
     final int increment = 50;
     //getting alliance color
     
@@ -58,26 +58,35 @@ public class LEDSubsystem extends SubsystemBase {
         color = Color;
     }
 
-    public boolean blinkIsYes(){
-        return blinkYes = true;
-    }
-
     //Probably doesn't work while periodic display colors is going
-    public void BlinkTime(float downTime){
+    public void BlinkTime(){
         double remainder = Timer.getFPGATimestamp() % downTime;
-        blinkYes = false;
+        if(downTime == 0){
+            return;
+        }
+        if(downTime >= 10){
             for(int i=0; i <m_ledBuffer.getLength(); i++){
                 m_ledBuffer.setRGB(i, 0, 0, 0);
                 }
                 m_led.setData(m_ledBuffer);
-            }
-        } else{
-            blinkIsYes();
+            return;
         }
+
+        if(remainder < downTime/2){
+            for(int i=0; i <m_ledBuffer.getLength(); i++){
+                m_ledBuffer.setRGB(i, 0, 0, 0);
+                }
+                m_led.setData(m_ledBuffer);
+        }else{
+                for(int i=0; i <m_ledBuffer.getLength(); i++){
+                m_ledBuffer.setRGB(i, 124, 252, 0);
+                }
+                m_led.setData(m_ledBuffer);
+        } 
     }
 
-    public int setBlink(int blinkTime){
-        return blinkTime;
+    public void setBlink(int blinkTime){
+        downTime = blinkTime;
     }
 
     public void rainbow(){
@@ -107,11 +116,12 @@ public class LEDSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         displayColors();
+        BlinkTime();
 
     }
     
-    private void displayColors() {       
-        time = System.currentTimeMillis();
+    private void displayColors() {    
+        time = Timer.getFPGATimestamp()*1000;   
         if (time >= (last_time + increment)) {
             add = (add+1)%DarkPix;
             last_time = time;

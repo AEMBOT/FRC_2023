@@ -46,11 +46,10 @@ public class RobotContainer {
     private PowerDistribution power = new PowerDistribution();
 
     // Subsystems
-    private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-    private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
+    private final LEDSubsystem m_LedSubsystem = new LEDSubsystem();
+    private final ArmSubsystem m_armSubsystem = new ArmSubsystem(m_LedSubsystem);
     private final VisionSubsystem visionSubsystem = new VisionSubsystem(new Limelight[]{new Limelight("limelight")});
     private final Limelight m_limelight = new Limelight();
-    private final LEDSubsystem m_LedSubsystem = new LEDSubsystem();
     @Log
     private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
 
@@ -275,6 +274,8 @@ public class RobotContainer {
     public void onEnabled() {
         CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
         ALLIANCE = DriverStation.getAlliance();
+        m_LedSubsystem.setBlink(2);
+        //CommandScheduler.getInstance().schedule(new RunCommand(m_LedSubsystem.setBlink(2), m_LedSubsystem));
     }
 
     public void onInit() {
