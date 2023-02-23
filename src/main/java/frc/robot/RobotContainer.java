@@ -5,13 +5,14 @@
 package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
-import static frc.robot.Constants.AutoConstants.ALLIANCE;
 import static frc.robot.Constants.ArmConstants.*;
+import static frc.robot.Constants.AutoConstants.*;
 import static frc.robot.Constants.InputDevices.*;
 import static frc.robot.Constants.VisionConstants.*;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
@@ -73,7 +74,26 @@ public class RobotContainer {
     // Path Planner Trajectories
     private final PathPlannerTrajectory twoPiecePath = PathPlanner.loadPath("twopiece", 1.0, 0.5);
 
-
+    // Path Planner Built Autos
+    private final SwerveAutoBuilder autoBuilder = drivebaseS.getSwerveAutoBuilder();
+    private final Command redLeft_blueRight = autoBuilder.fullAuto(
+            PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+    );
+    private final Command redRight_blueLeft = autoBuilder.fullAuto(
+            PathPlanner.loadPath("redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+    );
+    private final Command leave_redLeft_blueRight = autoBuilder.fullAuto(
+            PathPlanner.loadPath("leave-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+    );
+    private final Command leave_redRight_blueLeft = autoBuilder.fullAuto(
+            PathPlanner.loadPath("leave-redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+    );
+    private final Command twopiece_redLeft_blueRight = autoBuilder.fullAuto(
+            PathPlanner.loadPath("twopiece-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+    );
+    private final Command twopiece_redRight_blueLeft = autoBuilder.fullAuto(
+            PathPlanner.loadPath("twopiece-redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+    );
 
     @Log
     private final Field2d field = new Field2d();
@@ -103,6 +123,22 @@ public class RobotContainer {
         // Configure the button bindings
         configureBindings();
 
+        // Build Auto Event Map
+        eventMap.put("placeConeHigh",
+                new SequentialCommandGroup(
+                        m_GoToPositionHigh,
+                        new InstantCommand(m_armSubsystem::extendClamp)
+                )
+        );
+        eventMap.put("floorPickup",
+                new SequentialCommandGroup(
+                        new InstantCommand(m_armSubsystem::extendClamp),
+                        m_GoToPositionPickUp,
+                        new InstantCommand(m_armSubsystem::retractClamp)
+                )
+        );
+        eventMap.put("autoDock", m_newDocking);
+
         // Build Autos
         autoSelector.setDefaultOption("No-op", new InstantCommand());
         autoSelector.addOption("Leave Immediately",
@@ -116,6 +152,13 @@ public class RobotContainer {
                         )
                 )
         );
+
+        autoSelector.addOption("redLeft-blueRight", redLeft_blueRight);
+        autoSelector.addOption("redRight-blueLeft", redRight_blueLeft);
+        autoSelector.addOption("leave-redLeft-blueRight", leave_redLeft_blueRight);
+        autoSelector.addOption("leave-redRight-blueLeft", leave_redRight_blueLeft);
+        autoSelector.addOption("twopiece-redLeft-blueRight", twopiece_redLeft_blueRight);
+        autoSelector.addOption("twopiece-redRight-blueLeft", twopiece_redRight_blueLeft);
 
         autoSelector.addOption("twopiece",
                 new SequentialCommandGroup(
