@@ -6,16 +6,17 @@ package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static frc.robot.Constants.AutoConstants.ALLIANCE;
-import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
-import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
 import static frc.robot.Constants.ArmConstants.*;
+import static frc.robot.Constants.InputDevices.*;
 import static frc.robot.Constants.VisionConstants.*;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -46,7 +47,6 @@ public class RobotContainer {
     private PowerDistribution power = new PowerDistribution();
 
     // Subsystems
-    private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
     private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
     private final VisionSubsystem visionSubsystem = new VisionSubsystem(new Limelight[]{new Limelight("limelight")});
     private final Limelight m_limelight = new Limelight();
@@ -68,7 +68,7 @@ public class RobotContainer {
     // Controllers
     private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
     private final CommandXboxController m_secondaryController = new CommandXboxController(SECONDARY_CONTROLLER_PORT);
-    private final CommandGenericHID m_numpad = new CommandGenericHID(3);
+    private final CommandGenericHID m_numpad = new CommandGenericHID(NUMPAD_CONTROLLER_PORT);
 
     // Path Planner Trajectories
     private final PathPlannerTrajectory twoPiecePath = PathPlanner.loadPath("twopiece", 1.0, 0.5);
@@ -83,6 +83,7 @@ public class RobotContainer {
 
     @Log
     SendableChooser<Command> autoSelector = new SendableChooser<Command>();
+    GenericEntry pathDelay = Shuffleboard.getTab("Auto").add("Path Delay Time", 2.0).getEntry();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.

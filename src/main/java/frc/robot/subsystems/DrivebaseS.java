@@ -43,6 +43,7 @@ import java.util.function.Supplier;
 
 import static frc.robot.Constants.AutoConstants.eventMap;
 import static frc.robot.Constants.DriveConstants.*;
+import static frc.robot.Constants.VisionConstants.*;
 import static java.lang.Math.abs;
 
 public class DrivebaseS extends SubsystemBase implements Loggable {
@@ -57,10 +58,10 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
     private final SimGyroSensorModel simNavx = new SimGyroSensorModel();
     private final Limelight limelight;
 
-    public final PIDController xController = new PIDController(3.0, 0, 0);
-    public final PIDController yController = new PIDController(3.0, 0, 0);
+    public final PIDController xController = new PIDController(chassisTranslationalkP, 0, chassisTranslationalkD);
+    public final PIDController yController = new PIDController(chassisTranslationalkP, 0, chassisTranslationalkD);
     @Log
-    public final PIDController thetaController = new PIDController(3, 0, 0.1);
+    public final PIDController thetaController = new PIDController(chassisThetakP, 0, chassisThetakD);
     public final PPHolonomicDriveController holonomicDriveController = new PPHolonomicDriveController(xController, yController, thetaController);
 
     /**
@@ -98,9 +99,9 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
             fl, fr, bl, br
     );
 
-    private final LinearFilter visionPoseAverageX = LinearFilter.movingAverage(20);
-    private final LinearFilter visionPoseAverageY = LinearFilter.movingAverage(20);
-    private final LinearFilter visionPoseAverageT = LinearFilter.movingAverage(20);
+    private final LinearFilter visionPoseAverageX = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
+    private final LinearFilter visionPoseAverageY = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
+    private final LinearFilter visionPoseAverageT = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
 
     public DrivebaseS(Limelight m_limelight) {
         navx.reset();
@@ -112,7 +113,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
                         getModulePositions(),
                         new Pose2d()
                 );
-        odometry.setVisionMeasurementStdDevs(VecBuilder.fill(0.4, 0.4, 0.4));
+        odometry.setVisionMeasurementStdDevs(VecBuilder.fill(VISION_MEASUREMENT_STD_DEV, VISION_MEASUREMENT_STD_DEV, VISION_MEASUREMENT_STD_DEV));
         resetPose(new Pose2d());
         limelight = m_limelight;
     }
@@ -137,9 +138,9 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
             double poseAvgY = visionPoseAverageY.calculate(limelightPose.getY());
             double poseAvgT = visionPoseAverageT.calculate(limelightPose.getRotation().getRadians());
             if (
-                    abs(poseAvgX - limelightPose.getX()) < 0.5 &&
-                            abs(poseAvgY - limelightPose.getY()) < 0.5 &&
-                            abs(poseAvgT - limelightPose.getRotation().getRadians()) < 10.0
+                    abs(poseAvgX - limelightPose.getX()) < VISION_TRANSLATIONAL_RANGE &&
+                            abs(poseAvgY - limelightPose.getY()) < VISION_TRANSLATIONAL_RANGE &&
+                            abs(poseAvgT - limelightPose.getRotation().getRadians()) < VISION_ROTATIONAL_RANGE
                 // limelightPose.minus(odometry.getEstimatedPosition()).getTranslation().getNorm() < 1.0
             ) {
                 odometry.addVisionMeasurement(limelightPose, limelight.getLastTimestamp() / 1000.0);
@@ -510,8 +511,8 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
                 this::getPose,
                 this::resetPose,
                 m_kinematics,
-                new PIDConstants(3.0, 0.0, 0.0),
-                new PIDConstants(3.0, 0.0, 0.1),
+                new PIDConstants(chassisTranslationalkP, 0.0, chassisTranslationalkD),
+                new PIDConstants(chassisThetakP, 0.0, chassisThetakD),
                 this::setModuleStates,
                 eventMap,
                 true,

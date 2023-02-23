@@ -36,6 +36,7 @@ public final class Constants {
 
         public static final int PRIMARY_CONTROLLER_PORT = 0;
         public static final int SECONDARY_CONTROLLER_PORT = 1;
+        public static final int NUMPAD_CONTROLLER_PORT = 3;
 
     }
 
@@ -51,6 +52,8 @@ public final class Constants {
         static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI * 8;
         static public final double MAX_TRANSLATE_ACCEL_MPS2 = MAX_FWD_REV_SPEED_MPS / 0.125; //0-full time of 0.25 second
         static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC / 0.25; //0-full time of 0.25 second
+        static public final int DRIVE_MOTOR_CURRENT_LIMIT = 40;
+        static public final int ROTATION_MOTOR_CURRENT_LIMIT = 30;
 
         // HELPER ORGANIZATION CONSTANTS
         static public final int FL = 0; // Front Left Module Index
@@ -120,6 +123,11 @@ public final class Constants {
 
         //public static final double drivekP = 4.6; // 0.06 w/measurement delay?
         public static final double drivekP = 3;
+
+        public static final double chassisTranslationalkP = 3.0;
+        public static final double chassisTranslationalkD = 0.0;
+        public static final double chassisThetakP = 3.0;
+        public static final double chassisThetakD = 0.1;
 
 
         public static final double MAX_MODULE_SPEED_FPS = Units.feetToMeters(12);
@@ -202,6 +210,10 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
+        public static final double VISION_MEASUREMENT_STD_DEV = 0.4;
+        public static final int VISION_AVERAGING_TIME = 20;
+        public static final double VISION_TRANSLATIONAL_RANGE = 0.5;
+        public static final double VISION_ROTATIONAL_RANGE = 10;
         public static AprilTagFieldLayout getFieldLayout() {
             AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(
                     List.of(
