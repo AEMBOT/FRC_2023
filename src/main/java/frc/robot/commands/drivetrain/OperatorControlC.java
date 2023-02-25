@@ -31,8 +31,10 @@ public class OperatorControlC extends CommandBase {
     private final SlewRateLimiter yRateLimiter = new SlewRateLimiter(3);
     private final DoubleSupplier rotation;
     private final SlewRateLimiter thetaRateLimiter = new SlewRateLimiter(2);
+    private final boolean slow_mode;
 
-    private final double MAX_LINEAR_SPEED = 1;
+    private final double MAX_LINEAR_SPEED = 4;
+    private final double MIN_LINEAR_SPEED = 1;
 
     private final double JOYSTICK_DEADBAND = 0.07;
 
@@ -40,6 +42,7 @@ public class OperatorControlC extends CommandBase {
             DoubleSupplier fwdX,
             DoubleSupplier fwdY,
             DoubleSupplier rot,
+            boolean SLOW_MODE,
             DrivebaseS subsystem
     ) {
 
@@ -47,6 +50,7 @@ public class OperatorControlC extends CommandBase {
         forwardX = fwdX;
         forwardY = fwdY;
         rotation = rot;
+        slow_mode = SLOW_MODE;
 
         addRequirements(subsystem);
 
@@ -79,7 +83,8 @@ public class OperatorControlC extends CommandBase {
 
         double driveDirectionRadians = Math.atan2(fwdY, fwdX);
         double driveMagnitude = Math.hypot(fwdX, fwdY);
-        driveMagnitude *= MAX_LINEAR_SPEED;
+        driveMagnitude *= slow_mode ? MIN_LINEAR_SPEED : MAX_LINEAR_SPEED;
+
         //fwdX = driveMagnitude * Math.cos(driveDirectionRadians);
         //fwdY = driveMagnitude * Math.sin(driveDirectionRadians);
 

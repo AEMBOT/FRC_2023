@@ -100,6 +100,7 @@ public class RobotContainer {
                         m_primaryController::getLeftY,
                         m_primaryController::getLeftX,
                         m_primaryController::getRightX,
+                        false,
                         drivebaseS
                 )
         );
@@ -238,12 +239,18 @@ public class RobotContainer {
 
         m_secondaryController.start().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorYellow), m_LedSubsystem));
         m_secondaryController.back().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorPurple), m_LedSubsystem));
-        
-        // SloMo for driver
-      //  m_primaryController.leftBumper().whileTrue(
-       //         new RunCommand(m_SwerveModule::slowDrive).finallyDo((interrupted) -> m_SwerveModule.regularDrive())
-       // );
-}
+
+        // slow mode for driver
+        m_primaryController.leftBumper().whileTrue(
+                new OperatorControlC(
+                        m_primaryController::getLeftY,
+                        m_primaryController::getLeftX,
+                        m_primaryController::getRightX,
+                        true,
+                        drivebaseS
+                )
+        );
+    }   
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
