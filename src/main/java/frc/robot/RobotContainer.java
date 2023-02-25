@@ -35,6 +35,7 @@ import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import frc.robot.commands.scoring.DriverAssist;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.ArmSubsystem.TargetGrid;
 import io.github.oblarg.oblog.annotations.Log;
 
 import static frc.robot.Constants.LedConstants.*;
