@@ -307,4 +307,16 @@ public class SwerveModule extends SubsystemBase implements Loggable {
     public double getVelocitySetpoint() {
         return drivePIDController.getSetpoint();
     }
+
+    // Stuff for SloMo
+
+    public void slowDrive() {
+        driveMotor.setSmartCurrentLimit(10);
+        rotationMotor.setSmartCurrentLimit(8);
+    }
+
+    public void regularDrive() {
+        driveMotor.setSmartCurrentLimit(40);
+        rotationMotor.setSmartCurrentLimit(30);
+    }
 }

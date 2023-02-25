@@ -11,6 +11,7 @@ import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
 import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
+import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.*;
@@ -51,6 +52,9 @@ public class RobotContainer {
     private final VisionSubsystem visionSubsystem = new VisionSubsystem(new Limelight[]{new Limelight("limelight")});
     private final Limelight m_limelight = new Limelight();
     private final LEDSubsystem m_LedSubsystem = new LEDSubsystem();
+   // private final WPI_CANCoder driveMotor = new WPI_CANCoder();
+   // private final WPI_CANCoder rotationMotor = new WPI_CANCoder();
+   // private final SwerveModule m_SwerveModule = new SwerveModule(driveMotor, rotationMotor);
     @Log
     private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
 
@@ -234,7 +238,12 @@ public class RobotContainer {
 
         m_secondaryController.start().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorYellow), m_LedSubsystem));
         m_secondaryController.back().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorPurple), m_LedSubsystem));
-        }
+        
+        // SloMo for driver
+      //  m_primaryController.leftBumper().whileTrue(
+       //         new RunCommand(m_SwerveModule::slowDrive).finallyDo((interrupted) -> m_SwerveModule.regularDrive())
+       // );
+}
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.

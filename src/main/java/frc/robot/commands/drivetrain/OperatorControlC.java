@@ -32,7 +32,7 @@ public class OperatorControlC extends CommandBase {
     private final DoubleSupplier rotation;
     private final SlewRateLimiter thetaRateLimiter = new SlewRateLimiter(2);
 
-    private final double MAX_LINEAR_SPEED = 4;
+    private final double MAX_LINEAR_SPEED = 1;
 
     private final double JOYSTICK_DEADBAND = 0.07;
 
