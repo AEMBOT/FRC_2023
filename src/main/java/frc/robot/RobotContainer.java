@@ -10,7 +10,7 @@ import static frc.robot.Constants.AutoConstants.*;
 import static frc.robot.Constants.InputDevices.*;
 import static frc.robot.Constants.VisionConstants.*;
 
-import java.sql.Driver;
+import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 import javax.management.InstanceAlreadyExistsException;
 
@@ -58,6 +58,9 @@ public class RobotContainer {
     private final VisionSubsystem visionSubsystem = new VisionSubsystem(new Limelight[]{new Limelight("limelight")});
     private final Limelight m_limelight = new Limelight();
     private final LEDSubsystem m_LedSubsystem = new LEDSubsystem();
+   // private final WPI_CANCoder driveMotor = new WPI_CANCoder();
+   // private final WPI_CANCoder rotationMotor = new WPI_CANCoder();
+   // private final SwerveModule m_SwerveModule = new SwerveModule(driveMotor, rotationMotor);
     @Log
     private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
 
@@ -124,6 +127,7 @@ public class RobotContainer {
                         m_primaryController::getLeftY,
                         m_primaryController::getLeftX,
                         m_primaryController::getRightX,
+                        false,
                         drivebaseS
                 )
         );
@@ -361,7 +365,18 @@ public class RobotContainer {
 
         m_secondaryController.start().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorYellow), m_LedSubsystem));
         m_secondaryController.back().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorPurple), m_LedSubsystem));
-        }
+
+        // slow mode for driver
+        m_primaryController.leftBumper().whileTrue(
+                new OperatorControlC(
+                        m_primaryController::getLeftY,
+                        m_primaryController::getLeftX,
+                        m_primaryController::getRightX,
+                        true,
+                        drivebaseS
+                )
+        );
+    }   
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
