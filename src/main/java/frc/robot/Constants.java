@@ -285,6 +285,19 @@ public final class Constants {
                                 new Rotation2d(Math.PI)
                         );
 
+        public static final Pose2d GRID_LEFT =
+                ALLIANCE == DriverStation.Alliance.Red ?
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                FIELD_WIDTH - Units.feetToMeters(6.25 / 2.0),
+                                new Rotation2d(Math.PI)
+                        ) :
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                Units.feetToMeters(6.25) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0),
+                                new Rotation2d(Math.PI)
+                        );
+
         public static final Pose2d GRID_COOP =
                 ALLIANCE == DriverStation.Alliance.Red ?
                         new Pose2d(
@@ -295,6 +308,19 @@ public final class Constants {
                         new Pose2d(
                                 Units.feetToMeters(4) + Units.inchesToMeters(8.25),
                                 Units.feetToMeters(6.25) + Units.feetToMeters(5.5 / 2.0),
+                                new Rotation2d(Math.PI)
+                        );
+
+        public static final Pose2d GRID_RIGHT =
+                ALLIANCE == DriverStation.Alliance.Red ?
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                FIELD_WIDTH - (Units.feetToMeters(6.25) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0)),
+                                new Rotation2d(Math.PI)
+                        ) :
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                Units.feetToMeters(6.25 / 2.0),
                                 new Rotation2d(Math.PI)
                         );
 
