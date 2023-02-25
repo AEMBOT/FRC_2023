@@ -133,7 +133,6 @@ public class Limelight extends SubsystemBase {
         }
         return limeLight.getEntry("tv").getDouble(0) > 0.5; // Key tv is 1 for a vision target found and 0 for no target
     }
-
     /**
      * Returns the positions of any game pieces in the camera field-of-view
      * Returns in camera pixels, returns an empty set if not in the correct pipeline

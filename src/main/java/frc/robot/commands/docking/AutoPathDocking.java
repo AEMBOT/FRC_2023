@@ -116,7 +116,9 @@ public class AutoPathDocking extends CommandBase implements Loggable {
     @Override
     public void execute() {
        // double appliedSpeed  = 0.05* (navx.getRoll() + 12)  + 0.0025 * navx.getRawGyroY();
-        double appliedSpeed  = 0.07* (navx.getRoll() + 12) - 0.0025 * navx.getRawGyroY() * Math.signum(navx.getRoll());
+        //double appliedSpeed  = 0.01* (navx.getRoll() + 12 * Math.signum(navx.getRoll())) + 0.0025 * navx.getRawGyroY() * Math.signum(navx.getRoll());
+        //double appliedSpeed  =  0.0025 * navx.getRawGyroY() * Math.signum(navx.getRoll());
+        double appliedSpeed  = 0.01* (navx.getRoll() + 10 * Math.signum(navx.getRoll())) + 0.01 * navx.getRawGyroY() * Math.signum(navx.getRoll());
         if (Math.abs(appliedSpeed) > 0.5){
             appliedSpeed = 0.5 * Math.signum(appliedSpeed);   
         }

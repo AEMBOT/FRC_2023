@@ -12,6 +12,10 @@ import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 import static frc.robot.subsystems.ArmSubsystem.*;
 
+import java.sql.Driver;
+
+import javax.management.InstanceAlreadyExistsException;
+
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.*;
@@ -32,6 +36,7 @@ import frc.robot.commands.docking.AutoPathDocking;
 import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
+import frc.robot.commands.scoring.DriverAssist;
 import frc.robot.subsystems.*;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -73,6 +78,7 @@ public class RobotContainer {
     private final GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid, angleToDelivery);
     private final GoToPosition m_GoToPositionHigh = new GoToPosition(m_armSubsystem, extendToHigh, angleToDelivery);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
+    private DriverAssist m_driverAssist = new DriverAssist(m_limelight, drivebaseS, m_armSubsystem,TargetGrid.NONE);
 
 
     // Controllers
@@ -178,29 +184,103 @@ public class RobotContainer {
                 () -> DOUBLE_SUBSTATION.plus(DOUBLE_SUBSTATION_OFFSET_RIGHT)
         ));
 
-        m_numpad.button(7).whileTrue(
+        m_numpad.button(-1).onTrue(
+                //m_driverAssist.setTargetGrid(TargetGrid.INNER)
+                Commands.runOnce(() -> m_armSubsystem.setTargetGrid(TargetGrid.INNER), m_armSubsystem)
+        );
+        m_numpad.button(-2).onTrue(
+                Commands.runOnce(() -> m_armSubsystem.setTargetGrid(TargetGrid.COOP), m_armSubsystem)
+        );
+        m_numpad.button(-3).onTrue(
+                Commands.runOnce(() -> m_armSubsystem.setTargetGrid(TargetGrid.OUTER), m_armSubsystem)
+        );
+
+        m_numpad.button(1).whileTrue(
+                new SequentialCommandGroup(
+                new ParallelCommandGroup(
                 drivebaseS.chasePoseC(
-                        () -> GRID_COOP.plus(CONE_OFFSET_LEFT).plus(ONE_METER_BACK.times(0.5))
+                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(CONE_OFFSET_LEFT).plus(ONE_METER_BACK.times(0.5))),
+                m_GoToPositionPickUp
+                ), Commands.runOnce(() -> m_armSubsystem.setTargetGrid(TargetGrid.NONE), m_armSubsystem)
+        ));
+        m_numpad.button(2).whileTrue(
+                new ParallelCommandGroup(
+                drivebaseS.chasePoseC(
+                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(ONE_METER_BACK.times(0.5))),
+                new GoToPosition(m_armSubsystem, 0, 0)
+                )
+        );
+
+        m_numpad.button(3).whileTrue(
+                new ParallelCommandGroup(
+                drivebaseS.chasePoseC(
+                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))
+                ), m_GoToPositionPickUp
+        ));
+
+        m_numpad.button(4).whileTrue(
+                new ParallelCommandGroup(
+                drivebaseS.chasePoseC(
+                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(CONE_OFFSET_LEFT).plus(ONE_METER_BACK.times(0.5))),
+                m_GoToPositionMid
+                
+         ));
+
+        m_numpad.button(5).whileTrue(
+                new ParallelCommandGroup(
+                drivebaseS.chasePoseC(
+                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(ONE_METER_BACK.times(0.5))),
+                m_GoToPositionMid
+                )
+        );
+
+        m_numpad.button(6).whileTrue(
+                new ParallelCommandGroup(
+                drivebaseS.chasePoseC(
+                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))
+                ), m_GoToPositionMid
+        ));
+
+        m_numpad.button(7).whileTrue(
+                new ParallelCommandGroup(
+                drivebaseS.chasePoseC(
+                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(CONE_OFFSET_LEFT).plus(ONE_METER_BACK.times(0.5))),
+                m_GoToPositionHigh
                 )
         );
 
         m_numpad.button(8).whileTrue(
+                new ParallelCommandGroup(
                 drivebaseS.chasePoseC(
-                        () -> GRID_COOP.plus(ONE_METER_BACK.times(0.5))
+                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(ONE_METER_BACK.times(0.5))),
+                m_GoToPositionHigh
                 )
         );
 
         m_numpad.button(9).whileTrue(
+                new ParallelCommandGroup(
                 drivebaseS.chasePoseC(
-                        () -> GRID_COOP.plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))
-                )
-        );
+                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))
+                ), m_GoToPositionHigh
+        ));
+
+        m_numpad.button(10).whileTrue(
+                new SequentialCommandGroup(
+                new ParallelCommandGroup(
+                        m_GoToPositionHigh, new InstantCommand(m_armSubsystem::toggleClamp, m_armSubsystem)
+                ),
+                new SequentialCommandGroup(
+                        new InstantCommand(m_armSubsystem::toggleClamp, m_armSubsystem), 
+                        new GoToPosition(m_armSubsystem, 0,0)) //higher than go to position high, same extension
+                ));
+        
 
         //m_primaryController.a().toggleOnTrue(drivebaseS.chasePoseC(target::getPose));
 
 
         // Secondary Controller
         // Clamp
+
         m_secondaryController.a().toggleOnTrue(new InstantCommand(
                 // Toggles the clamp
                 m_armSubsystem::toggleClamp,
@@ -238,9 +318,9 @@ public class RobotContainer {
         //y will be replaced with numpad buttons 
         m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
         //Docking
-        m_secondaryController.b().onTrue(m_newDocking);
+        m_secondaryController.b().whileTrue(m_newDocking);
 
-        //m_primaryController.a().whileTrue(m_dockingForceBalance);
+        m_primaryController.a().whileTrue(m_dockingForceBalance);
 
         m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 

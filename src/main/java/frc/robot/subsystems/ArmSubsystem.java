@@ -222,5 +222,35 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     public void setExtendZeroed(boolean zeroed) {
         extendZeroed = zeroed;
     }
+    public enum TargetGrid{
+        INNER,
+        COOP,
+        OUTER,
+        NONE
+    }
+
+    private TargetGrid targetGrid;
+    public TargetGrid setTargetGrid(TargetGrid coop){
+        if (coop == TargetGrid.COOP){
+            targetGrid = coop;
+            return TargetGrid.COOP;
+       }
+       if (coop == TargetGrid.INNER){
+            targetGrid = coop;
+            return TargetGrid.INNER;
+       }
+       if (coop == TargetGrid.OUTER){
+            targetGrid = coop;
+            return TargetGrid.OUTER;
+       }
+       else{
+        targetGrid = coop;
+        return TargetGrid.NONE;
+       }
+    }
+    public TargetGrid getTargetGrid(){
+        return targetGrid;
+    }
+    
 
 }
