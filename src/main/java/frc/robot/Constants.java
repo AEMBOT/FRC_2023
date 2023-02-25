@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -13,6 +14,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.DrivebaseS;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +36,7 @@ public final class Constants {
 
         public static final int PRIMARY_CONTROLLER_PORT = 0;
         public static final int SECONDARY_CONTROLLER_PORT = 1;
+        public static final int NUMPAD_CONTROLLER_PORT = 3;
 
     }
 
@@ -44,11 +47,13 @@ public final class Constants {
         static public final double ROBOT_MASS_kg = Units.lbsToKilograms(20.0);
         static public final double ROBOT_MOI_KGM2 = 1.0 / 12.0 * ROBOT_MASS_kg * Math.pow((WHEEL_BASE_WIDTH_M * 1.1), 2) * 2; //Model moment of intertia as a square slab slightly bigger than wheelbase with axis through center
         // Drivetrain Performance Mechanical limits
-        static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(6);
-        static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(6);
-        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI * 4;
+        static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(12);
+        static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(12);
+        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI * 8;
         static public final double MAX_TRANSLATE_ACCEL_MPS2 = MAX_FWD_REV_SPEED_MPS / 0.125; //0-full time of 0.25 second
         static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC / 0.25; //0-full time of 0.25 second
+        static public final int DRIVE_MOTOR_CURRENT_LIMIT = 40;
+        static public final int ROTATION_MOTOR_CURRENT_LIMIT = 30;
 
         // HELPER ORGANIZATION CONSTANTS
         static public final int FL = 0; // Front Left Module Index
@@ -119,8 +124,13 @@ public final class Constants {
         //public static final double drivekP = 4.6; // 0.06 w/measurement delay?
         public static final double drivekP = 3;
 
+        public static final double chassisTranslationalkP = 3.0;
+        public static final double chassisTranslationalkD = 0.0;
+        public static final double chassisThetakP = 3.0;
+        public static final double chassisThetakD = 0.1;
 
-        public static final double MAX_MODULE_SPEED_FPS = Units.feetToMeters(6);
+
+        public static final double MAX_MODULE_SPEED_FPS = Units.feetToMeters(12);
         public static final double MAX_TELEOP_TURN_RATE = Math.PI * 4; //Rate the robot will spin with full rotation command
 
         public static final int ENC_PULSE_PER_REV = 1;
@@ -139,7 +149,7 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final DriverStation.Alliance ALLIANCE = DriverStation.getAlliance();
+        public static DriverStation.Alliance ALLIANCE = DriverStation.getAlliance();
 
         public static final double maxVelMetersPerSec = 2;
         public static final double maxAccelMetersPerSecondSq = 1;
@@ -180,8 +190,8 @@ public final class Constants {
         public static final double maxAngleHardStop = -0.78;
         public static final double minAngleSoftStop = 0.25;
 
-        public static final double minExtendHardStop = -0.02;
-        public static final double maxExtendSoftStop = 1.10;
+        public static final double minExtendHardStop = 0.00;
+        public static final double maxExtendSoftStop = 1.25;
 
         //All of these need testing...
         //meter value * tick conversion
@@ -200,6 +210,10 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
+        public static final double VISION_MEASUREMENT_STD_DEV = 0.4;
+        public static final int VISION_AVERAGING_TIME = 20;
+        public static final double VISION_TRANSLATIONAL_RANGE = 0.5;
+        public static final double VISION_ROTATIONAL_RANGE = 10;
         public static AprilTagFieldLayout getFieldLayout() {
             AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(
                     List.of(
@@ -271,6 +285,19 @@ public final class Constants {
                                 new Rotation2d(Math.PI)
                         );
 
+        public static final Pose2d GRID_LEFT =
+                ALLIANCE == DriverStation.Alliance.Red ?
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                FIELD_WIDTH - Units.feetToMeters(6.25 / 2.0),
+                                new Rotation2d(Math.PI)
+                        ) :
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                Units.feetToMeters(6.25) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0),
+                                new Rotation2d(Math.PI)
+                        );
+
         public static final Pose2d GRID_COOP =
                 ALLIANCE == DriverStation.Alliance.Red ?
                         new Pose2d(
@@ -281,6 +308,19 @@ public final class Constants {
                         new Pose2d(
                                 Units.feetToMeters(4) + Units.inchesToMeters(8.25),
                                 Units.feetToMeters(6.25) + Units.feetToMeters(5.5 / 2.0),
+                                new Rotation2d(Math.PI)
+                        );
+
+        public static final Pose2d GRID_RIGHT =
+                ALLIANCE == DriverStation.Alliance.Red ?
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                FIELD_WIDTH - (Units.feetToMeters(6.25) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0)),
+                                new Rotation2d(Math.PI)
+                        ) :
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                Units.feetToMeters(6.25 / 2.0),
                                 new Rotation2d(Math.PI)
                         );
 
@@ -334,7 +374,7 @@ public final class Constants {
         public static final Transform2d DOUBLE_SUBSTATION_OFFSET_LEFT = new Transform2d(
                 new Translation2d(
                         1.0,
-                        Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0)
+                        -(Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0))
                 ),
                 new Rotation2d(Math.PI)
         );
@@ -342,7 +382,7 @@ public final class Constants {
         public static final Transform2d DOUBLE_SUBSTATION_OFFSET_RIGHT = new Transform2d(
                 new Translation2d(
                         1.0,
-                        -(Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0))
+                        Units.inchesToMeters(46.25) - Units.inchesToMeters(32.25 / 2.0)
                 ),
                 new Rotation2d(Math.PI)
         );

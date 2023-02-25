@@ -17,6 +17,9 @@ import frc.robot.util.sim.SparkMaxEncoderWrapper;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
+import static frc.robot.Constants.DriveConstants.DRIVE_MOTOR_CURRENT_LIMIT;
+import static frc.robot.Constants.DriveConstants.ROTATION_MOTOR_CURRENT_LIMIT;
+
 public class SwerveModule extends SubsystemBase implements Loggable {
 
     /**
@@ -110,6 +113,9 @@ public class SwerveModule extends SubsystemBase implements Loggable {
 
         driveMotor.setInverted(true);
         rotationMotor.setInverted(true);
+
+        driveMotor.setSmartCurrentLimit(DRIVE_MOTOR_CURRENT_LIMIT);
+        rotationMotor.setSmartCurrentLimit(ROTATION_MOTOR_CURRENT_LIMIT);
 
         // Config the pid controllers
 

@@ -4,9 +4,9 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.LedConstants;
 
 public class LEDSubsystem extends SubsystemBase {
 
@@ -21,6 +21,7 @@ public class LEDSubsystem extends SubsystemBase {
     long last_time = 0;
     long time;
     final int increment = 50;
+    SerialPort serial = new SerialPort(115200, SerialPort.Port.kUSB);
     //getting alliance color
     
 
@@ -91,6 +92,7 @@ public class LEDSubsystem extends SubsystemBase {
         if (time >= (last_time + increment)) {
             add = (add+1)%DarkPix;
             last_time = time;
+            serial.writeString("a");
         }
 
         for (var i = 0; i < m_ledBuffer.getLength(); i++) {

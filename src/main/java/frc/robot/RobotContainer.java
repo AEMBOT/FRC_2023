@@ -5,12 +5,10 @@
 package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
-import static frc.robot.Constants.AutoConstants.ALLIANCE;
-import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
-import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
 import static frc.robot.Constants.ArmConstants.*;
+import static frc.robot.Constants.AutoConstants.*;
+import static frc.robot.Constants.InputDevices.*;
 import static frc.robot.Constants.VisionConstants.*;
-import static frc.robot.subsystems.ArmSubsystem.*;
 
 import java.sql.Driver;
 
@@ -18,12 +16,12 @@ import javax.management.InstanceAlreadyExistsException;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -31,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
-import frc.robot.commands.auto.gamePieceCheck;
 import frc.robot.commands.docking.AutoPathDocking;
 import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
@@ -40,12 +37,7 @@ import frc.robot.commands.scoring.DriverAssist;
 import frc.robot.subsystems.*;
 import io.github.oblarg.oblog.annotations.Log;
 
-import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
-import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.LedConstants.*;
-import static frc.robot.Constants.AutoConstants.ALLIANCE;
-import static frc.robot.Constants.InputDevices.PRIMARY_CONTROLLER_PORT;
-import static frc.robot.Constants.InputDevices.SECONDARY_CONTROLLER_PORT;
 import static frc.robot.Constants.VisionConstants.APRILTAG_LAYOUT;
 
 /**
@@ -61,7 +53,6 @@ public class RobotContainer {
     private PowerDistribution power = new PowerDistribution();
 
     // Subsystems
-    private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
     private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
     private final VisionSubsystem visionSubsystem = new VisionSubsystem(new Limelight[]{new Limelight("limelight")});
     private final Limelight m_limelight = new Limelight();
@@ -84,7 +75,31 @@ public class RobotContainer {
     // Controllers
     private final CommandXboxController m_primaryController = new CommandXboxController(PRIMARY_CONTROLLER_PORT);
     private final CommandXboxController m_secondaryController = new CommandXboxController(SECONDARY_CONTROLLER_PORT);
-    private final CommandGenericHID m_numpad = new CommandGenericHID(3);
+    private final CommandGenericHID m_numpad = new CommandGenericHID(NUMPAD_CONTROLLER_PORT);
+
+    // Path Planner Trajectories
+    private final PathPlannerTrajectory twoPiecePath = PathPlanner.loadPath("twopiece", 1.0, 0.5);
+
+    // Path Planner Built Autos
+    private final SwerveAutoBuilder autoBuilder = drivebaseS.getSwerveAutoBuilder();
+    private final Command redLeft_blueRight = autoBuilder.fullAuto(
+            PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+    );
+    private final Command redRight_blueLeft = autoBuilder.fullAuto(
+            PathPlanner.loadPath("redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+    );
+    private final Command leave_redLeft_blueRight = autoBuilder.fullAuto(
+            PathPlanner.loadPath("leave-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+    );
+    private final Command leave_redRight_blueLeft = autoBuilder.fullAuto(
+            PathPlanner.loadPath("leave-redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+    );
+    private final Command twopiece_redLeft_blueRight = autoBuilder.fullAuto(
+            PathPlanner.loadPath("twopiece-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+    );
+    private final Command twopiece_redRight_blueLeft = autoBuilder.fullAuto(
+            PathPlanner.loadPath("twopiece-redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+    );
 
     @Log
     private final Field2d field = new Field2d();
@@ -94,8 +109,7 @@ public class RobotContainer {
 
     @Log
     SendableChooser<Command> autoSelector = new SendableChooser<Command>();
-
-    PathPlannerTrajectory pathPlannerTrajectory;
+    GenericEntry pathDelay = Shuffleboard.getTab("Auto").add("Path Delay Time", 2.0).getEntry();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -103,7 +117,7 @@ public class RobotContainer {
     public RobotContainer() {
         target.setPose(new Pose2d(0, 0, new Rotation2d()));
 
-
+        // Subsystem Default Commands
         drivebaseS.setDefaultCommand(
                 new OperatorControlC(
                         m_primaryController::getLeftY,
@@ -115,17 +129,42 @@ public class RobotContainer {
         // Configure the button bindings
         configureBindings();
 
-        autoSelector.setDefaultOption("pathPlanner", new InstantCommand());
-        autoSelector.addOption("1 Meter Forward",
-                drivebaseS.pathPlannerCommand(
-                        DrivebaseS.generateTrajectoryToPose(
-                                drivebaseS.getPose(),
-                                drivebaseS.getPose().plus(new Transform2d(new Translation2d(1.0, 0.0), drivebaseS.getPoseHeading())),
-                                drivebaseS.getFieldRelativeLinearSpeedsMPS()
+        // Build Auto Event Map
+        eventMap.put("placeConeHigh",
+                new SequentialCommandGroup(
+                        m_GoToPositionHigh,
+                        new InstantCommand(m_armSubsystem::extendClamp)
+                )
+        );
+        eventMap.put("floorPickup",
+                new SequentialCommandGroup(
+                        new InstantCommand(m_armSubsystem::extendClamp),
+                        m_GoToPositionPickUp,
+                        new InstantCommand(m_armSubsystem::retractClamp)
+                )
+        );
+        eventMap.put("autoDock", m_newDocking);
+
+        // Build Autos
+        autoSelector.setDefaultOption("No-op", new InstantCommand());
+        autoSelector.addOption("Leave Immediately",
+                new ProxyCommand(
+                        () -> drivebaseS.pathPlannerCommand(
+                                DrivebaseS.generateTrajectoryToPose(
+                                        drivebaseS.getPose(),
+                                        drivebaseS.getPose().plus(ONE_METER_BACK.times(5.0)),
+                                        drivebaseS.getFieldRelativeLinearSpeedsMPS()
+                                )
                         )
                 )
         );
-        pathPlannerTrajectory = PathPlanner.loadPath("twopiece", 1.0, 0.5);
+
+        autoSelector.addOption("redLeft-blueRight", redLeft_blueRight);
+        autoSelector.addOption("redRight-blueLeft", redRight_blueLeft);
+        autoSelector.addOption("leave-redLeft-blueRight", leave_redLeft_blueRight);
+        autoSelector.addOption("leave-redRight-blueLeft", leave_redRight_blueLeft);
+        autoSelector.addOption("twopiece-redLeft-blueRight", twopiece_redLeft_blueRight);
+        autoSelector.addOption("twopiece-redRight-blueLeft", twopiece_redRight_blueLeft);
 
         autoSelector.addOption("twopiece",
                 new SequentialCommandGroup(
@@ -135,8 +174,8 @@ public class RobotContainer {
                         new ParallelCommandGroup(
 //                                new GoToPosition(m_armSubsystem, 0, -0.5),
                                 new SequentialCommandGroup(
-                                        new InstantCommand(() -> drivebaseS.resetPose(pathPlannerTrajectory.getInitialHolonomicPose())),
-                                        drivebaseS.pathPlannerCommand(pathPlannerTrajectory)
+                                        new InstantCommand(() -> drivebaseS.resetPose(twoPiecePath.getInitialHolonomicPose())),
+                                        drivebaseS.pathPlannerCommand(twoPiecePath)
                                         //m_newDocking
                                 )
                         )
@@ -290,29 +329,22 @@ public class RobotContainer {
 
         // Elevator
         // Angle Motor
-        m_secondaryController.leftBumper().whileTrue(new StartEndCommand(
-                m_armSubsystem::angleDown,
-                m_armSubsystem::stopAngle,
-                m_armSubsystem
-        ));
+        m_secondaryController.leftBumper().whileTrue(
+                new RunCommand(m_armSubsystem::angleDown).finallyDo((interrupted) -> m_armSubsystem.stopAngle())
+        );
 
-        m_secondaryController.rightBumper().whileTrue(new StartEndCommand(
-                m_armSubsystem::angleUp,
-                m_armSubsystem::stopAngle,
-                m_armSubsystem
-        ));
+        m_secondaryController.rightBumper().whileTrue(
+                new RunCommand(m_armSubsystem::angleUp).finallyDo((interrupted) -> m_armSubsystem.stopAngle())
+        );
+
         // Extend Motor
-        m_secondaryController.leftTrigger().whileTrue(new StartEndCommand(
-                m_armSubsystem::retractArm,
-                m_armSubsystem::stopExtend,
-                m_armSubsystem
-        ));
+        m_secondaryController.leftTrigger().whileTrue(
+                new RunCommand(m_armSubsystem::retractArm).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
+        );
 
-        m_secondaryController.rightTrigger().whileTrue(new StartEndCommand(
-                m_armSubsystem::extendArm,
-                m_armSubsystem::stopExtend,
-                m_armSubsystem
-        ));
+        m_secondaryController.rightTrigger().whileTrue(
+                new RunCommand(m_armSubsystem::extendArm).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
+        );
 
         // Elevator go to Position\
         //y will be replaced with numpad buttons 
@@ -366,6 +398,7 @@ public class RobotContainer {
 
     public void onEnabled() {
         CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
+        ALLIANCE = DriverStation.getAlliance();
     }
 
     public void onInit() {
