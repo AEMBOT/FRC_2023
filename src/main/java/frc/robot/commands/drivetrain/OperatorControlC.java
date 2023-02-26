@@ -26,11 +26,11 @@ public class OperatorControlC extends CommandBase {
      * versus using a double which would only update when the constructor is called
      */
     private final DoubleSupplier forwardX;
-    private final SlewRateLimiter xRateLimiter = new SlewRateLimiter(10);
+    private final SlewRateLimiter xRateLimiter = new SlewRateLimiter(5);
     private final DoubleSupplier forwardY;
-    private final SlewRateLimiter yRateLimiter = new SlewRateLimiter(10);
+    private final SlewRateLimiter yRateLimiter = new SlewRateLimiter(5);
     private final DoubleSupplier rotation;
-    private final SlewRateLimiter thetaRateLimiter = new SlewRateLimiter(10);
+    private final SlewRateLimiter thetaRateLimiter = new SlewRateLimiter(5);
     private final boolean slow_mode;
 
     private final double MAX_LINEAR_SPEED = 4;
