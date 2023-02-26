@@ -35,6 +35,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import static frc.robot.Constants.LedConstants.*;
 import static frc.robot.Constants.VisionConstants.APRILTAG_LAYOUT;
 import static frc.robot.commands.arm.ArmCommands.getPlaceGamePieceCommand;
+import static frc.robot.commands.arm.ArmCommands.HighPiecePickUpCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -221,6 +222,10 @@ public class RobotContainer {
 
         m_primaryController.start().whileTrue(drivebaseS.chasePoseC(
                 () -> DOUBLE_SUBSTATION.plus(DOUBLE_SUBSTATION_OFFSET_RIGHT)
+        ));
+
+        m_numpad.button(20).whileTrue(new ProxyCommand(
+                () -> HighPiecePickUpCommand(drivebaseS, m_armSubsystem, lastPressedNumpad)
         ));
 
         m_primaryController.a().whileTrue(

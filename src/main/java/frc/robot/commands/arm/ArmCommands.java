@@ -12,12 +12,12 @@ import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
 public class ArmCommands {
-    public static Command HighPiecePickUpCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, boolean left){
+    public static Command HighPiecePickUpCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, int numpadPosition){
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
             m_drivebase.chasePoseC(() -> 
             DOUBLE_SUBSTATION
-            .plus(left? DOUBLE_SUBSTATION_OFFSET_LEFT : DOUBLE_SUBSTATION_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))),
+            .plus(numpadPosition == 10? DOUBLE_SUBSTATION_OFFSET_LEFT : DOUBLE_SUBSTATION_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))),
             new GoToPosition(m_arm, 0.5,0.5)
             ),
             new InstantCommand(m_arm::toggleClamp, m_arm)
@@ -25,12 +25,17 @@ public class ArmCommands {
     }
 
     public static Command getPlaceGamePieceCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition position, int numpadPosition) {
+        /*
+        //for driving to grid
         Pose2d targetPosition = switch (position) {
             case LEFT_GRID -> GRID_LEFT;
             case COOP_GRID, NONE -> GRID_COOP;
             case RIGHT_GRID -> GRID_RIGHT;
             case DOUBLE_SUBSTATION -> DOUBLE_SUBSTATION;
-        };
+        };*/
+        //for only grid itself     
+        Pose2d targetPosition = m_drivebase.getPose();
+
         targetPosition = switch (numpadPosition) {
             case 1, 4, 7 -> targetPosition.plus(CONE_OFFSET_LEFT);
             case 2, 5, 8 -> targetPosition;
@@ -63,4 +68,9 @@ public class ArmCommands {
                 )
         );
     }
+    /* 
+    public static Command getPlacePieceAnyOrientationCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition targetPosition){
+
+    }*/
+   
 }
