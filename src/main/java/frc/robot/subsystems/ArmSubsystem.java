@@ -26,7 +26,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     // Elevator
     private final CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
     private final CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
-    private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, clampSolenoidID);
+    private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.REVPH, clampSolenoidID);
 
     public RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
