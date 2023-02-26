@@ -34,7 +34,7 @@ public final class Constants {
 
         public static final int PRIMARY_CONTROLLER_PORT = 0;
         public static final int SECONDARY_CONTROLLER_PORT = 1;
-        public static final int NUMPAD_CONTROLLER_PORT = 3;
+        public static final int NUMPAD_CONTROLLER_PORT = 2;
 
     }
 
@@ -111,7 +111,8 @@ public final class Constants {
          * ks, kv, ka
          */
         //public static final double[] DRIVE_FF = {0.11452, 1.9844, 0.31123};
-        public static final double[] DRIVE_FF = {0.055, 2.6826, 0.1188};
+//        public static final double[] DRIVE_FF = {0.055, 2.6826, 0.1188};
+        public static final double[] DRIVE_FF = {0.0256, 2.4837, 0.2629};
 
         public static final SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(DRIVE_FF[0], DRIVE_FF[1], DRIVE_FF[2]);
 
@@ -119,12 +120,12 @@ public final class Constants {
         //public static final double rotationkD = 0.05 / 2.5;
         public static final double rotationkD = 0;
 
-        //public static final double drivekP = 4.6; // 0.06 w/measurement delay?
-        public static final double drivekP = 3;
+        public static final double drivekP = 3.8888; // 0.06 w/measurement delay?
+//        public static final double drivekP = 3;
 
-        public static final double chassisTranslationalkP = 3.0;
+        public static final double chassisTranslationalkP = 4.0;
         public static final double chassisTranslationalkD = 0.0;
-        public static final double chassisThetakP = 3.0;
+        public static final double chassisThetakP = 4.0;
         public static final double chassisThetakD = 0.1;
 
 

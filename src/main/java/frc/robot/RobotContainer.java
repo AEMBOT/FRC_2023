@@ -48,6 +48,7 @@ public class RobotContainer {
 
     @Log(methodName = "getTotalCurrent")
     private PowerDistribution power = new PowerDistribution();
+    private final Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
 
     // Subsystems
     private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
@@ -108,7 +109,9 @@ public class RobotContainer {
     GenericEntry pathDelay = Shuffleboard.getTab("Auto").add("Path Delay Time", 2.0).getEntry();
 
     // Driver Controls
+    @Log
     private int lastPressedNumpad = -1;
+    @Log(methodName = "toString")
     private TargetPosition targetPosition = TargetPosition.NONE;
 
     /**
@@ -116,6 +119,7 @@ public class RobotContainer {
      */
     public RobotContainer() {
         target.setPose(new Pose2d(0, 0, new Rotation2d()));
+        compressor.enableDigital();
 
         // Subsystem Default Commands
         drivebaseS.setDefaultCommand(
@@ -379,7 +383,7 @@ public class RobotContainer {
     }
 
     public void onEnabled() {
-//        CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
+        CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
         ALLIANCE = DriverStation.getAlliance();
     }
 

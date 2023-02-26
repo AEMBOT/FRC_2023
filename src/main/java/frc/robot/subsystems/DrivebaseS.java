@@ -9,6 +9,7 @@ import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -58,7 +59,9 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
     private final SimGyroSensorModel simNavx = new SimGyroSensorModel();
     private final Limelight limelight;
 
+    @Log
     public final PIDController xController = new PIDController(chassisTranslationalkP, 0, chassisTranslationalkD);
+    @Log
     public final PIDController yController = new PIDController(chassisTranslationalkP, 0, chassisTranslationalkD);
     @Log
     public final PIDController thetaController = new PIDController(chassisThetakP, 0, chassisThetakD);
@@ -234,20 +237,20 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
      * @return
      */
     private SwerveModuleState[] getStoppedStates() {
-//        SwerveModuleState[] states = new SwerveModuleState[4];
-//        for (int i = 0; i < NUM_MODULES; i++) {
-//            states[i] = new SwerveModuleState(
-//                0,
-//                new Rotation2d(MathUtil.angleModulus(modules.get(i).getCanEncoderAngle().getRadians())));
-//        }
-//        return states;
         SwerveModuleState[] states = new SwerveModuleState[4];
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < NUM_MODULES; i++) {
             states[i] = new SwerveModuleState(
-                    0,
-                    new Rotation2d(0));
+                0,
+                new Rotation2d(MathUtil.angleModulus(modules.get(i).getCanEncoderAngle().getRadians())));
         }
         return states;
+//        SwerveModuleState[] states = new SwerveModuleState[4];
+//        for (int i = 0; i < 4; i++) {
+//            states[i] = new SwerveModuleState(
+//                    0,
+//                    new Rotation2d(0));
+//        }
+//        return states;
     }
 
     /**

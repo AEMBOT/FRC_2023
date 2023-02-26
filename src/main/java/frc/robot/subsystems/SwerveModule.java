@@ -135,6 +135,9 @@ public class SwerveModule extends SubsystemBase implements Loggable {
         // Give this module a unique name on the dashboard so we have four separate sub-tabs.
         loggingName = "SwerveModule-" + moduleConstants.name + "-[" + driveMotor.getDeviceId() + ',' + rotationMotor.getDeviceId() + ']';
         resetDistance();
+
+        rotationMotor.burnFlash();
+        driveMotor.burnFlash();
     }
 
     /**
