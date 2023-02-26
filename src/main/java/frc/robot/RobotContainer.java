@@ -379,7 +379,7 @@ public class RobotContainer {
     }
 
     public void onEnabled() {
-        CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
+//        CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
         ALLIANCE = DriverStation.getAlliance();
     }
 

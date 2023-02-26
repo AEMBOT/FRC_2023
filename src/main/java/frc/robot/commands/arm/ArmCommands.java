@@ -25,17 +25,12 @@ public class ArmCommands {
     }
 
     public static Command getPlaceGamePieceCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition position, int numpadPosition) {
-        /*
-        //for driving to grid
         Pose2d targetPosition = switch (position) {
             case LEFT_GRID -> GRID_LEFT;
             case COOP_GRID, NONE -> GRID_COOP;
             case RIGHT_GRID -> GRID_RIGHT;
             case DOUBLE_SUBSTATION -> DOUBLE_SUBSTATION;
-        };*/
-        //for only grid itself     
-        Pose2d targetPosition = m_drivebase.getPose();
-
+        };
         targetPosition = switch (numpadPosition) {
             case 1, 4, 7 -> targetPosition.plus(CONE_OFFSET_LEFT);
             case 2, 5, 8 -> targetPosition;

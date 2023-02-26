@@ -113,7 +113,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         m_extendMotor.setSmartCurrentLimit(extendMotorCurrentLimit);
         m_angleMotor.setSmartCurrentLimit(angleMotorCurrentLimit);
 
-        m_extendMotor.setInverted(true);
+        m_extendMotor.setInverted(false);
         m_angleMotor.setInverted(true);
 
         extendEncoder.setPositionConversionFactor(extendTickToMeter);

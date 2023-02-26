@@ -65,10 +65,10 @@ public final class Constants {
         static private final double HW = WHEEL_BASE_WIDTH_M / 2.0;
 
         public enum ModuleConstants {
-            FL("FL", 9, 2, 12, 2.351588, HW, HW),
-            FR("FR", 3, 4, 10, 2.109219, HW, -HW),
-            BL("BL", 5, 6, 13, 0.971008, -HW, HW),
-            BR("BR", 7, 8, 11, 1.366774, -HW, -HW);
+            FL("FL", 9, 2, 12, 5.378126, HW, HW),
+            FR("FR", 3, 4, 13, 1.253253, HW, -HW),
+            BL("BL", 5, 6, 14, 2.997392, -HW, HW),
+            BR("BR", 7, 8, 15, 5.934966, -HW, -HW);
 
             public final String name;
             public final int driveMotorID;
@@ -172,7 +172,7 @@ public final class Constants {
         public static final int angleEncoderPort = 0;
         public static final int angleEncoderOffset = 0;
         public static final int extendMotorCanID = 11;
-        public static final int clampSolenoidID = 0;
+        public static final int clampSolenoidID = 15;
         public static final int movingAverage = 5;
         public static final int extendMotorCurrentLimit = 35;
         public static final int angleMotorCurrentLimit = 40;
