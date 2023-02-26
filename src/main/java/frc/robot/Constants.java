@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -14,7 +13,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.DrivebaseS;
 
 import java.util.HashMap;
 import java.util.List;
@@ -397,5 +395,13 @@ public final class Constants {
                 ),
                 new Rotation2d()
         );
+
+        public enum TargetPosition {
+            LEFT_GRID,
+            COOP_GRID,
+            RIGHT_GRID,
+            DOUBLE_SUBSTATION,
+            NONE
+        }
     }
 }

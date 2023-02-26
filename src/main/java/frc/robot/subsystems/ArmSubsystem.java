@@ -13,7 +13,9 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.arm.GoToPosition;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -222,34 +224,9 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     public void setExtendZeroed(boolean zeroed) {
         extendZeroed = zeroed;
     }
-    public enum TargetGrid{
-        INNER,
-        COOP,
-        OUTER,
-        NONE
-    }
 
-    private TargetGrid targetGrid;
-    public TargetGrid setTargetGrid(TargetGrid coop){
-        if (coop == TargetGrid.COOP){
-            targetGrid = coop;
-            return TargetGrid.COOP;
-       }
-       if (coop == TargetGrid.INNER){
-            targetGrid = coop;
-            return TargetGrid.INNER;
-       }
-       if (coop == TargetGrid.OUTER){
-            targetGrid = coop;
-            return TargetGrid.OUTER;
-       }
-       else{
-        targetGrid = coop;
-        return TargetGrid.NONE;
-       }
-    }
-    public TargetGrid getTargetGrid(){
-        return targetGrid;
+    public Command getGoToPositionCommand(double targetExtend, double targetTheta) {
+        return new GoToPosition(this, targetExtend, targetTheta);
     }
     
 

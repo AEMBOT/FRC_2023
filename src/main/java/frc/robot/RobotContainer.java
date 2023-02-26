@@ -10,10 +10,6 @@ import static frc.robot.Constants.AutoConstants.*;
 import static frc.robot.Constants.InputDevices.*;
 import static frc.robot.Constants.VisionConstants.*;
 
-import com.ctre.phoenix.sensors.WPI_CANCoder;
-
-import javax.management.InstanceAlreadyExistsException;
-
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
@@ -33,13 +29,12 @@ import frc.robot.commands.docking.AutoPathDocking;
 import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
-import frc.robot.commands.scoring.DriverAssist;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.ArmSubsystem.TargetGrid;
 import io.github.oblarg.oblog.annotations.Log;
 
 import static frc.robot.Constants.LedConstants.*;
 import static frc.robot.Constants.VisionConstants.APRILTAG_LAYOUT;
+import static frc.robot.commands.arm.ArmCommands.getPlaceGamePieceCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -50,7 +45,7 @@ import static frc.robot.Constants.VisionConstants.APRILTAG_LAYOUT;
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
 
-    @Log(methodName="getTotalCurrent")
+    @Log(methodName = "getTotalCurrent")
     private PowerDistribution power = new PowerDistribution();
 
     // Subsystems
@@ -58,9 +53,6 @@ public class RobotContainer {
     private final VisionSubsystem visionSubsystem = new VisionSubsystem(new Limelight[]{new Limelight("limelight")});
     private final Limelight m_limelight = new Limelight();
     private final LEDSubsystem m_LedSubsystem = new LEDSubsystem();
-   // private final WPI_CANCoder driveMotor = new WPI_CANCoder();
-   // private final WPI_CANCoder rotationMotor = new WPI_CANCoder();
-   // private final SwerveModule m_SwerveModule = new SwerveModule(driveMotor, rotationMotor);
     @Log
     private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
 
@@ -73,7 +65,6 @@ public class RobotContainer {
     private final GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid, angleToDelivery);
     private final GoToPosition m_GoToPositionHigh = new GoToPosition(m_armSubsystem, extendToHigh, angleToDelivery);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
-    private DriverAssist m_driverAssist = new DriverAssist(m_limelight, drivebaseS, m_armSubsystem,TargetGrid.NONE);
 
 
     // Controllers
@@ -114,6 +105,10 @@ public class RobotContainer {
     @Log
     SendableChooser<Command> autoSelector = new SendableChooser<Command>();
     GenericEntry pathDelay = Shuffleboard.getTab("Auto").add("Path Delay Time", 2.0).getEntry();
+
+    // Driver Controls
+    private int lastPressedNumpad = -1;
+    private TargetPosition targetPosition = TargetPosition.NONE;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -228,102 +223,66 @@ public class RobotContainer {
                 () -> DOUBLE_SUBSTATION.plus(DOUBLE_SUBSTATION_OFFSET_RIGHT)
         ));
 
-        m_numpad.button(-1).onTrue(
+        m_primaryController.a().whileTrue(
+                new ProxyCommand(
+                        () -> getPlaceGamePieceCommand(drivebaseS, m_armSubsystem, targetPosition, lastPressedNumpad)
+                )
+        );
+
+        m_numpad.button(10).onTrue(
+                Commands.runOnce(() -> { targetPosition = TargetPosition.DOUBLE_SUBSTATION; lastPressedNumpad = 10; })
+        );
+
+        m_numpad.button(11).onTrue(
+                Commands.runOnce(() -> { targetPosition = TargetPosition.DOUBLE_SUBSTATION; lastPressedNumpad = 11; })
+        );
+
+        m_numpad.button(12).onTrue(
                 //m_driverAssist.setTargetGrid(TargetGrid.INNER)
-                Commands.runOnce(() -> m_armSubsystem.setTargetGrid(TargetGrid.INNER), m_armSubsystem)
+                Commands.runOnce(() -> targetPosition = TargetPosition.LEFT_GRID)
         );
-        m_numpad.button(-2).onTrue(
-                Commands.runOnce(() -> m_armSubsystem.setTargetGrid(TargetGrid.COOP), m_armSubsystem)
+        m_numpad.button(13).onTrue(
+                Commands.runOnce(() -> targetPosition = TargetPosition.COOP_GRID)
         );
-        m_numpad.button(-3).onTrue(
-                Commands.runOnce(() -> m_armSubsystem.setTargetGrid(TargetGrid.OUTER), m_armSubsystem)
+        m_numpad.button(14).onTrue(
+                Commands.runOnce(() -> targetPosition = TargetPosition.RIGHT_GRID)
         );
-        
-        
 
         m_numpad.button(1).whileTrue(
-                new SequentialCommandGroup(
-                new ParallelCommandGroup(
-                drivebaseS.chasePoseC(
-                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(CONE_OFFSET_LEFT).plus(ONE_METER_BACK.times(0.5))),
-                m_GoToPositionPickUp
-                ), Commands.runOnce(() -> m_armSubsystem.setTargetGrid(TargetGrid.NONE), m_armSubsystem)
-        ));
+                new InstantCommand(() -> lastPressedNumpad = 1)
+        );
+
         m_numpad.button(2).whileTrue(
-                new ParallelCommandGroup(
-                drivebaseS.chasePoseC(
-                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(ONE_METER_BACK.times(0.5))),
-                new GoToPosition(m_armSubsystem, 0, 0)
-                )
+                new InstantCommand(() -> lastPressedNumpad = 2)
         );
 
         m_numpad.button(3).whileTrue(
-                new ParallelCommandGroup(
-                drivebaseS.chasePoseC(
-                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))
-                ), m_GoToPositionPickUp
-        ));
+                new InstantCommand(() -> lastPressedNumpad = 3)
+        );
 
         m_numpad.button(4).whileTrue(
-                new ParallelCommandGroup(
-                drivebaseS.chasePoseC(
-                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(CONE_OFFSET_LEFT).plus(ONE_METER_BACK.times(0.5))),
-                m_GoToPositionMid
-                
-         ));
+                new InstantCommand(() -> lastPressedNumpad = 4)
+        );
 
         m_numpad.button(5).whileTrue(
-                new ParallelCommandGroup(
-                drivebaseS.chasePoseC(
-                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(ONE_METER_BACK.times(0.5))),
-                m_GoToPositionMid
-                )
+                new InstantCommand(() -> lastPressedNumpad = 5)
         );
 
         m_numpad.button(6).whileTrue(
-                new ParallelCommandGroup(
-                drivebaseS.chasePoseC(
-                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))
-                ), m_GoToPositionMid
-        ));
+                new InstantCommand(() -> lastPressedNumpad = 6)
+        );
 
         m_numpad.button(7).whileTrue(
-                new ParallelCommandGroup(
-                drivebaseS.chasePoseC(
-                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(CONE_OFFSET_LEFT).plus(ONE_METER_BACK.times(0.5))),
-                m_GoToPositionHigh
-                )
+                new InstantCommand(() -> lastPressedNumpad = 7)
         );
 
         m_numpad.button(8).whileTrue(
-                new ParallelCommandGroup(
-                drivebaseS.chasePoseC(
-                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(ONE_METER_BACK.times(0.5))),
-                m_GoToPositionHigh
-                )
+                new InstantCommand(() -> lastPressedNumpad = 8)
         );
 
         m_numpad.button(9).whileTrue(
-                new ParallelCommandGroup(
-                drivebaseS.chasePoseC(
-                        () -> m_driverAssist.goToStation(m_armSubsystem.getTargetGrid()).plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))
-                ), m_GoToPositionHigh
-        ));
-
-        m_numpad.button(10).whileTrue(
-                new SequentialCommandGroup(
-                new ParallelCommandGroup(
-                        m_GoToPositionHigh, new InstantCommand(m_armSubsystem::toggleClamp, m_armSubsystem)
-                ),
-                new SequentialCommandGroup(
-                        new InstantCommand(m_armSubsystem::toggleClamp, m_armSubsystem), 
-                        new GoToPosition(m_armSubsystem, 0,0)) //higher than go to position high, same extension
-                ));
-        
-
-        //m_primaryController.a().toggleOnTrue(drivebaseS.chasePoseC(target::getPose));
-
-
+                new InstantCommand(() -> lastPressedNumpad = 9)
+        );
         // Secondary Controller
         // Clamp
 
@@ -376,7 +335,7 @@ public class RobotContainer {
                         drivebaseS
                 )
         );
-    }   
+    }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -406,13 +365,13 @@ public class RobotContainer {
         // Needs to
     }
 
-  public void periodic() {
-    SmartDashboard.putString("Alliance", ALLIANCE.toString());
-    drivebaseS.drawRobotOnField(field);
-    field3d.setRobotPose(new Pose3d(drivebaseS.getPose()));
-    //Put LED stuff here
+    public void periodic() {
+        SmartDashboard.putString("Alliance", ALLIANCE.toString());
+        drivebaseS.drawRobotOnField(field);
+        field3d.setRobotPose(new Pose3d(drivebaseS.getPose()));
+        //Put LED stuff here
 
-  }
+    }
 
     public void onEnabled() {
         CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
