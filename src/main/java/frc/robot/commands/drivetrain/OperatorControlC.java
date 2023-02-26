@@ -26,11 +26,11 @@ public class OperatorControlC extends CommandBase {
      * versus using a double which would only update when the constructor is called
      */
     private final DoubleSupplier forwardX;
-    private final SlewRateLimiter xRateLimiter = new SlewRateLimiter(3);
+    private final SlewRateLimiter xRateLimiter = new SlewRateLimiter(10);
     private final DoubleSupplier forwardY;
-    private final SlewRateLimiter yRateLimiter = new SlewRateLimiter(3);
+    private final SlewRateLimiter yRateLimiter = new SlewRateLimiter(10);
     private final DoubleSupplier rotation;
-    private final SlewRateLimiter thetaRateLimiter = new SlewRateLimiter(2);
+    private final SlewRateLimiter thetaRateLimiter = new SlewRateLimiter(10);
     private final boolean slow_mode;
 
     private final double MAX_LINEAR_SPEED = 4;
@@ -89,8 +89,8 @@ public class OperatorControlC extends CommandBase {
         //fwdY = driveMagnitude * Math.sin(driveDirectionRadians);
 
         //PROGRAMMING MODE
-        fwdX = driveMagnitude * Math.cos(driveDirectionRadians) * 0.5;
-        fwdY = driveMagnitude * Math.sin(driveDirectionRadians) * 0.5;
+        fwdX = driveMagnitude * Math.cos(driveDirectionRadians);
+        fwdY = driveMagnitude * Math.sin(driveDirectionRadians);
 
 
         double rot = -rotation.getAsDouble();
@@ -98,7 +98,7 @@ public class OperatorControlC extends CommandBase {
         //rot = Math.copySign(rot * rot, rot);
         rot = applyDeadband(rot, JOYSTICK_DEADBAND);
         rot = thetaRateLimiter.calculate(rot);
-        rot *= DriveConstants.MAX_TELEOP_TURN_RATE * 0.5;
+        rot *= DriveConstants.MAX_TELEOP_TURN_RATE;
 
 
         drive.driveFieldRelative(new ChassisSpeeds(fwdX, fwdY, rot));
