@@ -30,6 +30,7 @@ import frc.robot.commands.docking.AutoPathDocking;
 import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
+import frc.robot.commands.drivetrain.OperatorControlHoldingC;
 import frc.robot.subsystems.*;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -63,9 +64,6 @@ public class RobotContainer {
     private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS, m_limelight);
     private final DockingForceBalance m_dockingForceBalance = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
-    private final GoToPosition m_GoToPositionPickUp = new GoToPosition(m_armSubsystem, 0, angleToSubstation);
-    private final GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid, angleToHigh);
-    private final GoToPosition m_GoToPositionHigh = new GoToPosition(m_armSubsystem, extendToHigh, angleToHigh);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
 
 
@@ -137,14 +135,14 @@ public class RobotContainer {
         // Build Auto Event Map
         eventMap.put("placeConeHigh",
                 new SequentialCommandGroup(
-                        m_GoToPositionHigh,
+                        m_armSubsystem.getGoToPositionCommand(extendToHigh, angleToHigh).withTimeout(3),
                         new InstantCommand(m_armSubsystem::extendClamp)
                 )
         );
         eventMap.put("floorPickup",
                 new SequentialCommandGroup(
                         new InstantCommand(m_armSubsystem::extendClamp),
-                        m_GoToPositionPickUp,
+                        m_armSubsystem.getGoToPositionCommand(extendToFloor, angleToFloor).withTimeout(3),
                         new InstantCommand(m_armSubsystem::retractClamp)
                 )
         );
@@ -215,11 +213,15 @@ public class RobotContainer {
     private void configureBindings() {
         // Primary Controller
         new Trigger(RobotController::getUserButton).onTrue(runOnce(() -> drivebaseS.resetPose(new Pose2d())));
-        m_primaryController.povCenter().onFalse(
-                runOnce(
-                        () -> drivebaseS.setRotationState(
-                                Units.degreesToRadians(m_primaryController.getHID().getPOV()))
-                ));
+
+        m_primaryController.povCenter().whileFalse(
+                new OperatorControlHoldingC(
+                        m_primaryController::getLeftY,
+                        m_primaryController::getLeftX,
+                        m_primaryController.getHID()::getPOV,
+                        drivebaseS
+                )
+        );
 
         m_primaryController.back().whileTrue(drivebaseS.chasePoseC(
                 () -> DOUBLE_SUBSTATION.plus(DOUBLE_SUBSTATION_OFFSET_LEFT)
