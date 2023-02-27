@@ -107,6 +107,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
     private final LinearFilter visionPoseAverageT = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
 
     public DrivebaseS(Limelight m_limelight) {
+        holonomicDriveController.setTolerance(new Pose2d(0.02, 0.02, Rotation2d.fromDegrees(0.5)));
         navx.reset();
 
         odometry =
