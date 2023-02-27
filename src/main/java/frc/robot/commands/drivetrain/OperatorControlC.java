@@ -10,6 +10,7 @@ import frc.robot.subsystems.DrivebaseS;
 import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.math.MathUtil.applyDeadband;
+import static frc.robot.Constants.InputDevices.JOYSTICK_DEADBAND;
 
 public class OperatorControlC extends CommandBase {
 
@@ -35,8 +36,6 @@ public class OperatorControlC extends CommandBase {
 
     private final double MAX_LINEAR_SPEED = 4;
     private final double MIN_LINEAR_SPEED = 1;
-
-    private final double JOYSTICK_DEADBAND = 0.07;
 
     public OperatorControlC(
             DoubleSupplier fwdX,

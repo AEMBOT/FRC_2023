@@ -7,6 +7,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -48,6 +49,8 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     ArmFeedforward thetaDown = new ArmFeedforward(0.5, 0.5, 50, 0);
     ArmFeedforward thetaUp = new ArmFeedforward(-0.5, 0.5, 40, 0);
+
+    SlewRateLimiter thetaVelocity = new SlewRateLimiter(10.0, -5.0, 0);
 
 
     @Override
@@ -94,10 +97,6 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         SmartDashboard.putNumber("thetaUpFeedForward", thetaUpFeedforward);
         SmartDashboard.putNumber("pidThetaValue", pidThetaValue);
         SmartDashboard.putNumber("pidExtendValue", pidExtendValue);
-//        SmartDashboard.putNumber("thetaGoal", pidTheta.getGoal().position);
-//        SmartDashboard.putNumber("thetaSetpointPos", pidTheta.getSetpoint().position);
-//        SmartDashboard.putNumber("thetaSetpointVel", pidTheta.getSetpoint().velocity);
-
     }
 
     public ArmSubsystem() {
@@ -147,6 +146,8 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     private void setAngleMotorVoltage(double voltage) {
+        voltage = thetaVelocity.calculate(voltage);
+
         if (getAnglePosition() > maxAngleHardStop) {
             m_angleMotor.setVoltage(MathUtil.clamp(voltage, -12, 0));
         } else if (getAnglePosition() < minAngleSoftStop) {
@@ -175,7 +176,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     public void angleUp() {
-        setAngleMotorVoltage(7.0);
+        setAngleMotorVoltage(10.0);
     }
 
     public double getAnglePosition() {
@@ -183,15 +184,15 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     public void angleDown() {
-        setAngleMotorVoltage(-7.0);
+        setAngleMotorVoltage(-10.0);
     }
 
-    public void extendArm() {
-        setExtendMotorVoltage(7.0);
+    public void extendArm(double power) {
+        setExtendMotorVoltage(10.0 * power);
     }
 
-    public void retractArm() {
-        setExtendMotorVoltage(-7.0);
+    public void retractArm(double power) {
+        setExtendMotorVoltage(-10.0 * power);
     }
 
     public double getExtendPosition() {

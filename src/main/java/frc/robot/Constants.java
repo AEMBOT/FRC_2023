@@ -36,6 +36,8 @@ public final class Constants {
         public static final int SECONDARY_CONTROLLER_PORT = 1;
         public static final int NUMPAD_CONTROLLER_PORT = 2;
 
+        public static final double JOYSTICK_DEADBAND = 0.07;
+        public static final double TRIGGER_DEADBAND = 0.1;
     }
 
     public static final class DriveConstants {

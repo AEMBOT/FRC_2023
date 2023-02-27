@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.math.MathUtil.applyDeadband;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.AutoConstants.*;
@@ -326,12 +327,16 @@ public class RobotContainer {
         );
 
         // Extend Motor
-        m_secondaryController.leftTrigger().whileTrue(
-                new RunCommand(m_armSubsystem::retractArm).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
+        m_secondaryController.leftTrigger(TRIGGER_DEADBAND).whileTrue(
+                new RunCommand(() -> m_armSubsystem.retractArm(
+                        applyDeadband(m_secondaryController.getLeftTriggerAxis(), TRIGGER_DEADBAND)
+                )).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
         );
 
-        m_secondaryController.rightTrigger().whileTrue(
-                new RunCommand(m_armSubsystem::extendArm).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
+        m_secondaryController.rightTrigger(TRIGGER_DEADBAND).whileTrue(
+                new RunCommand(() -> m_armSubsystem.extendArm(
+                        applyDeadband(m_secondaryController.getRightTriggerAxis(), TRIGGER_DEADBAND)
+                )).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
         );
 
         // Elevator go to Position\
