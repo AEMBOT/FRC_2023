@@ -330,13 +330,17 @@ public class RobotContainer {
         m_secondaryController.leftTrigger(TRIGGER_DEADBAND).whileTrue(
                 new RunCommand(() -> m_armSubsystem.retractArm(
                         applyDeadband(m_secondaryController.getLeftTriggerAxis(), TRIGGER_DEADBAND)
-                )).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
+                ))
         );
 
         m_secondaryController.rightTrigger(TRIGGER_DEADBAND).whileTrue(
                 new RunCommand(() -> m_armSubsystem.extendArm(
                         applyDeadband(m_secondaryController.getRightTriggerAxis(), TRIGGER_DEADBAND)
-                )).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
+                ))
+        );
+
+        m_secondaryController.leftTrigger(TRIGGER_DEADBAND).or(m_secondaryController.rightTrigger(TRIGGER_DEADBAND)).whileFalse(
+                new RunCommand(m_armSubsystem::stopExtend)
         );
 
         // Elevator go to Position\
