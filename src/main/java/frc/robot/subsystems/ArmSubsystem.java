@@ -31,7 +31,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     public RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
     public DutyCycleEncoder absoluteAngleEncoder = new DutyCycleEncoder(angleEncoderPort);
-    public Encoder relativeAngleEncoder = new Encoder(1, 2);
+    public Encoder relativeAngleEncoder = new Encoder(2, 1);
     private Ultrasonic objectSensor = new Ultrasonic(ultrasonicPingPort, ultrasonicEchoPort);
     @Log
     private boolean activateExtendPID = false; // Activates PID controller, false when zeroing
@@ -114,10 +114,10 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         m_angleMotor.setSmartCurrentLimit(angleMotorCurrentLimit);
 
         m_extendMotor.setInverted(false);
-        m_angleMotor.setInverted(true);
+        m_angleMotor.setInverted(false);
 
         extendEncoder.setPositionConversionFactor(extendTickToMeter);
-        absoluteAngleEncoder.setPositionOffset(0.346);
+        absoluteAngleEncoder.setPositionOffset(0.049);
         relativeAngleEncoder.setDistancePerPulse(2 * Math.PI / 8192.0);
 
         pidExtend.setSetpoint(0);
@@ -147,10 +147,10 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     private void setAngleMotorVoltage(double voltage) {
-        if (getAnglePosition() < maxAngleHardStop) {
-            m_angleMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));
-        } else if (getAnglePosition() > minAngleSoftStop) {
+        if (getAnglePosition() > maxAngleHardStop) {
             m_angleMotor.setVoltage(MathUtil.clamp(voltage, -12, 0));
+        } else if (getAnglePosition() < minAngleSoftStop) {
+            m_angleMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));
         } else {
             m_angleMotor.setVoltage(voltage);
         }

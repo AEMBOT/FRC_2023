@@ -64,8 +64,8 @@ public class RobotContainer {
     private final DockingForceBalance m_dockingForceBalance = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
     private final GoToPosition m_GoToPositionPickUp = new GoToPosition(m_armSubsystem, 0, angleToSubstation);
-    private final GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid, angleToDelivery);
-    private final GoToPosition m_GoToPositionHigh = new GoToPosition(m_armSubsystem, extendToHigh, angleToDelivery);
+    private final GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid, angleToHigh);
+    private final GoToPosition m_GoToPositionHigh = new GoToPosition(m_armSubsystem, extendToHigh, angleToHigh);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
 
 
@@ -203,6 +203,7 @@ public class RobotContainer {
                 )
         );
         field.getObject("target").setPose(APRILTAG_LAYOUT.getTagPose(3).get().toPose2d().plus(new Transform2d(new Translation2d(2.77, 2.5), new Rotation2d(Math.PI))));
+        field.getObject("target").setPose(GRID_LEFT.plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5)));
     }
 
     /**
@@ -235,6 +236,7 @@ public class RobotContainer {
         m_primaryController.a().whileTrue(
                 new ProxyCommand(
                         () -> getPlaceGamePieceCommand(drivebaseS, m_armSubsystem, targetPosition, lastPressedNumpad)
+//                        () -> getPlaceGamePieceCommand(drivebaseS, m_armSubsystem, TargetPosition.LEFT_GRID, 9)
                 )
         );
 
@@ -326,8 +328,6 @@ public class RobotContainer {
         m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
         //Docking
         m_secondaryController.b().whileTrue(m_newDocking);
-
-        m_primaryController.a().whileTrue(m_dockingForceBalance);
 
         m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 

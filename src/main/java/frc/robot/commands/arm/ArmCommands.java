@@ -1,6 +1,7 @@
 package frc.robot.commands.arm;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -12,16 +13,16 @@ import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
 public class ArmCommands {
-    public static Command HighPiecePickUpCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, int numpadPosition){
+    public static Command HighPiecePickUpCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, int numpadPosition) {
         return new SequentialCommandGroup(
-            new ParallelCommandGroup(
-            m_drivebase.chasePoseC(() -> 
-            DOUBLE_SUBSTATION
-            .plus(numpadPosition == 10? DOUBLE_SUBSTATION_OFFSET_LEFT : DOUBLE_SUBSTATION_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))),
-            new GoToPosition(m_arm, 0.5,0.5)
-            ),
-            new InstantCommand(m_arm::toggleClamp, m_arm)
-            );
+                new ParallelCommandGroup(
+                        m_drivebase.chasePoseC(() ->
+                                DOUBLE_SUBSTATION
+                                        .plus(numpadPosition == 10 ? DOUBLE_SUBSTATION_OFFSET_LEFT : DOUBLE_SUBSTATION_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))),
+                        new GoToPosition(m_arm, 0.5, 0.5)
+                ),
+                new InstantCommand(m_arm::toggleClamp, m_arm)
+        );
     }
 
     public static Command getPlaceGamePieceCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition position, int numpadPosition) {
@@ -41,25 +42,26 @@ public class ArmCommands {
         };
 
         Pose2d finalTargetGrid = targetPosition;
-        return new SequentialCommandGroup(
-                new ParallelCommandGroup(
-                        m_drivebase.chasePoseC(
-                                () -> finalTargetGrid.plus(ONE_METER_BACK.times(0.5))),
-                        m_arm.getGoToPositionCommand(
-                                switch (numpadPosition) {
-                                    case 1, 2, 3 -> extendToFloor;
-                                    case 4, 5, 6 -> extendToMid;
-                                    case 7, 8, 9 -> extendToHigh;
-                                    case 10, 11 -> extendToSubstation;
-                                    default -> minExtendHardStop;
-                                },
-                                switch (numpadPosition) {
-                                    case 1, 2, 3 -> angleToFloor;
-                                    case 4, 5, 6, 7, 8, 9 -> angleToDelivery;
-                                    case 10, 11 -> angleToSubstation;
-                                    default -> maxAngleHardStop;
-                                }
-                        )
+        SmartDashboard.putNumber("targetPosX", finalTargetGrid.getX());
+        SmartDashboard.putNumber("targetPosY", finalTargetGrid.getY());
+        return new ParallelCommandGroup(
+                m_drivebase.chasePoseC(
+                        () -> finalTargetGrid.plus(ONE_METER_BACK.times(0.5))),
+                m_arm.getGoToPositionCommand(
+                        switch (numpadPosition) {
+                            case 1, 2, 3 -> extendToFloor;
+                            case 4, 5, 6 -> extendToMid;
+                            case 7, 8, 9 -> extendToHigh;
+                            case 10, 11 -> extendToSubstation;
+                            default -> minExtendHardStop;
+                        },
+                        switch (numpadPosition) {
+                            case 1, 2, 3 -> angleToFloor;
+                            case 4, 5, 6 -> angleToMid;
+                            case 7, 8, 9 -> angleToHigh;
+                            case 10, 11 -> angleToSubstation;
+                            default -> maxAngleHardStop;
+                        }
                 )
         );
     }
@@ -67,5 +69,5 @@ public class ArmCommands {
     public static Command getPlacePieceAnyOrientationCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition targetPosition){
 
     }*/
-   
+
 }
