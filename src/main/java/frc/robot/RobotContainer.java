@@ -228,10 +228,10 @@ public class RobotContainer {
         m_primaryController.start().whileTrue(drivebaseS.chasePoseC(
                 () -> DOUBLE_SUBSTATION.plus(DOUBLE_SUBSTATION_OFFSET_RIGHT)
         ));
-
+/* 
         m_numpad.button(20).whileTrue(new ProxyCommand(
                 () -> HighPiecePickUpCommand(drivebaseS, m_armSubsystem, lastPressedNumpad)
-        ));
+        ));*/
 
         m_primaryController.a().whileTrue(
                 new ProxyCommand(
@@ -239,6 +239,13 @@ public class RobotContainer {
 //                        () -> getPlaceGamePieceCommand(drivebaseS, m_armSubsystem, TargetPosition.LEFT_GRID, 9)
                 )
         );
+
+        m_numpad.button(15).onTrue(new InstantCommand(
+                // Toggles the clamp
+                m_armSubsystem::toggleClamp,
+                // Requires the Arm subsystem
+                m_armSubsystem
+        ));
 
         m_numpad.button(10).onTrue(
                 Commands.runOnce(() -> { targetPosition = TargetPosition.DOUBLE_SUBSTATION; lastPressedNumpad = 10; })
@@ -306,11 +313,11 @@ public class RobotContainer {
 
         // Elevator
         // Angle Motor
-        m_secondaryController.leftBumper().whileTrue(
+        m_secondaryController.rightBumper().whileTrue(
                 new RunCommand(m_armSubsystem::angleDown).finallyDo((interrupted) -> m_armSubsystem.stopAngle())
         );
 
-        m_secondaryController.rightBumper().whileTrue(
+        m_secondaryController.leftBumper().whileTrue(
                 new RunCommand(m_armSubsystem::angleUp).finallyDo((interrupted) -> m_armSubsystem.stopAngle())
         );
 
