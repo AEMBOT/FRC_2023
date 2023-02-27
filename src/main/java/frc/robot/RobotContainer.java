@@ -35,8 +35,7 @@ import io.github.oblarg.oblog.annotations.Log;
 
 import static frc.robot.Constants.LedConstants.*;
 import static frc.robot.Constants.VisionConstants.APRILTAG_LAYOUT;
-import static frc.robot.commands.arm.ArmCommands.getPlaceGamePieceCommand;
-import static frc.robot.commands.arm.ArmCommands.HighPiecePickUpCommand;
+import static frc.robot.commands.arm.ArmCommands.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -269,6 +268,12 @@ public class RobotContainer {
 
         m_numpad.button(16).whileTrue(
                 m_armSubsystem.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
+        );
+
+        m_numpad.button(17).whileTrue(
+                new ProxyCommand(
+                        () -> getPrepareAngleCommand(m_armSubsystem, lastPressedNumpad)
+                )
         );
 
         m_numpad.button(1).whileTrue(

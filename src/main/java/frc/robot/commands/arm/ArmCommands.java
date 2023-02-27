@@ -65,6 +65,19 @@ public class ArmCommands {
                 )
         );
     }
+
+    public static Command getPrepareAngleCommand(ArmSubsystem m_arm, int numpadPosition) {
+        return m_arm.getGoToPositionCommand(
+                m_arm.getExtendPosition(),
+                switch (numpadPosition) {
+                    case 1, 2, 3 -> angleToFloor;
+                    case 4, 5, 6 -> angleToMid;
+                    case 7, 8, 9 -> angleToHigh;
+                    case 10, 11 -> angleToSubstation;
+                    default -> maxAngleHardStop;
+                }
+        );
+    }
     /* 
     public static Command getPlacePieceAnyOrientationCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition targetPosition){
 
