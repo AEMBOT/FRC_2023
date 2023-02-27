@@ -125,8 +125,8 @@ public final class Constants {
 
         public static final double chassisTranslationalkP = 4.0;
         public static final double chassisTranslationalkD = 0.0;
-        public static final double chassisThetakP = 4.0;
-        public static final double chassisThetakD = 0.1;
+        public static final double chassisThetakP = 3.0;
+        public static final double chassisThetakD = 0.05;
 
 
         public static final double MAX_MODULE_SPEED_FPS = Units.feetToMeters(12);
@@ -187,7 +187,7 @@ public final class Constants {
         public static final double angleToFloor = -.36;
         public static final double angleToSubstation = -.2;
 
-        public static final double maxAngleHardStop = 1.16;
+        public static final double maxAngleHardStop = 1.15;
         public static final double minAngleSoftStop = -0.27;
 
         public static final double minExtendHardStop = 0.00;
@@ -340,7 +340,7 @@ public final class Constants {
         public static final Transform2d CONE_OFFSET_LEFT = new Transform2d(
                 new Translation2d(
                         0,
-                        Units.feetToMeters(1) + Units.inchesToMeters(6.5)
+                        -(Units.feetToMeters(1) + Units.inchesToMeters(6.5) + Units.inchesToMeters(8))
                 ),
                 new Rotation2d()
         );
@@ -348,7 +348,7 @@ public final class Constants {
         public static final Transform2d CONE_OFFSET_RIGHT = new Transform2d(
                 new Translation2d(
                         0,
-                        -(Units.feetToMeters(1) + Units.inchesToMeters(6.5))
+                        Units.feetToMeters(1) + Units.inchesToMeters(6.5) + Units.inchesToMeters(8)
                 ),
                 new Rotation2d()
         );

@@ -266,6 +266,10 @@ public class RobotContainer {
                 Commands.runOnce(() -> targetPosition = TargetPosition.RIGHT_GRID)
         );
 
+        m_numpad.button(16).whileTrue(
+                m_armSubsystem.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
+        );
+
         m_numpad.button(1).whileTrue(
                 new InstantCommand(() -> lastPressedNumpad = 1)
         );
