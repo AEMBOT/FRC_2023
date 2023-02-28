@@ -30,6 +30,7 @@ public class ArmCommands {
 
     public static Command HighPiecePickUpCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition targetPosition, int numpadPosition) {
         return new SequentialCommandGroup(
+            new InstantCommand(m_arm::extendClamp, m_arm),
             getPlaceGamePieceCommand(m_drivebase, m_arm, targetPosition, numpadPosition),
                 new InstantCommand(m_arm::toggleClamp, m_arm),
                 m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)

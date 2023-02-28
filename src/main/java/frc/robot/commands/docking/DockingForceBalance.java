@@ -13,9 +13,6 @@ public class DockingForceBalance extends CommandBase implements Loggable {
     double pitchUpper = -65;
     double pitchLower = -75;
 
-
-    private final boolean go = true;
-
     private final AHRS navx = new AHRS(Port.kMXP);
 
     private final DrivebaseS m_drivebase;
