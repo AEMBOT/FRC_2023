@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.arm.ArmCommands;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.docking.AutoPathDocking;
@@ -237,8 +238,13 @@ public class RobotContainer {
 
         m_primaryController.a().whileTrue(
                 new ProxyCommand(
-                        () -> getPlaceGamePieceCommand(drivebaseS, m_armSubsystem, targetPosition, lastPressedNumpad)
-//                        () -> getPlaceGamePieceCommand(drivebaseS, m_armSubsystem, TargetPosition.LEFT_GRID, 9)
+                        () -> {
+                            if (lastPressedNumpad == 10 || lastPressedNumpad == 11) {
+                                return getHighPiecePickUpCommand(drivebaseS, m_armSubsystem, targetPosition, lastPressedNumpad);
+                            } else {
+                                return getPlaceGamePieceCommand(drivebaseS, m_armSubsystem, targetPosition, lastPressedNumpad);
+                            }
+                        }
                 )
         );
 
@@ -334,20 +340,28 @@ public class RobotContainer {
         );
 
         // Extend Motor
-        m_secondaryController.leftTrigger(TRIGGER_DEADBAND).whileTrue(
-                new RunCommand(() -> m_armSubsystem.retractArm(
-                        applyDeadband(m_secondaryController.getLeftTriggerAxis(), TRIGGER_DEADBAND)
-                ))
+//        m_secondaryController.leftTrigger(TRIGGER_DEADBAND).whileTrue(
+//                new RunCommand(() -> m_armSubsystem.retractArm(
+//                        applyDeadband(m_secondaryController.getLeftTriggerAxis(), TRIGGER_DEADBAND)
+//                ))
+//        );
+//
+//        m_secondaryController.rightTrigger(TRIGGER_DEADBAND).whileTrue(
+//                new RunCommand(() -> m_armSubsystem.extendArm(
+//                        applyDeadband(m_secondaryController.getRightTriggerAxis(), TRIGGER_DEADBAND)
+//                ))
+//        );
+//
+//        m_secondaryController.leftTrigger(TRIGGER_DEADBAND).or(m_secondaryController.rightTrigger(TRIGGER_DEADBAND)).whileFalse(
+//                new RunCommand(m_armSubsystem::stopExtend)
+//        );
+
+        m_secondaryController.leftTrigger().whileTrue(
+                new RunCommand(m_armSubsystem::retractArm).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
         );
 
-        m_secondaryController.rightTrigger(TRIGGER_DEADBAND).whileTrue(
-                new RunCommand(() -> m_armSubsystem.extendArm(
-                        applyDeadband(m_secondaryController.getRightTriggerAxis(), TRIGGER_DEADBAND)
-                ))
-        );
-
-        m_secondaryController.leftTrigger(TRIGGER_DEADBAND).or(m_secondaryController.rightTrigger(TRIGGER_DEADBAND)).whileFalse(
-                new RunCommand(m_armSubsystem::stopExtend)
+        m_secondaryController.rightTrigger().whileTrue(
+                new RunCommand(m_armSubsystem::extendArm).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
         );
 
         // Elevator go to Position\

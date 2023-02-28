@@ -50,7 +50,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     ArmFeedforward thetaDown = new ArmFeedforward(0.5, 0.5, 50, 0);
     ArmFeedforward thetaUp = new ArmFeedforward(-0.5, 0.5, 40, 0);
 
-    SlewRateLimiter thetaVelocity = new SlewRateLimiter(10.0, -5.0, 0);
+//    SlewRateLimiter thetaVelocity = new SlewRateLimiter(10.0, -5.0, 0);
 
 
     @Override
@@ -121,6 +121,9 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
         pidExtend.setSetpoint(0);
         pidTheta.setSetpoint(0);
+
+        pidExtend.setTolerance(0.01);
+        pidTheta.setTolerance(0.01);
     }
 
     public boolean isGamePieceThere() {
@@ -146,7 +149,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     private void setAngleMotorVoltage(double voltage) {
-        voltage = thetaVelocity.calculate(voltage);
+//        voltage = thetaVelocity.calculate(voltage);
 
         if (getAnglePosition() > maxAngleHardStop) {
             m_angleMotor.setVoltage(MathUtil.clamp(voltage, -12, 0));
@@ -187,8 +190,16 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         setAngleMotorVoltage(-10.0);
     }
 
+    public void extendArm() {
+        setExtendMotorVoltage(10.0);
+    }
+
     public void extendArm(double power) {
         setExtendMotorVoltage(10.0 * power);
+    }
+
+    public void retractArm() {
+        setExtendMotorVoltage(-10.0);
     }
 
     public void retractArm(double power) {
@@ -228,6 +239,10 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     public Command getGoToPositionCommand(double targetExtend, double targetTheta) {
         return new GoToPosition(this, targetExtend, targetTheta);
+    }
+
+    public boolean getArmAtPosition() {
+        return pidExtend.atSetpoint() && pidTheta.atSetpoint();
     }
     
 
