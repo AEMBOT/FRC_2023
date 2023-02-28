@@ -1,11 +1,11 @@
 package frc.robot.commands.arm;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DrivebaseS;
 
@@ -28,12 +28,26 @@ public class ArmCommands {
         );
     }*/
 
-    public static Command HighPiecePickUpCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition targetPosition, int numpadPosition) {
-        return new SequentialCommandGroup(
-            new InstantCommand(m_arm::extendClamp, m_arm),
-            getPlaceGamePieceCommand(m_drivebase, m_arm, targetPosition, numpadPosition),
-                new InstantCommand(m_arm::toggleClamp, m_arm),
-                m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
+    public static Command getHighPiecePickUpCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition targetPosition, int numpadPosition) {
+        return new ParallelCommandGroup(
+                new InstantCommand(m_arm::extendClamp),
+                getPlaceGamePieceCommand(m_drivebase, m_arm, targetPosition, numpadPosition),
+                new SequentialCommandGroup(
+                        new WaitUntilCommand(() -> {
+                            Transform2d error = m_drivebase.getPose().minus(m_drivebase.getTargetPose());
+                            Transform2d tolerance = new Transform2d(
+                                    new Translation2d(0.02, 0.02),
+                                    Rotation2d.fromDegrees(0.5)
+                            );
+                            return error.getRotation().getRadians() < tolerance.getRotation().getRadians() &&
+                                    error.getX() < tolerance.getX() &&
+                                    error.getY() < tolerance.getY();
+                        }),
+                        new WaitUntilCommand(m_arm::getArmAtPosition),
+                        new InstantCommand(m_arm::retractClamp),
+                        new WaitCommand(0.5),
+                        m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
+                )
         );
     }
 
@@ -57,6 +71,7 @@ public class ArmCommands {
         SmartDashboard.putNumber("targetPosX", finalTargetGrid.getX());
         SmartDashboard.putNumber("targetPosY", finalTargetGrid.getY());
         return new ParallelCommandGroup(
+                new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(0.5)))),
                 m_drivebase.chasePoseC(
                         () -> finalTargetGrid.plus(ONE_METER_BACK.times(0.5))),
                 m_arm.getGoToPositionCommand(
