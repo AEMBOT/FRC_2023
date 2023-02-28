@@ -47,9 +47,10 @@ public final class Constants {
         static public final double ROBOT_MASS_kg = Units.lbsToKilograms(20.0);
         static public final double ROBOT_MOI_KGM2 = 1.0 / 12.0 * ROBOT_MASS_kg * Math.pow((WHEEL_BASE_WIDTH_M * 1.1), 2) * 2; //Model moment of intertia as a square slab slightly bigger than wheelbase with axis through center
         // Drivetrain Performance Mechanical limits
-        static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(12);
-        static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(12);
-        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI * 8;
+        static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(14.5);
+        static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(14.5);
+//        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI * 8;
+        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = 5; // Calculated from max module free speed around a 25-inch wheelbase
         static public final double MAX_TRANSLATE_ACCEL_MPS2 = MAX_FWD_REV_SPEED_MPS / 0.125; //0-full time of 0.25 second
         static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC / 0.25; //0-full time of 0.25 second
         static public final int DRIVE_MOTOR_CURRENT_LIMIT = 40;
@@ -133,7 +134,7 @@ public final class Constants {
         public static final double chassisThetakD = 0.05;
 
 
-        public static final double MAX_MODULE_SPEED_FPS = Units.feetToMeters(12);
+        public static final double MAX_MODULE_SPEED_FPS = Units.feetToMeters(14.5);
         public static final double MAX_TELEOP_TURN_RATE = Math.PI * 4; //Rate the robot will spin with full rotation command
 
         public static final int ENC_PULSE_PER_REV = 1;
