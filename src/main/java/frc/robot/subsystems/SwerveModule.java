@@ -135,6 +135,9 @@ public class SwerveModule extends SubsystemBase implements Loggable {
         // Give this module a unique name on the dashboard so we have four separate sub-tabs.
         loggingName = "SwerveModule-" + moduleConstants.name + "-[" + driveMotor.getDeviceId() + ',' + rotationMotor.getDeviceId() + ']';
         resetDistance();
+
+        rotationMotor.burnFlash();
+        driveMotor.burnFlash();
     }
 
     /**
@@ -309,5 +312,17 @@ public class SwerveModule extends SubsystemBase implements Loggable {
     @Log
     public double getVelocitySetpoint() {
         return drivePIDController.getSetpoint();
+    }
+
+    // Stuff for SloMo
+
+    public void slowDrive() {
+        driveMotor.setSmartCurrentLimit(10);
+        rotationMotor.setSmartCurrentLimit(8);
+    }
+
+    public void regularDrive() {
+        driveMotor.setSmartCurrentLimit(40);
+        rotationMotor.setSmartCurrentLimit(30);
     }
 }

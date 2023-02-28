@@ -1,0 +1,98 @@
+package frc.robot.commands.arm;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.DrivebaseS;
+
+import static frc.robot.Constants.ArmConstants.*;
+import static frc.robot.Constants.VisionConstants.*;
+
+public class ArmCommands {
+    /* 
+    public static Command HighPiecePickUpCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, int numpadPosition) {
+        return new SequentialCommandGroup(
+            
+                new ParallelCommandGroup(
+                        m_drivebase.chasePoseC(() ->
+                                DOUBLE_SUBSTATION
+                                        .plus(numpadPosition == 10 ? DOUBLE_SUBSTATION_OFFSET_LEFT : DOUBLE_SUBSTATION_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))),
+                        new GoToPosition(m_arm, 0.5, 0.5)
+                ),
+                new InstantCommand(m_arm::toggleClamp, m_arm),
+                m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
+        );
+    }*/
+
+    public static Command HighPiecePickUpCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition targetPosition, int numpadPosition) {
+        return new SequentialCommandGroup(
+            new InstantCommand(m_arm::extendClamp, m_arm),
+            getPlaceGamePieceCommand(m_drivebase, m_arm, targetPosition, numpadPosition),
+                new InstantCommand(m_arm::toggleClamp, m_arm),
+                m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
+        );
+    }
+
+    public static Command getPlaceGamePieceCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition position, int numpadPosition) {
+        Pose2d targetPosition = switch (position) {
+            case LEFT_GRID -> GRID_LEFT;
+            case COOP_GRID, NONE -> GRID_COOP;
+            case RIGHT_GRID -> GRID_RIGHT;
+            case DOUBLE_SUBSTATION -> DOUBLE_SUBSTATION;
+        };
+        targetPosition = switch (numpadPosition) {
+            case 1, 4, 7 -> targetPosition.plus(CONE_OFFSET_LEFT);
+            case 2, 5, 8 -> targetPosition;
+            case 3, 6, 9 -> targetPosition.plus(CONE_OFFSET_RIGHT);
+            case 10 -> targetPosition.plus(DOUBLE_SUBSTATION_OFFSET_LEFT);
+            case 11 -> targetPosition.plus(DOUBLE_SUBSTATION_OFFSET_RIGHT);
+            default -> m_drivebase.getPose().plus(ONE_METER_BACK.times(-0.5));
+        };
+
+        Pose2d finalTargetGrid = targetPosition;
+        SmartDashboard.putNumber("targetPosX", finalTargetGrid.getX());
+        SmartDashboard.putNumber("targetPosY", finalTargetGrid.getY());
+        return new ParallelCommandGroup(
+                m_drivebase.chasePoseC(
+                        () -> finalTargetGrid.plus(ONE_METER_BACK.times(0.5))),
+                m_arm.getGoToPositionCommand(
+                        switch (numpadPosition) {
+                            case 1, 2, 3 -> extendToFloor;
+                            case 4, 5, 6 -> extendToMid;
+                            case 7, 8, 9 -> extendToHigh;
+                            case 10, 11 -> extendToSubstation;
+                            default -> minExtendHardStop;
+                        },
+                        switch (numpadPosition) {
+                            case 1, 2, 3 -> angleToFloor;
+                            case 4, 5, 6 -> angleToMid;
+                            case 7, 8, 9 -> angleToHigh;
+                            case 10, 11 -> angleToSubstation;
+                            default -> maxAngleHardStop;
+                        }
+                )
+        );
+    }
+
+    public static Command getPrepareAngleCommand(ArmSubsystem m_arm, int numpadPosition) {
+        return m_arm.getGoToPositionCommand(
+                m_arm.getExtendPosition(),
+                switch (numpadPosition) {
+                    case 1, 2, 3 -> angleToFloor;
+                    case 4, 5, 6 -> angleToMid;
+                    case 7, 8, 9 -> angleToHigh;
+                    case 10, 11 -> angleToSubstation;
+                    default -> maxAngleHardStop;
+                }
+        );
+    }
+    /* 
+    public static Command getPlacePieceAnyOrientationCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition targetPosition){
+
+    }*/
+
+}

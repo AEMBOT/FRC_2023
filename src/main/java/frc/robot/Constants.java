@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -14,7 +13,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.DrivebaseS;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,8 +34,10 @@ public final class Constants {
 
         public static final int PRIMARY_CONTROLLER_PORT = 0;
         public static final int SECONDARY_CONTROLLER_PORT = 1;
-        public static final int NUMPAD_CONTROLLER_PORT = 3;
+        public static final int NUMPAD_CONTROLLER_PORT = 2;
 
+        public static final double JOYSTICK_DEADBAND = 0.07;
+        public static final double TRIGGER_DEADBAND = 0.1;
     }
 
     public static final class DriveConstants {
@@ -67,10 +67,10 @@ public final class Constants {
         static private final double HW = WHEEL_BASE_WIDTH_M / 2.0;
 
         public enum ModuleConstants {
-            FL("FL", 9, 2, 12, 2.351588, HW, HW),
-            FR("FR", 3, 4, 10, 2.109219, HW, -HW),
-            BL("BL", 5, 6, 13, 0.971008, -HW, HW),
-            BR("BR", 7, 8, 11, 1.366774, -HW, -HW);
+            FL("FL", 9, 2, 12, 5.378126, HW, HW),
+            FR("FR", 3, 4, 13, 1.253253, HW, -HW),
+            BL("BL", 5, 6, 14, 2.997392, -HW, HW),
+            BR("BR", 7, 8, 15, 5.934966, -HW, -HW);
 
             public final String name;
             public final int driveMotorID;
@@ -113,7 +113,9 @@ public final class Constants {
          * ks, kv, ka
          */
         //public static final double[] DRIVE_FF = {0.11452, 1.9844, 0.31123};
-        public static final double[] DRIVE_FF = {0.055, 2.6826, 0.1188};
+//        public static final double[] DRIVE_FF = {0.055, 2.6826, 0.1188}; PRACTICE BOT
+//        public static final double[] DRIVE_FF = {0.0256, 2.4837, 0.2629}; DO NOT USE BAD MATH
+        public static final double[] DRIVE_FF = {0.17302, 2.6681, 0.28239};
 
         public static final SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(DRIVE_FF[0], DRIVE_FF[1], DRIVE_FF[2]);
 
@@ -121,13 +123,14 @@ public final class Constants {
         //public static final double rotationkD = 0.05 / 2.5;
         public static final double rotationkD = 0;
 
-        //public static final double drivekP = 4.6; // 0.06 w/measurement delay?
-        public static final double drivekP = 3;
+//        public static final double drivekP = 3.8888; // 0.06 w/measurement delay?
+        public static final double drivekP = 1; // 0.06 w/measurement delay?
+//        public static final double drivekP = 3;
 
-        public static final double chassisTranslationalkP = 3.0;
+        public static final double chassisTranslationalkP = 4.0;
         public static final double chassisTranslationalkD = 0.0;
         public static final double chassisThetakP = 3.0;
-        public static final double chassisThetakD = 0.1;
+        public static final double chassisThetakD = 0.05;
 
 
         public static final double MAX_MODULE_SPEED_FPS = Units.feetToMeters(12);
@@ -174,7 +177,7 @@ public final class Constants {
         public static final int angleEncoderPort = 0;
         public static final int angleEncoderOffset = 0;
         public static final int extendMotorCanID = 11;
-        public static final int clampSolenoidID = 0;
+        public static final int clampSolenoidID = 15;
         public static final int movingAverage = 5;
         public static final int extendMotorCurrentLimit = 35;
         public static final int angleMotorCurrentLimit = 40;
@@ -183,12 +186,13 @@ public final class Constants {
         public static final int ultrasonicEchoPort = 3;
 
         //Angle and Extend arm Constants
-        public static final double angleToDelivery = -.48;
+        public static final double angleToHigh = 0.52;
+        public static final double angleToMid = 0.40;
         public static final double angleToFloor = -.36;
         public static final double angleToSubstation = -.2;
 
-        public static final double maxAngleHardStop = -0.78;
-        public static final double minAngleSoftStop = 0.25;
+        public static final double maxAngleHardStop = 1.15;
+        public static final double minAngleSoftStop = -0.27;
 
         public static final double minExtendHardStop = 0.00;
         public static final double maxExtendSoftStop = 1.25;
@@ -200,8 +204,8 @@ public final class Constants {
 
         public static final double extendOffset = 2.5;
         public static final double extendToFloor = 0.257175;
-        public static final double extendToMid = 0.3857625;
-        public static final double extendToHigh = 0.6429375;
+        public static final double extendToMid = 0.45;
+        public static final double extendToHigh = 1.01;
         public static final double extendToSubstation = 0.6429375;
         // Arm Constants that need measuring
         public static final double pivotPointHeight = 0; // Height of pivot point of arm above point where belt separates from belt wheel
@@ -285,6 +289,19 @@ public final class Constants {
                                 new Rotation2d(Math.PI)
                         );
 
+        public static final Pose2d GRID_LEFT =
+                ALLIANCE == DriverStation.Alliance.Red ?
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                FIELD_WIDTH - Units.feetToMeters(6.25 / 2.0),
+                                new Rotation2d(Math.PI)
+                        ) :
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                Units.feetToMeters(6.25) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0),
+                                new Rotation2d(Math.PI)
+                        );
+
         public static final Pose2d GRID_COOP =
                 ALLIANCE == DriverStation.Alliance.Red ?
                         new Pose2d(
@@ -295,6 +312,19 @@ public final class Constants {
                         new Pose2d(
                                 Units.feetToMeters(4) + Units.inchesToMeters(8.25),
                                 Units.feetToMeters(6.25) + Units.feetToMeters(5.5 / 2.0),
+                                new Rotation2d(Math.PI)
+                        );
+
+        public static final Pose2d GRID_RIGHT =
+                ALLIANCE == DriverStation.Alliance.Red ?
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                FIELD_WIDTH - (Units.feetToMeters(6.25) + Units.feetToMeters(5.5) + Units.feetToMeters(6.25 / 2.0)),
+                                new Rotation2d(Math.PI)
+                        ) :
+                        new Pose2d(
+                                Units.feetToMeters(4) + Units.inchesToMeters(8.25),
+                                Units.feetToMeters(6.25 / 2.0),
                                 new Rotation2d(Math.PI)
                         );
 
@@ -314,7 +344,7 @@ public final class Constants {
         public static final Transform2d CONE_OFFSET_LEFT = new Transform2d(
                 new Translation2d(
                         0,
-                        Units.feetToMeters(1) + Units.inchesToMeters(6.5)
+                        -(Units.feetToMeters(1) + Units.inchesToMeters(6.5) + Units.inchesToMeters(8))
                 ),
                 new Rotation2d()
         );
@@ -322,7 +352,7 @@ public final class Constants {
         public static final Transform2d CONE_OFFSET_RIGHT = new Transform2d(
                 new Translation2d(
                         0,
-                        -(Units.feetToMeters(1) + Units.inchesToMeters(6.5))
+                        Units.feetToMeters(1) + Units.inchesToMeters(6.5) + Units.inchesToMeters(8)
                 ),
                 new Rotation2d()
         );
@@ -371,5 +401,13 @@ public final class Constants {
                 ),
                 new Rotation2d()
         );
+
+        public enum TargetPosition {
+            LEFT_GRID,
+            COOP_GRID,
+            RIGHT_GRID,
+            DOUBLE_SUBSTATION,
+            NONE
+        }
     }
 }

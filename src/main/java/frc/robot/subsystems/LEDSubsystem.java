@@ -21,7 +21,7 @@ public class LEDSubsystem extends SubsystemBase {
     long last_time = 0;
     long time;
     final int increment = 50;
-    SerialPort serial = new SerialPort(115200, SerialPort.Port.kUSB);
+    //SerialPort serial = new SerialPort(115200, SerialPort.Port.kUSB);
     //getting alliance color
     
 
@@ -92,7 +92,7 @@ public class LEDSubsystem extends SubsystemBase {
         if (time >= (last_time + increment)) {
             add = (add+1)%DarkPix;
             last_time = time;
-            serial.writeString("a");
+            //serial.writeString("a");
         }
 
         for (var i = 0; i < m_ledBuffer.getLength(); i++) {

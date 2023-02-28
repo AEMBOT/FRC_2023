@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.math.MathUtil.applyDeadband;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.AutoConstants.*;
@@ -29,11 +30,13 @@ import frc.robot.commands.docking.AutoPathDocking;
 import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
+import frc.robot.commands.drivetrain.OperatorControlHoldingC;
 import frc.robot.subsystems.*;
 import io.github.oblarg.oblog.annotations.Log;
 
 import static frc.robot.Constants.LedConstants.*;
 import static frc.robot.Constants.VisionConstants.APRILTAG_LAYOUT;
+import static frc.robot.commands.arm.ArmCommands.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -44,8 +47,9 @@ import static frc.robot.Constants.VisionConstants.APRILTAG_LAYOUT;
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
 
-    @Log(methodName="getTotalCurrent")
+    @Log(methodName = "getTotalCurrent")
     private PowerDistribution power = new PowerDistribution();
+    private final Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
 
     // Subsystems
     private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
@@ -60,9 +64,6 @@ public class RobotContainer {
     private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS, m_limelight);
     private final DockingForceBalance m_dockingForceBalance = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
-    private final GoToPosition m_GoToPositionPickUp = new GoToPosition(m_armSubsystem, 0, angleToSubstation);
-    private final GoToPosition m_GoToPositionMid = new GoToPosition(m_armSubsystem, extendToMid, angleToDelivery);
-    private final GoToPosition m_GoToPositionHigh = new GoToPosition(m_armSubsystem, extendToHigh, angleToDelivery);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
 
 
@@ -105,11 +106,18 @@ public class RobotContainer {
     SendableChooser<Command> autoSelector = new SendableChooser<Command>();
     GenericEntry pathDelay = Shuffleboard.getTab("Auto").add("Path Delay Time", 2.0).getEntry();
 
+    // Driver Controls
+    @Log
+    private int lastPressedNumpad = -1;
+    @Log(methodName = "toString")
+    private TargetPosition targetPosition = TargetPosition.NONE;
+
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
         target.setPose(new Pose2d(0, 0, new Rotation2d()));
+        compressor.enableDigital();
 
         // Subsystem Default Commands
         drivebaseS.setDefaultCommand(
@@ -117,6 +125,7 @@ public class RobotContainer {
                         m_primaryController::getLeftY,
                         m_primaryController::getLeftX,
                         m_primaryController::getRightX,
+                        false,
                         drivebaseS
                 )
         );
@@ -126,14 +135,14 @@ public class RobotContainer {
         // Build Auto Event Map
         eventMap.put("placeConeHigh",
                 new SequentialCommandGroup(
-                        m_GoToPositionHigh,
+                        m_armSubsystem.getGoToPositionCommand(extendToHigh, angleToHigh).withTimeout(3),
                         new InstantCommand(m_armSubsystem::extendClamp)
                 )
         );
         eventMap.put("floorPickup",
                 new SequentialCommandGroup(
                         new InstantCommand(m_armSubsystem::extendClamp),
-                        m_GoToPositionPickUp,
+                        m_armSubsystem.getGoToPositionCommand(extendToFloor, angleToFloor).withTimeout(3),
                         new InstantCommand(m_armSubsystem::retractClamp)
                 )
         );
@@ -192,6 +201,7 @@ public class RobotContainer {
                 )
         );
         field.getObject("target").setPose(APRILTAG_LAYOUT.getTagPose(3).get().toPose2d().plus(new Transform2d(new Translation2d(2.77, 2.5), new Rotation2d(Math.PI))));
+        field.getObject("target").setPose(GRID_LEFT.plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5)));
     }
 
     /**
@@ -203,11 +213,15 @@ public class RobotContainer {
     private void configureBindings() {
         // Primary Controller
         new Trigger(RobotController::getUserButton).onTrue(runOnce(() -> drivebaseS.resetPose(new Pose2d())));
-        m_primaryController.povCenter().onFalse(
-                runOnce(
-                        () -> drivebaseS.setRotationState(
-                                Units.degreesToRadians(m_primaryController.getHID().getPOV()))
-                ));
+
+        m_primaryController.povCenter().whileFalse(
+                new OperatorControlHoldingC(
+                        m_primaryController::getLeftY,
+                        m_primaryController::getLeftX,
+                        m_primaryController.getHID()::getPOV,
+                        drivebaseS
+                )
+        );
 
         m_primaryController.back().whileTrue(drivebaseS.chasePoseC(
                 () -> DOUBLE_SUBSTATION.plus(DOUBLE_SUBSTATION_OFFSET_LEFT)
@@ -216,30 +230,92 @@ public class RobotContainer {
         m_primaryController.start().whileTrue(drivebaseS.chasePoseC(
                 () -> DOUBLE_SUBSTATION.plus(DOUBLE_SUBSTATION_OFFSET_RIGHT)
         ));
+/* 
+        m_numpad.button(20).whileTrue(new ProxyCommand(
+                () -> HighPiecePickUpCommand(drivebaseS, m_armSubsystem, lastPressedNumpad)
+        ));*/
+
+        m_primaryController.a().whileTrue(
+                new ProxyCommand(
+                        () -> getPlaceGamePieceCommand(drivebaseS, m_armSubsystem, targetPosition, lastPressedNumpad)
+//                        () -> getPlaceGamePieceCommand(drivebaseS, m_armSubsystem, TargetPosition.LEFT_GRID, 9)
+                )
+        );
+
+        m_numpad.button(15).onTrue(new InstantCommand(
+                // Toggles the clamp
+                m_armSubsystem::toggleClamp,
+                // Requires the Arm subsystem
+                m_armSubsystem
+        ));
+
+        m_numpad.button(10).onTrue(
+                Commands.runOnce(() -> { targetPosition = TargetPosition.DOUBLE_SUBSTATION; lastPressedNumpad = 10; })
+        );
+
+        m_numpad.button(11).onTrue(
+                Commands.runOnce(() -> { targetPosition = TargetPosition.DOUBLE_SUBSTATION; lastPressedNumpad = 11; })
+        );
+
+        m_numpad.button(12).onTrue(
+                //m_driverAssist.setTargetGrid(TargetGrid.INNER)
+                Commands.runOnce(() -> targetPosition = TargetPosition.LEFT_GRID)
+        );
+        m_numpad.button(13).onTrue(
+                Commands.runOnce(() -> targetPosition = TargetPosition.COOP_GRID)
+        );
+        m_numpad.button(14).onTrue(
+                Commands.runOnce(() -> targetPosition = TargetPosition.RIGHT_GRID)
+        );
+
+        m_numpad.button(16).whileTrue(
+                m_armSubsystem.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
+        );
+
+        m_numpad.button(17).whileTrue(
+                new ProxyCommand(
+                        () -> getPrepareAngleCommand(m_armSubsystem, lastPressedNumpad)
+                )
+        );
+
+        m_numpad.button(1).whileTrue(
+                new InstantCommand(() -> lastPressedNumpad = 1)
+        );
+
+        m_numpad.button(2).whileTrue(
+                new InstantCommand(() -> lastPressedNumpad = 2)
+        );
+
+        m_numpad.button(3).whileTrue(
+                new InstantCommand(() -> lastPressedNumpad = 3)
+        );
+
+        m_numpad.button(4).whileTrue(
+                new InstantCommand(() -> lastPressedNumpad = 4)
+        );
+
+        m_numpad.button(5).whileTrue(
+                new InstantCommand(() -> lastPressedNumpad = 5)
+        );
+
+        m_numpad.button(6).whileTrue(
+                new InstantCommand(() -> lastPressedNumpad = 6)
+        );
 
         m_numpad.button(7).whileTrue(
-                drivebaseS.chasePoseC(
-                        () -> GRID_COOP.plus(CONE_OFFSET_LEFT).plus(ONE_METER_BACK.times(0.5))
-                )
+                new InstantCommand(() -> lastPressedNumpad = 7)
         );
 
         m_numpad.button(8).whileTrue(
-                drivebaseS.chasePoseC(
-                        () -> GRID_COOP.plus(ONE_METER_BACK.times(0.5))
-                )
+                new InstantCommand(() -> lastPressedNumpad = 8)
         );
 
         m_numpad.button(9).whileTrue(
-                drivebaseS.chasePoseC(
-                        () -> GRID_COOP.plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))
-                )
+                new InstantCommand(() -> lastPressedNumpad = 9)
         );
-
-        //m_primaryController.a().toggleOnTrue(drivebaseS.chasePoseC(target::getPose));
-
-
         // Secondary Controller
         // Clamp
+
         m_secondaryController.a().toggleOnTrue(new InstantCommand(
                 // Toggles the clamp
                 m_armSubsystem::toggleClamp,
@@ -249,36 +325,53 @@ public class RobotContainer {
 
         // Elevator
         // Angle Motor
-        m_secondaryController.leftBumper().whileTrue(
+        m_secondaryController.rightBumper().whileTrue(
                 new RunCommand(m_armSubsystem::angleDown).finallyDo((interrupted) -> m_armSubsystem.stopAngle())
         );
 
-        m_secondaryController.rightBumper().whileTrue(
+        m_secondaryController.leftBumper().whileTrue(
                 new RunCommand(m_armSubsystem::angleUp).finallyDo((interrupted) -> m_armSubsystem.stopAngle())
         );
 
         // Extend Motor
-        m_secondaryController.leftTrigger().whileTrue(
-                new RunCommand(m_armSubsystem::retractArm).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
+        m_secondaryController.leftTrigger(TRIGGER_DEADBAND).whileTrue(
+                new RunCommand(() -> m_armSubsystem.retractArm(
+                        applyDeadband(m_secondaryController.getLeftTriggerAxis(), TRIGGER_DEADBAND)
+                ))
         );
 
-        m_secondaryController.rightTrigger().whileTrue(
-                new RunCommand(m_armSubsystem::extendArm).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
+        m_secondaryController.rightTrigger(TRIGGER_DEADBAND).whileTrue(
+                new RunCommand(() -> m_armSubsystem.extendArm(
+                        applyDeadband(m_secondaryController.getRightTriggerAxis(), TRIGGER_DEADBAND)
+                ))
+        );
+
+        m_secondaryController.leftTrigger(TRIGGER_DEADBAND).or(m_secondaryController.rightTrigger(TRIGGER_DEADBAND)).whileFalse(
+                new RunCommand(m_armSubsystem::stopExtend)
         );
 
         // Elevator go to Position\
         //y will be replaced with numpad buttons 
         m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
         //Docking
-        m_secondaryController.b().onTrue(m_newDocking);
-
-        //m_primaryController.a().whileTrue(m_dockingForceBalance);
+        m_secondaryController.b().whileTrue(m_newDocking);
 
         m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 
         m_secondaryController.start().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorYellow), m_LedSubsystem));
         m_secondaryController.back().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorPurple), m_LedSubsystem));
-        }
+
+        // slow mode for driver
+        m_primaryController.leftBumper().whileTrue(
+                new OperatorControlC(
+                        m_primaryController::getLeftY,
+                        m_primaryController::getLeftX,
+                        m_primaryController::getRightX,
+                        true,
+                        drivebaseS
+                )
+        );
+    }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -308,13 +401,13 @@ public class RobotContainer {
         // Needs to
     }
 
-  public void periodic() {
-    SmartDashboard.putString("Alliance", ALLIANCE.toString());
-    drivebaseS.drawRobotOnField(field);
-    field3d.setRobotPose(new Pose3d(drivebaseS.getPose()));
-    //Put LED stuff here
+    public void periodic() {
+        SmartDashboard.putString("Alliance", ALLIANCE.toString());
+        drivebaseS.drawRobotOnField(field);
+        field3d.setRobotPose(new Pose3d(drivebaseS.getPose()));
+        //Put LED stuff here
 
-  }
+    }
 
     public void onEnabled() {
         CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));

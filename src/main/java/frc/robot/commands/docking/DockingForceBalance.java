@@ -13,9 +13,6 @@ public class DockingForceBalance extends CommandBase implements Loggable {
     double pitchUpper = -65;
     double pitchLower = -75;
 
-
-    private final boolean go = true;
-
     private final AHRS navx = new AHRS(Port.kMXP);
 
     private final DrivebaseS m_drivebase;
@@ -74,10 +71,13 @@ public class DockingForceBalance extends CommandBase implements Loggable {
         //m_drivebase.drive(new ChassisSpeeds(-omegaToDriveSpeed(navx.getRawGyroY()), 0,0));
         //m_drivebase.drive(new ChassisSpeeds(omegaToDriveSpeed(navx.getRoll(), navx.getRawGyroY()), 0, 0));
         //turn robot orientation x forward or backward (no yaw value)
+        /* 
         if  (Math.abs(navx.getYaw()) > 10){
             m_drivebase.drive(new ChassisSpeeds(0,0,0.3 * Math.signum(navx.getYaw())));
-        }
-        double appliedSpeed  = 0.05* (navx.getRoll()) - 0.005 * navx.getRawGyroY() * Math.signum(navx.getRoll());
+        }*/
+        //double appliedSpeed  = 0.05* (navx.getRoll()) - 0.005 * navx.getRawGyroY() * Math.signum(navx.getRoll());
+        //double appliedSpeed  = 0.05* (navx.getRoll()) - 0.005 * navx.getRawGyroY() * -Math.signum(navx.getRoll());
+        double appliedSpeed = 0.02 * (navx.getRoll());
         if (Math.abs(appliedSpeed) > 0.25){
             appliedSpeed = 0.25 * Math.signum(appliedSpeed);   
         }

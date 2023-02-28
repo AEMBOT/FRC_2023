@@ -7,13 +7,16 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.arm.GoToPosition;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -24,12 +27,12 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     // Elevator
     private final CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
     private final CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
-    private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, clampSolenoidID);
+    private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.REVPH, clampSolenoidID);
 
     public RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
     public DutyCycleEncoder absoluteAngleEncoder = new DutyCycleEncoder(angleEncoderPort);
-    public Encoder relativeAngleEncoder = new Encoder(1, 2);
+    public Encoder relativeAngleEncoder = new Encoder(2, 1);
     private Ultrasonic objectSensor = new Ultrasonic(ultrasonicPingPort, ultrasonicEchoPort);
     @Log
     private boolean activateExtendPID = false; // Activates PID controller, false when zeroing
@@ -46,6 +49,8 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     ArmFeedforward thetaDown = new ArmFeedforward(0.5, 0.5, 50, 0);
     ArmFeedforward thetaUp = new ArmFeedforward(-0.5, 0.5, 40, 0);
+
+    SlewRateLimiter thetaVelocity = new SlewRateLimiter(10.0, -5.0, 0);
 
 
     @Override
@@ -92,10 +97,6 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         SmartDashboard.putNumber("thetaUpFeedForward", thetaUpFeedforward);
         SmartDashboard.putNumber("pidThetaValue", pidThetaValue);
         SmartDashboard.putNumber("pidExtendValue", pidExtendValue);
-//        SmartDashboard.putNumber("thetaGoal", pidTheta.getGoal().position);
-//        SmartDashboard.putNumber("thetaSetpointPos", pidTheta.getSetpoint().position);
-//        SmartDashboard.putNumber("thetaSetpointVel", pidTheta.getSetpoint().velocity);
-
     }
 
     public ArmSubsystem() {
@@ -111,11 +112,11 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         m_extendMotor.setSmartCurrentLimit(extendMotorCurrentLimit);
         m_angleMotor.setSmartCurrentLimit(angleMotorCurrentLimit);
 
-        m_extendMotor.setInverted(true);
-        m_angleMotor.setInverted(true);
+        m_extendMotor.setInverted(false);
+        m_angleMotor.setInverted(false);
 
         extendEncoder.setPositionConversionFactor(extendTickToMeter);
-        absoluteAngleEncoder.setPositionOffset(0.346);
+        absoluteAngleEncoder.setPositionOffset(0.049);
         relativeAngleEncoder.setDistancePerPulse(2 * Math.PI / 8192.0);
 
         pidExtend.setSetpoint(0);
@@ -145,10 +146,12 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     private void setAngleMotorVoltage(double voltage) {
-        if (getAnglePosition() < maxAngleHardStop) {
-            m_angleMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));
-        } else if (getAnglePosition() > minAngleSoftStop) {
+        voltage = thetaVelocity.calculate(voltage);
+
+        if (getAnglePosition() > maxAngleHardStop) {
             m_angleMotor.setVoltage(MathUtil.clamp(voltage, -12, 0));
+        } else if (getAnglePosition() < minAngleSoftStop) {
+            m_angleMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));
         } else {
             m_angleMotor.setVoltage(voltage);
         }
@@ -173,7 +176,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     public void angleUp() {
-        setAngleMotorVoltage(7.0);
+        setAngleMotorVoltage(10.0);
     }
 
     public double getAnglePosition() {
@@ -181,15 +184,15 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     public void angleDown() {
-        setAngleMotorVoltage(-7.0);
+        setAngleMotorVoltage(-10.0);
     }
 
-    public void extendArm() {
-        setExtendMotorVoltage(7.0);
+    public void extendArm(double power) {
+        setExtendMotorVoltage(10.0 * power);
     }
 
-    public void retractArm() {
-        setExtendMotorVoltage(-7.0);
+    public void retractArm(double power) {
+        setExtendMotorVoltage(-10.0 * power);
     }
 
     public double getExtendPosition() {
@@ -197,7 +200,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     public boolean isCurrentLimited() {
-        return filter.calculate(m_extendMotor.getOutputCurrent()) >= 35;
+        return filter.calculate(m_extendMotor.getOutputCurrent()) >= 25;
     }
 
     // Extends the clamp
@@ -222,5 +225,10 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     public void setExtendZeroed(boolean zeroed) {
         extendZeroed = zeroed;
     }
+
+    public Command getGoToPositionCommand(double targetExtend, double targetTheta) {
+        return new GoToPosition(this, targetExtend, targetTheta);
+    }
+    
 
 }

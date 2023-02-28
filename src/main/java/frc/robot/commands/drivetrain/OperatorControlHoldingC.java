@@ -12,7 +12,7 @@ import java.util.function.DoubleSupplier;
 import static edu.wpi.first.math.MathUtil.applyDeadband;
 import static frc.robot.Constants.InputDevices.JOYSTICK_DEADBAND;
 
-public class OperatorControlC extends CommandBase {
+public class OperatorControlHoldingC extends CommandBase {
 
     /**
      * Command to allow for driver input in teleop
@@ -32,24 +32,20 @@ public class OperatorControlC extends CommandBase {
     private final SlewRateLimiter yRateLimiter = new SlewRateLimiter(5);
     private final DoubleSupplier rotation;
     private final SlewRateLimiter thetaRateLimiter = new SlewRateLimiter(5);
-    private final boolean slow_mode;
 
     private final double MAX_LINEAR_SPEED = 4;
-    private final double MIN_LINEAR_SPEED = 1;
 
-    public OperatorControlC(
+    public OperatorControlHoldingC(
             DoubleSupplier fwdX,
             DoubleSupplier fwdY,
-            DoubleSupplier rot,
-            boolean SLOW_MODE,
+            DoubleSupplier povAngle,
             DrivebaseS subsystem
     ) {
 
         drive = subsystem;
         forwardX = fwdX;
         forwardY = fwdY;
-        rotation = rot;
-        slow_mode = SLOW_MODE;
+        rotation = povAngle;
 
         addRequirements(subsystem);
 
@@ -82,7 +78,7 @@ public class OperatorControlC extends CommandBase {
 
         double driveDirectionRadians = Math.atan2(fwdY, fwdX);
         double driveMagnitude = Math.hypot(fwdX, fwdY);
-        driveMagnitude *= slow_mode ? MIN_LINEAR_SPEED : MAX_LINEAR_SPEED;
+        driveMagnitude *= MAX_LINEAR_SPEED;
 
         //fwdX = driveMagnitude * Math.cos(driveDirectionRadians);
         //fwdY = driveMagnitude * Math.sin(driveDirectionRadians);
@@ -91,16 +87,10 @@ public class OperatorControlC extends CommandBase {
         fwdX = driveMagnitude * Math.cos(driveDirectionRadians);
         fwdY = driveMagnitude * Math.sin(driveDirectionRadians);
 
+        double rot = rotation.getAsDouble();
 
-        double rot = -rotation.getAsDouble();
-
-        //rot = Math.copySign(rot * rot, rot);
-        rot = applyDeadband(rot, JOYSTICK_DEADBAND);
-        rot = thetaRateLimiter.calculate(rot);
-        rot *= DriveConstants.MAX_TELEOP_TURN_RATE;
-
-
-        drive.driveFieldRelative(new ChassisSpeeds(fwdX, fwdY, rot));
+        drive.setRotationState(rot);
+        drive.driveFieldRelativeHeading(new ChassisSpeeds(fwdX, fwdY, 0));
 //        drive.drive(new ChassisSpeeds(fwdX, fwdY, rot));
 
         SmartDashboard.putNumber("GetPose", drive.getPose().getX());
