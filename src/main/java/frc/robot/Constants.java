@@ -188,8 +188,8 @@ public final class Constants {
         //Angle and Extend arm Constants
         public static final double angleToHigh = 0.52;
         public static final double angleToMid = 0.40;
-        public static final double angleToFloor = -.36;
-        public static final double angleToSubstation = -.2;
+        public static final double angleToFloor = -0.25;
+        public static final double angleToSubstation = 0.29;
 
         public static final double maxAngleHardStop = 1.15;
         public static final double minAngleSoftStop = -0.27;
@@ -206,7 +206,7 @@ public final class Constants {
         public static final double extendToFloor = 0.257175;
         public static final double extendToMid = 0.45;
         public static final double extendToHigh = 1.01;
-        public static final double extendToSubstation = 0.6429375;
+        public static final double extendToSubstation = 1.10;
         // Arm Constants that need measuring
         public static final double pivotPointHeight = 0; // Height of pivot point of arm above point where belt separates from belt wheel
         public static final double pivotPointDistance = 0; // Distance of pivot point of arm behind point where belt separates from belt wheel
@@ -344,7 +344,7 @@ public final class Constants {
         public static final Transform2d CONE_OFFSET_LEFT = new Transform2d(
                 new Translation2d(
                         0,
-                        -(Units.feetToMeters(1) + Units.inchesToMeters(6.5) + Units.inchesToMeters(8))
+                        -(Units.feetToMeters(1) + Units.inchesToMeters(6.5))
                 ),
                 new Rotation2d()
         );
@@ -352,7 +352,7 @@ public final class Constants {
         public static final Transform2d CONE_OFFSET_RIGHT = new Transform2d(
                 new Translation2d(
                         0,
-                        Units.feetToMeters(1) + Units.inchesToMeters(6.5) + Units.inchesToMeters(8)
+                        Units.feetToMeters(1) + Units.inchesToMeters(6.5)
                 ),
                 new Rotation2d()
         );
