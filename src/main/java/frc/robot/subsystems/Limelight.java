@@ -34,7 +34,7 @@ public class Limelight extends SubsystemBase {
          */
         private GamePiece(boolean isCube, double xPos, double yPos) {
             this.isCube = isCube;
-            this.xPos = xPos - 1280 / 2;
+            this.xPos = xPos + 300 - 1280 / 2;
             this.yPos = -yPos + 960 / 2;
         }
 
@@ -215,8 +215,8 @@ public class Limelight extends SubsystemBase {
             }
 
             tagRelativePosition = new Pose2d(new Translation2d(rawPosition[2], rawPosition[0]), new Rotation2d(rawPosition[5])); // Convert to Pose2d for use elsewhere
-            if (lastUpdate != (limeLight.getEntry(ntKey).getLastChange() / 1000.0) - limeLight.getEntry("tl").getDouble(0) - 11.0) {
-                lastUpdate = (limeLight.getEntry(ntKey).getLastChange() / 1000.0) - limeLight.getEntry("tl").getDouble(0) - 11.0;
+            if (lastUpdate != (limeLight.getEntry(ntKey).getLastChange() / 1000.0) - limeLight.getEntry("tl").getDouble(0) - limeLight.getEntry("cl").getDouble(0)) {
+                lastUpdate = (limeLight.getEntry(ntKey).getLastChange() / 1000.0) - limeLight.getEntry("tl").getDouble(0) - limeLight.getEntry("cl").getDouble(0);
                 accessedBefore = false;
             }
 
@@ -272,13 +272,8 @@ public class Limelight extends SubsystemBase {
      */
     public void periodic() {
         updatePosition(); // Update position
-        test();
     }
 
     public void test() {
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("LimelightTesting");
-        table.getEntry("PoseX").setValue(position.getX());
-        table.getEntry("PoseY").setValue(position.getY());
-        table.getEntry("PoseR").setValue(position.getRotation().getZ());
     }
 }

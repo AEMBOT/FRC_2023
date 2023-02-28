@@ -9,7 +9,9 @@ def runPipeline(image, llrobot):
     processor = ConeDetection()
     processed = processor.coneProcess(image)
     processed2 = processor.cubeProcess(image)
-    return processed[2], processed[1]+processed2[1], processed[0]+processed2[0]
+    output = processed[1] + processed2[1]
+    output2 = numpy.concatenate((numpy.zeros((960,300), dtype=int), output), axis=1)
+    return processed[2], output2, numpy.concatenate((processed[0],processed2[0]))
 
 class ConeDetection:
     """
@@ -19,6 +21,7 @@ class ConeDetection:
     def __init__(self):
         """initializes all values to presets or None if need to be set
         """
+        self.cropped_image = None
 
         self.__hsv_threshold_hue_cone = [15.0, 35.0]
         self.__hsv_threshold_saturation_cone = [170.0, 255.0]
@@ -82,8 +85,9 @@ class ConeDetection:
         """
         Runs the pipeline and sets all outputs to new values.
         """
+        self.cropped_image = source0[0:960, 300:1280]
         # Step HSV_Threshold0:
-        self.__hsv_threshold_input = source0
+        self.__hsv_threshold_input = self.cropped_image
         (self.hsv_threshold_output) = self.__hsv_threshold(self.__hsv_threshold_input, self.__hsv_threshold_hue_cone, self.__hsv_threshold_saturation_cone, self.__hsv_threshold_value_cone)
 
         # Step CV_erode0:
@@ -111,8 +115,9 @@ class ConeDetection:
         """
         Runs the pipeline and sets all outputs to new values.
         """
+        self.cropped_image = source0[0:960, 300:1280]
         # Step HSV_Threshold0:
-        self.__hsv_threshold_input = source0
+        self.__hsv_threshold_input = self.cropped_image
         (self.hsv_threshold_output) = self.__hsv_threshold(self.__hsv_threshold_input, self.__hsv_threshold_hue_cube, self.__hsv_threshold_saturation_cube, self.__hsv_threshold_value_cube)
 
         # Step CV_erode0:
