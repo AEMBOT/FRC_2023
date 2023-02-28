@@ -13,15 +13,26 @@ import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
 public class ArmCommands {
+    /* 
     public static Command HighPiecePickUpCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, int numpadPosition) {
         return new SequentialCommandGroup(
+            
                 new ParallelCommandGroup(
                         m_drivebase.chasePoseC(() ->
                                 DOUBLE_SUBSTATION
                                         .plus(numpadPosition == 10 ? DOUBLE_SUBSTATION_OFFSET_LEFT : DOUBLE_SUBSTATION_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5))),
                         new GoToPosition(m_arm, 0.5, 0.5)
                 ),
-                new InstantCommand(m_arm::toggleClamp, m_arm)
+                new InstantCommand(m_arm::toggleClamp, m_arm),
+                m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
+        );
+    }*/
+
+    public static Command HighPiecePickUpCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition targetPosition, int numpadPosition) {
+        return new SequentialCommandGroup(
+            getPlaceGamePieceCommand(m_drivebase, m_arm, targetPosition, numpadPosition),
+                new InstantCommand(m_arm::toggleClamp, m_arm),
+                m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
         );
     }
 
