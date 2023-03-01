@@ -22,12 +22,14 @@ import io.github.oblarg.oblog.annotations.Log;
 
 import static frc.robot.Constants.ArmConstants.*;
 
+
 public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     // Elevator
     private final CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
     private final CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
     private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.REVPH, clampSolenoidID);
+    private final Solenoid m_ratchetSolenoid = new Solenoid(PneumaticsModuleType.REVPH, ratchetSolenoidID);
 
     public RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
@@ -50,7 +52,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     ArmFeedforward thetaDown = new ArmFeedforward(0.5, 0.5, 50, 0);
     ArmFeedforward thetaUp = new ArmFeedforward(-0.5, 0.5, 40, 0);
 
-    SlewRateLimiter thetaVelocity = new SlewRateLimiter(10.0, -5.0, 0);
+//    SlewRateLimiter thetaVelocity = new SlewRateLimiter(10.0, -5.0, 0);
 
 
     @Override
@@ -97,13 +99,20 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         SmartDashboard.putNumber("thetaUpFeedForward", thetaUpFeedforward);
         SmartDashboard.putNumber("pidThetaValue", pidThetaValue);
         SmartDashboard.putNumber("pidExtendValue", pidExtendValue);
+
+        /*
+        if (Math.abs(m_angleMotor.get()) < 0.001){
+            extendRatchet();
+        }
+        else{
+            retractRatchet();
+        }*/
     }
 
     public ArmSubsystem() {
         // Restore motors to factory defaults for settings to be consistent
         m_angleMotor.restoreFactoryDefaults();
         m_extendMotor.restoreFactoryDefaults();
-
         // Lift shouldn't drift, so set it to brake mode
         m_extendMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
         m_angleMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -114,6 +123,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
         m_extendMotor.setInverted(false);
         m_angleMotor.setInverted(false);
+       
 
         extendEncoder.setPositionConversionFactor(extendTickToMeter);
         absoluteAngleEncoder.setPositionOffset(0.049);
@@ -121,6 +131,10 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
         pidExtend.setSetpoint(0);
         pidTheta.setSetpoint(0);
+
+        pidExtend.setTolerance(0.01);
+        pidTheta.setTolerance(0.01);
+        lockRatchet();
     }
 
     public boolean isGamePieceThere() {
@@ -146,7 +160,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     private void setAngleMotorVoltage(double voltage) {
-        voltage = thetaVelocity.calculate(voltage);
+//        voltage = thetaVelocity.calculate(voltage);
 
         if (getAnglePosition() > maxAngleHardStop) {
             m_angleMotor.setVoltage(MathUtil.clamp(voltage, -12, 0));
@@ -187,8 +201,16 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         setAngleMotorVoltage(-10.0);
     }
 
+    public void extendArm() {
+        setExtendMotorVoltage(10.0);
+    }
+
     public void extendArm(double power) {
         setExtendMotorVoltage(10.0 * power);
+    }
+
+    public void retractArm() {
+        setExtendMotorVoltage(-10.0);
     }
 
     public void retractArm(double power) {
@@ -200,7 +222,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     public boolean isCurrentLimited() {
-        return filter.calculate(m_extendMotor.getOutputCurrent()) >= 25;
+        return filter.calculate(m_extendMotor.getOutputCurrent()) >= 35;
     }
 
     // Extends the clamp
@@ -218,6 +240,18 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         m_clampSolenoid.set(!m_clampSolenoid.get());
     }
 
+    public void unlockRatchet(){
+        m_ratchetSolenoid.set(false);
+    }
+
+    public void lockRatchet(){
+        m_ratchetSolenoid.set(true);
+    }
+
+    public void toggleRatchet(){
+        m_ratchetSolenoid.set(!m_ratchetSolenoid.get());
+    }
+
     public void setExtendPIDState(boolean ready) {
         activateExtendPID = ready;
     }
@@ -228,6 +262,10 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     public Command getGoToPositionCommand(double targetExtend, double targetTheta) {
         return new GoToPosition(this, targetExtend, targetTheta);
+    }
+
+    public boolean getArmAtPosition() {
+        return pidExtend.atSetpoint() && pidTheta.atSetpoint();
     }
     
 

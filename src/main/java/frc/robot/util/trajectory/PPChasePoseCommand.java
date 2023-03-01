@@ -134,6 +134,7 @@ public class PPChasePoseCommand extends CommandBase implements Loggable {
 
     @Override
     public boolean isFinished() {
-        return m_controller.atReference();
+//        return m_controller.atReference();
+        return false;
     }
 }

@@ -47,9 +47,10 @@ public final class Constants {
         static public final double ROBOT_MASS_kg = Units.lbsToKilograms(20.0);
         static public final double ROBOT_MOI_KGM2 = 1.0 / 12.0 * ROBOT_MASS_kg * Math.pow((WHEEL_BASE_WIDTH_M * 1.1), 2) * 2; //Model moment of intertia as a square slab slightly bigger than wheelbase with axis through center
         // Drivetrain Performance Mechanical limits
-        static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(12);
-        static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(12);
-        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI * 8;
+        static public final double MAX_FWD_REV_SPEED_MPS = Units.feetToMeters(14.5);
+        static public final double MAX_STRAFE_SPEED_MPS = Units.feetToMeters(14.5);
+//        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = Math.PI * 8;
+        static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = 5; // Calculated from max module free speed around a 25-inch wheelbase
         static public final double MAX_TRANSLATE_ACCEL_MPS2 = MAX_FWD_REV_SPEED_MPS / 0.125; //0-full time of 0.25 second
         static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC / 0.25; //0-full time of 0.25 second
         static public final int DRIVE_MOTOR_CURRENT_LIMIT = 40;
@@ -133,7 +134,7 @@ public final class Constants {
         public static final double chassisThetakD = 0.05;
 
 
-        public static final double MAX_MODULE_SPEED_FPS = Units.feetToMeters(12);
+        public static final double MAX_MODULE_SPEED_FPS = Units.feetToMeters(14.5);
         public static final double MAX_TELEOP_TURN_RATE = Math.PI * 4; //Rate the robot will spin with full rotation command
 
         public static final int ENC_PULSE_PER_REV = 1;
@@ -154,8 +155,8 @@ public final class Constants {
     public static final class AutoConstants {
         public static DriverStation.Alliance ALLIANCE = DriverStation.getAlliance();
 
-        public static final double maxVelMetersPerSec = 2;
-        public static final double maxAccelMetersPerSecondSq = 1;
+        public static final double maxVelMetersPerSec = 3;
+        public static final double maxAccelMetersPerSecondSq = 1.5;
 
         public static HashMap<String, Command> eventMap = new HashMap<String, Command>();
     }
@@ -178,6 +179,7 @@ public final class Constants {
         public static final int angleEncoderOffset = 0;
         public static final int extendMotorCanID = 11;
         public static final int clampSolenoidID = 15;
+        public static final int ratchetSolenoidID = 14; 
         public static final int movingAverage = 5;
         public static final int extendMotorCurrentLimit = 35;
         public static final int angleMotorCurrentLimit = 40;
@@ -188,8 +190,8 @@ public final class Constants {
         //Angle and Extend arm Constants
         public static final double angleToHigh = 0.52;
         public static final double angleToMid = 0.40;
-        public static final double angleToFloor = -.36;
-        public static final double angleToSubstation = -.2;
+        public static final double angleToFloor = -0.25;
+        public static final double angleToSubstation = 0.29;
 
         public static final double maxAngleHardStop = 1.15;
         public static final double minAngleSoftStop = -0.27;
@@ -206,7 +208,7 @@ public final class Constants {
         public static final double extendToFloor = 0.257175;
         public static final double extendToMid = 0.45;
         public static final double extendToHigh = 1.01;
-        public static final double extendToSubstation = 0.6429375;
+        public static final double extendToSubstation = 1.10;
         // Arm Constants that need measuring
         public static final double pivotPointHeight = 0; // Height of pivot point of arm above point where belt separates from belt wheel
         public static final double pivotPointDistance = 0; // Distance of pivot point of arm behind point where belt separates from belt wheel
@@ -344,7 +346,7 @@ public final class Constants {
         public static final Transform2d CONE_OFFSET_LEFT = new Transform2d(
                 new Translation2d(
                         0,
-                        -(Units.feetToMeters(1) + Units.inchesToMeters(6.5) + Units.inchesToMeters(8))
+                        -(Units.feetToMeters(1) + Units.inchesToMeters(6.5))
                 ),
                 new Rotation2d()
         );
@@ -352,7 +354,7 @@ public final class Constants {
         public static final Transform2d CONE_OFFSET_RIGHT = new Transform2d(
                 new Translation2d(
                         0,
-                        Units.feetToMeters(1) + Units.inchesToMeters(6.5) + Units.inchesToMeters(8)
+                        Units.feetToMeters(1) + Units.inchesToMeters(6.5)
                 ),
                 new Rotation2d()
         );

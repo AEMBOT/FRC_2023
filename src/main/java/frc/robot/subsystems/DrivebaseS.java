@@ -59,9 +59,9 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
     private final SimGyroSensorModel simNavx = new SimGyroSensorModel();
     private final Limelight limelight;
 
-    @Log
+    
     public final PIDController xController = new PIDController(chassisTranslationalkP, 0, chassisTranslationalkD);
-    @Log
+    
     public final PIDController yController = new PIDController(chassisTranslationalkP, 0, chassisTranslationalkD);
     @Log
     public final PIDController thetaController = new PIDController(chassisThetakP, 0, chassisThetakD);
@@ -105,6 +105,8 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
     private final LinearFilter visionPoseAverageX = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
     private final LinearFilter visionPoseAverageY = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
     private final LinearFilter visionPoseAverageT = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
+
+    private Pose2d targetPose = new Pose2d();
 
     public DrivebaseS(Limelight m_limelight) {
         holonomicDriveController.setTolerance(new Pose2d(0.02, 0.02, Rotation2d.fromDegrees(0.5)));
@@ -358,6 +360,14 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
     public void resetImu() {
         navx.reset();
         simNavx.resetToPose(new Pose2d());
+    }
+
+    public Pose2d getTargetPose() {
+        return targetPose;
+    }
+
+    public void setTargetPose(Pose2d target) {
+        targetPose = target;
     }
 
     public void setRotationState(double radians) {
