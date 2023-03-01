@@ -1,18 +1,22 @@
 #include <Adafruit_NeoPixel.h>
 
-#define PIN D1	 // input pin Neopixel is attached to
+#define PIN D1	 // output pin Neopixel is attached to
+#define PIN2 D5
 
 #define NUMPIXELS      58 // number of neopixels in strip
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels2 = Adafruit_NeoPixel(NUMPIXELS, PIN2, NEO_GRB + NEO_KHZ800);
 
-int add = 0;
+int shift = 0;
 
-int DarkPix = 6;
+int storedRed = 255;
+int storedGreen = 0;
+int storedBlue = 0;
 
-int storedRed = 60;
-int storedGreen = 112;
-int storedBlue = 203;
+int storedHue = 0;
+int storedSat = 100;
+int storedVal = 100;
 
 int doRainbow = 0;
 
@@ -27,100 +31,21 @@ void setup() {
   //pinMode(5, INPUT);
   //pinMode(LED_BUILTIN, OUTPUT);
   pinMode(D1, OUTPUT);
+  pinMode(D5, OUTPUT);
 }
 
 void loop() {
-  if (doRainbow == 0){
-    setColor(add, DarkPix);
-  } else if (doRainbow == 1) {
-    rainbow(add);
-  }
+  setColor();
   delay(100);
-  add = (add + 1) % DarkPix;
-  }
-    
-  //delay(1000);
-void rainbow(int add) {
-  if (Serial.available()) {
-    int input = Serial.read();
-    if (input == 113) {
-      doRainbow = 0;
-    }
-  }
-
-  int red[3] = {255,0,0};
-  int orange[3] = {255,65,0};
-  int yellow[3] = {255,182,0};
-  int green[3] = {0,255,0};
-  int blue[3] = {0,0,255};
-  int purple[3] = {128,0,255};
-  int colors[6] = {red[3],orange[3],yellow[3],green[3],blue[3],purple[3]};
-  for (int i=0; i < NUMPIXELS; i++) {
-    int index = (i+add)%6;
-    int selColor[3] = {colors[index]};    
-    int red = selColor[0];
-    int green = selColor[1];
-    int blue = selColor[2];
-    pixels.setPixelColor(i, pixels.Color(red,green,blue));
-    //Serial.print(red);
-    //Serial.print(green);
-    //Serial.println(blue);
-    //Serial.println("RED:");
-    //Serial.println((abs(red/2)+(red/2)));
-    //Serial.println((abs(green/2)+(green/2)));
-    //Serial.println((abs(blue/2)+(blue/2)));
-
-    // This sends the updated pixel color to the hardware.
-    pixels.show();
-
-    // Delay for a period of time (in milliseconds).
-    //delay(delayval);
+  shift = shift + 1;
+  if (shift > 100) {
+    shift = 0;
   }
 }
+    
 
-void setColor(int add, int DarkPix) {
-  if (Serial.available()) {
-    int input = Serial.read();
-    if (input == 112) { //purple
-      storedRed = 128;
-      storedGreen = 0;
-      storedBlue = 255;
-    } else if (input == 121) { //yellow
-      storedRed = 255;
-      storedGreen = 182;
-      storedBlue = 0;
-    } else if (input == 108) { //AEMLIGHT
-      storedRed = 60;
-      storedGreen = 112;
-      storedBlue = 203;
-    } else if (input == 100) { //AEMDARK
-      storedRed = 16;
-      storedGreen = 84;
-      storedBlue = 162;
-    } else if (input == 114) {//red
-      storedRed = 255;
-      storedGreen = 0;
-      storedBlue = 0;
-    } else if (input == 98) { //blue
-       storedRed = 0;
-       storedGreen = 0;
-       storedBlue = 255;
-    } else if (input == 103) { //green
-      storedRed = 0; 
-      storedGreen = 255;
-      storedBlue = 0;
-    } else if (input == 111) { //orange
-      storedRed = 255;
-      storedGreen = 65;
-      storedBlue = 0;
-    } else if (input == 48) {
-      storedRed = 0;
-      storedGreen = 0;
-      storedBlue = 0;
-    } else if (input == 113) {
-      doRainbow = 1;
-    }
-  }
+void setColor() {
+  detectInput();
   //int color[3] = {255,0,0};//red
   //int color[3] = {0,0,255};//blue
   //int color[3] = {255,255,0};//yellow
@@ -130,18 +55,14 @@ void setColor(int add, int DarkPix) {
   int red;
   int green;
   int blue;
-  int SubtractValR;
-  int SubtractValG;
-  int SubtractValB;
 
   for (int i=0; i < NUMPIXELS; i++) {
-    SubtractValR = map(((i+add)%DarkPix),0,(DarkPix),0,storedRed);
-    SubtractValG = map(((i+add)%DarkPix),0,(DarkPix),0,storedGreen);
-    SubtractValB = map(((i+add)%DarkPix),0,(DarkPix),0,storedBlue);
-    red = round(storedRed-SubtractValR);
-    green = round(storedGreen-SubtractValG);
-    blue = round(storedBlue-SubtractValB);
+    hsv_to_rgb(storedHue, storedSat, (storedVal-((shift+i)%100)));
+    red = storedRed;
+    green = storedGreen;
+    blue = storedBlue;
     pixels.setPixelColor(i, pixels.Color(red,green,blue));
+    pixels2.setPixelColor(i, pixels2.Color(red,green,blue));
     //Serial.print(red);
     //Serial.print(green);
     //Serial.println(blue);
@@ -152,11 +73,90 @@ void setColor(int add, int DarkPix) {
 
     // This sends the updated pixel color to the hardware.
     pixels.show();
+    pixels2.show();
 
     // Delay for a period of time (in milliseconds).
     //delay(delayval);
   }
-    
   
 }
 
+void detectInput() {
+  if (Serial.available()) {
+    int input = Serial.read();
+    if (input == 112) { //purple
+      storedHue = 285;
+      storedSat = 100;
+      storedVal = 100;
+    } else if (input == 121) { //yellow
+      storedHue = 75;
+      storedSat = 100;
+      storedVal = 100;
+    } else if (input == 108) { //AEMLIGHT
+      storedHue = 218;
+      storedSat = 70;
+      storedVal = 80;
+    } else if (input == 100) { //AEMDARK
+      storedHue = 212;
+      storedSat = 90;
+      storedVal = 64;
+    } else if (input == 114) {//red
+      storedHue = 0;
+      storedSat = 100;
+      storedVal = 100;
+    } else if (input == 98) { //blue
+       storedHue = 240;
+       storedSat = 100;
+       storedVal =100;
+    } else if (input == 103) { //green
+      storedHue = 120; 
+      storedSat = 100;
+      storedVal = 100;
+    } else if (input == 111) { //orange
+      storedHue = 15;
+      storedSat = 100;
+      storedVal = 100;
+    } else if (input == 48) { //off
+      storedHue = 0;
+      storedSat = 0;
+      storedVal = 0;
+    } else if (input == 119) { //white
+      storedHue = 0;
+      storedSat = 0;
+      storedVal = 100;
+    }
+  }
+}
+
+
+void hsv_to_rgb(int hue, int sat, int val) {
+  sat = sat/100;
+  val = val/100;
+  double C = val*sat;
+  double X = C*(1-abs((hue/60)%2-1));
+  double m = val-C;
+  double Rp, Gp, Bp;
+  if ((0 <= hue && hue < 60) || hue == 360) {
+    Rp, Gp, Bp = C, X, 0;
+  } else if (60 <= hue && hue < 120) {
+    Rp, Gp, Bp = X, C, 0;
+  } else if (120 <= hue && hue < 180) {
+    Rp, Gp, Bp = 0, C, X;
+  } else if (180 <= hue && hue < 240) {
+    Rp, Gp, Bp = 0, X, C;
+  } else if (240 <= hue && hue < 300) {
+    Rp, Gp, Bp = X, 0, C;
+  } else if (300 <= hue && hue < 360) {
+    Rp, Gp, Bp = C, 0, X;
+  }
+
+  double R = round(((Rp+m)*255));
+  double G = round(((Gp+m)*255));
+  double B = round(((Bp+m)*255));
+
+  storedRed = R;
+  storedGreen = G;
+  storedBlue = B;
+
+  Serial.println(storedVal);
+}
