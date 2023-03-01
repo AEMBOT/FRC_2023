@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.arm.ArmCommands;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.docking.AutoPathDocking;
@@ -148,6 +149,8 @@ public class RobotContainer {
                 )
         );
         eventMap.put("autoDock", m_newDocking);
+
+        eventMap.put("stowArm", m_armSubsystem.getGoToPositionCommand(maxAngleHardStop, minExtendHardStop));
 
         // Build Autos
         autoSelector.setDefaultOption("No-op", new InstantCommand());
@@ -423,9 +426,14 @@ public class RobotContainer {
 
     }
 
+    public void onDisabled(){
+        CommandScheduler.getInstance().schedule(new InstantCommand(m_armSubsystem::unlockRatchet, m_armSubsystem));
+    }
+
     public void onEnabled() {
         CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
         ALLIANCE = DriverStation.getAlliance();
+        CommandScheduler.getInstance().schedule(new InstantCommand(m_armSubsystem::lockRatchet, m_armSubsystem));
     }
 
     public void onInit() {

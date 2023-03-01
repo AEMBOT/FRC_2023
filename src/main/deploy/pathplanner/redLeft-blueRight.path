@@ -76,5 +76,12 @@
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 0.1,
+      "names": [
+        "stowArm"
+      ]
+    }
+  ]
 }

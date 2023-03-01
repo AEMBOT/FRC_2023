@@ -22,12 +22,14 @@ import io.github.oblarg.oblog.annotations.Log;
 
 import static frc.robot.Constants.ArmConstants.*;
 
+
 public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     // Elevator
     private final CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
     private final CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
     private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.REVPH, clampSolenoidID);
+    private final Solenoid m_ratchetSolenoid = new Solenoid(PneumaticsModuleType.REVPH, ratchetSolenoidID);
 
     public RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
@@ -97,13 +99,20 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         SmartDashboard.putNumber("thetaUpFeedForward", thetaUpFeedforward);
         SmartDashboard.putNumber("pidThetaValue", pidThetaValue);
         SmartDashboard.putNumber("pidExtendValue", pidExtendValue);
+
+        /*
+        if (Math.abs(m_angleMotor.get()) < 0.001){
+            extendRatchet();
+        }
+        else{
+            retractRatchet();
+        }*/
     }
 
     public ArmSubsystem() {
         // Restore motors to factory defaults for settings to be consistent
         m_angleMotor.restoreFactoryDefaults();
         m_extendMotor.restoreFactoryDefaults();
-
         // Lift shouldn't drift, so set it to brake mode
         m_extendMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
         m_angleMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -114,6 +123,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
         m_extendMotor.setInverted(false);
         m_angleMotor.setInverted(false);
+       
 
         extendEncoder.setPositionConversionFactor(extendTickToMeter);
         absoluteAngleEncoder.setPositionOffset(0.049);
@@ -124,6 +134,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
         pidExtend.setTolerance(0.01);
         pidTheta.setTolerance(0.01);
+        lockRatchet();
     }
 
     public boolean isGamePieceThere() {
@@ -227,6 +238,18 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     // Toggles the clamp
     public void toggleClamp() {
         m_clampSolenoid.set(!m_clampSolenoid.get());
+    }
+
+    public void unlockRatchet(){
+        m_ratchetSolenoid.set(false);
+    }
+
+    public void lockRatchet(){
+        m_ratchetSolenoid.set(true);
+    }
+
+    public void toggleRatchet(){
+        m_ratchetSolenoid.set(!m_ratchetSolenoid.get());
     }
 
     public void setExtendPIDState(boolean ready) {
