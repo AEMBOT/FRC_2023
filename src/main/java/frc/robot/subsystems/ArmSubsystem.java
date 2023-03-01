@@ -222,7 +222,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     public boolean isCurrentLimited() {
-        return filter.calculate(m_extendMotor.getOutputCurrent()) >= 25;
+        return filter.calculate(m_extendMotor.getOutputCurrent()) >= 35;
     }
 
     // Extends the clamp

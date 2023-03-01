@@ -79,8 +79,10 @@ public class RobotContainer {
 
     // Path Planner Built Autos
     private final SwerveAutoBuilder autoBuilder = drivebaseS.getSwerveAutoBuilder();
-    private final Command redLeft_blueRight = autoBuilder.fullAuto(
-            PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+    private final Command redLeft_blueRight = new SequentialCommandGroup(
+    autoBuilder.fullAuto(
+            PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)),
+            m_newDocking
     );
     private final Command redRight_blueLeft = autoBuilder.fullAuto(
             PathPlanner.loadPath("redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
@@ -91,9 +93,11 @@ public class RobotContainer {
     private final Command leave_redRight_blueLeft = autoBuilder.fullAuto(
             PathPlanner.loadPath("leave-redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
     );
-    private final Command twopiece_redLeft_blueRight = autoBuilder.fullAuto(
-            PathPlanner.loadPath("twopiece-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
-    );
+
+    private final Command twopiece_redLeft_blueRight =
+    autoBuilder.fullAuto(
+            PathPlanner.loadPath("twopiece-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq));
+
     private final Command twopiece_redRight_blueLeft = autoBuilder.fullAuto(
             PathPlanner.loadPath("twopiece-redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
     );

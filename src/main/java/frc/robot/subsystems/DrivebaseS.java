@@ -59,9 +59,9 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
     private final SimGyroSensorModel simNavx = new SimGyroSensorModel();
     private final Limelight limelight;
 
-    @Log
+    
     public final PIDController xController = new PIDController(chassisTranslationalkP, 0, chassisTranslationalkD);
-    @Log
+    
     public final PIDController yController = new PIDController(chassisTranslationalkP, 0, chassisTranslationalkD);
     @Log
     public final PIDController thetaController = new PIDController(chassisThetakP, 0, chassisThetakD);
