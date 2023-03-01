@@ -81,8 +81,8 @@ public class RobotContainer {
     private final SwerveAutoBuilder autoBuilder = drivebaseS.getSwerveAutoBuilder();
     private final Command redLeft_blueRight = new SequentialCommandGroup(
     autoBuilder.fullAuto(
-            PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)),
-            m_newDocking
+            PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)).withTimeout(15.0),
+            new AutoPathDocking(drivebaseS, m_limelight)
     );
     private final Command redRight_blueLeft = autoBuilder.fullAuto(
             PathPlanner.loadPath("redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)

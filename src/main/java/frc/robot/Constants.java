@@ -155,8 +155,8 @@ public final class Constants {
     public static final class AutoConstants {
         public static DriverStation.Alliance ALLIANCE = DriverStation.getAlliance();
 
-        public static final double maxVelMetersPerSec = 2;
-        public static final double maxAccelMetersPerSecondSq = .5;
+        public static final double maxVelMetersPerSec = 3;
+        public static final double maxAccelMetersPerSecondSq = 1.5;
 
         public static HashMap<String, Command> eventMap = new HashMap<String, Command>();
     }
