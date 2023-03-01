@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.docking.AutoPathDocking;
-import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import frc.robot.commands.drivetrain.OperatorControlHoldingC;
@@ -59,8 +58,7 @@ public class RobotContainer {
     private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
 
     //Commands
-    private final Docking m_docking = new Docking(drivebaseS, m_limelight);
-    private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS, m_limelight);
+    private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS);
     private final DockingForceBalance m_dockingForceBalance = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
@@ -77,9 +75,9 @@ public class RobotContainer {
     // Path Planner Built Autos
     private final SwerveAutoBuilder autoBuilder = drivebaseS.getSwerveAutoBuilder();
     private final Command redLeft_blueRight = new SequentialCommandGroup(
-            autoBuilder.fullAuto(
-                    PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)).withTimeout(15.0),
-            new AutoPathDocking(drivebaseS, m_limelight)
+    autoBuilder.fullAuto(
+            PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)).withTimeout(15.0),
+            new AutoPathDocking(drivebaseS)
     );
     private final Command redRight_blueLeft = autoBuilder.fullAuto(
             PathPlanner.loadPath("redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
@@ -139,14 +137,14 @@ public class RobotContainer {
         eventMap.put("placeConeHigh",
                 new SequentialCommandGroup(
                         m_armSubsystem.getGoToPositionCommand(extendToHigh, angleToHigh).withTimeout(3),
-                        new InstantCommand(m_armSubsystem::extendClamp)
+                        new InstantCommand(m_armSubsystem::openClamp)
                 )
         );
         eventMap.put("floorPickup",
                 new SequentialCommandGroup(
-                        new InstantCommand(m_armSubsystem::extendClamp),
+                        new InstantCommand(m_armSubsystem::openClamp),
                         m_armSubsystem.getGoToPositionCommand(extendToFloor, angleToFloor).withTimeout(3),
-                        new InstantCommand(m_armSubsystem::retractClamp)
+                        new InstantCommand(m_armSubsystem::closeClamp)
                 )
         );
         eventMap.put("autoDock", m_newDocking);
@@ -166,7 +164,7 @@ public class RobotContainer {
                         )
                 )
         );
-
+        
         autoSelector.addOption("redLeft-blueRight", redLeft_blueRight);
         autoSelector.addOption("redRight-blueLeft", redRight_blueLeft);
         autoSelector.addOption("leave-redLeft-blueRight", leave_redLeft_blueRight);
@@ -176,9 +174,9 @@ public class RobotContainer {
 
         autoSelector.addOption("twopiece",
                 new SequentialCommandGroup(
-//                        new InstantCommand(m_armSubsystem::extendClamp),
+//                        new InstantCommand(m_armSubsystem::openClamp),
 //                        m_GoToPositionHigh,
-//                        new InstantCommand(m_armSubsystem::retractClamp),
+//                        new InstantCommand(m_armSubsystem::closeClamp),
                         new ParallelCommandGroup(
 //                                new GoToPosition(m_armSubsystem, 0, -0.5),
                                 new SequentialCommandGroup(
@@ -370,7 +368,7 @@ public class RobotContainer {
 
         // Elevator go to Position\
         //y will be replaced with numpad buttons 
-        m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
+        m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::openClamp)));
         //Docking
         m_secondaryController.b().whileTrue(m_newDocking);
 

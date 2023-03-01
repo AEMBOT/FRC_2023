@@ -226,12 +226,12 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     // Extends the clamp
-    public void extendClamp() {
+    public void openClamp() {
         m_clampSolenoid.set(true);
     }
 
     // Retracts the clamp
-    public void retractClamp() {
+    public void closeClamp() {
         m_clampSolenoid.set(false);
     }
 
