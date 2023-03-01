@@ -30,7 +30,7 @@ public class ArmCommands {
 
     public static Command getHighPiecePickUpCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition targetPosition, int numpadPosition) {
         return new ParallelCommandGroup(
-                new InstantCommand(m_arm::extendClamp),
+                new InstantCommand(m_arm::openClamp),
                 getPlaceGamePieceCommand(m_drivebase, m_arm, targetPosition, numpadPosition),
                 new SequentialCommandGroup(
                         new WaitUntilCommand(() -> {
@@ -44,7 +44,7 @@ public class ArmCommands {
                                     error.getY() < tolerance.getY();
                         }),
                         new WaitUntilCommand(m_arm::getArmAtPosition),
-                        new InstantCommand(m_arm::retractClamp),
+                        new InstantCommand(m_arm::openClamp),
                         new WaitCommand(0.5),
                         m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
                 )
