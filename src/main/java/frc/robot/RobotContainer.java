@@ -15,7 +15,6 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -24,8 +23,6 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.arm.ArmCommands;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.docking.AutoPathDocking;
@@ -80,8 +77,8 @@ public class RobotContainer {
     // Path Planner Built Autos
     private final SwerveAutoBuilder autoBuilder = drivebaseS.getSwerveAutoBuilder();
     private final Command redLeft_blueRight = new SequentialCommandGroup(
-    autoBuilder.fullAuto(
-            PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)).withTimeout(15.0),
+            autoBuilder.fullAuto(
+                    PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)).withTimeout(15.0),
             new AutoPathDocking(drivebaseS, m_limelight)
     );
     private final Command redRight_blueLeft = autoBuilder.fullAuto(
@@ -287,7 +284,7 @@ public class RobotContainer {
 
         m_numpad.button(17).whileTrue(
                 new ProxyCommand(
-                        () -> getPrepareAngleCommand(m_armSubsystem, lastPressedNumpad)
+                        () -> getArmExtensionCommand(m_armSubsystem, lastPressedNumpad)
                 )
         );
 

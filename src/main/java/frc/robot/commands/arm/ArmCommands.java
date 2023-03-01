@@ -93,9 +93,15 @@ public class ArmCommands {
         );
     }
 
-    public static Command getPrepareAngleCommand(ArmSubsystem m_arm, int numpadPosition) {
+    public static Command getArmExtensionCommand(ArmSubsystem m_arm, int numpadPosition) {
         return m_arm.getGoToPositionCommand(
-                m_arm.getExtendPosition(),
+                switch (numpadPosition) {
+                    case 1, 2, 3 -> extendToFloor;
+                    case 4, 5, 6 -> extendToMid;
+                    case 7, 8, 9 -> extendToHigh;
+                    case 10, 11 -> extendToSubstation;
+                    default -> minExtendHardStop;
+                },
                 switch (numpadPosition) {
                     case 1, 2, 3 -> angleToFloor;
                     case 4, 5, 6 -> angleToMid;
