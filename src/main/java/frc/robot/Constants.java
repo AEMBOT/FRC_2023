@@ -178,8 +178,7 @@ public final class Constants {
         public static final int angleEncoderPort = 0;
         public static final int angleEncoderOffset = 0;
         public static final int extendMotorCanID = 11;
-        public static final int clampSolenoidID = 15;
-        public static final int ratchetSolenoidID = 14; 
+        public static final int clampSolenoidID = 0;
         public static final int movingAverage = 5;
         public static final int extendMotorCurrentLimit = 35;
         public static final int angleMotorCurrentLimit = 40;
@@ -188,27 +187,29 @@ public final class Constants {
         public static final int ultrasonicEchoPort = 3;
 
         //Angle and Extend arm Constants
-        public static final double angleToHigh = 0.52;
+        public static final double angleToHigh = 0.48;
         public static final double angleToMid = 0.40;
         public static final double angleToFloor = -0.25;
-        public static final double angleToSubstation = 0.29;
+        public static final double angleToSubstation = 0.34;
 
         public static final double maxAngleHardStop = 1.15;
         public static final double minAngleSoftStop = -0.27;
+        public static final double startingConfigurationAngle = 0.946;
 
         public static final double minExtendHardStop = 0.00;
-        public static final double maxExtendSoftStop = 1.25;
+        public static final double maxExtendSoftStop = 1.05;
 
         //All of these need testing...
         //meter value * tick conversion
 
-        public static final double extendTickToMeter = 0.01285875;
+//        public static final double extendMetersPerTick = 0.01285875;
+        public static final double extendMetersPerTick = 0.00771525;
 
         public static final double extendOffset = 2.5;
         public static final double extendToFloor = 0.257175;
         public static final double extendToMid = 0.45;
-        public static final double extendToHigh = 1.01;
-        public static final double extendToSubstation = 1.10;
+        public static final double extendToHigh = 1.02;
+        public static final double extendToSubstation = 0.90;
         // Arm Constants that need measuring
         public static final double pivotPointHeight = 0; // Height of pivot point of arm above point where belt separates from belt wheel
         public static final double pivotPointDistance = 0; // Distance of pivot point of arm behind point where belt separates from belt wheel
@@ -217,7 +218,7 @@ public final class Constants {
 
     public static final class VisionConstants {
         public static final double VISION_MEASUREMENT_STD_DEV = 0.4;
-        public static final int VISION_AVERAGING_TIME = 20;
+        public static final int VISION_AVERAGING_TIME = 10;
         public static final double VISION_TRANSLATIONAL_RANGE = 0.5;
         public static final double VISION_ROTATIONAL_RANGE = 10;
         public static AprilTagFieldLayout getFieldLayout() {

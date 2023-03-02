@@ -43,28 +43,6 @@ public class DockingForceBalance extends CommandBase implements Loggable {
         brakeRobot();
     }
 
-    public double omegaToDriveSpeed(double theta, double omega) {
-        double kp = 1 / 20; //increaese until enough to go
-        //value = angle of ramp * kp, multiply estimated desired kp by around 1.5
-        double kd = 1 / 50; //have dampening term do most work
-        double retSpeed = theta * kp + omega * kd;
-        double posNegRet = 1;
-        if (retSpeed >= 0) {
-            posNegRet = 1;
-        }
-        if (retSpeed < 0) {
-            posNegRet = -1;
-        }
-        if (Math.abs(retSpeed) > 0.3) {
-            retSpeed = posNegRet * 0.3;
-        }
-        if (omega > -2 && omega < 2) {
-            retSpeed = 0;
-        }
-        return retSpeed;
-    }
-
-
     //assuumes intial if(navx.getPitch() > pitchUpper || navx.getPitch() < pitchLower when called
     @Override
     public void execute() {

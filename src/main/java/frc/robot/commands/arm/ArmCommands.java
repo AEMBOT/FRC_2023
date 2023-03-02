@@ -11,6 +11,7 @@ import frc.robot.subsystems.DrivebaseS;
 
 import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
+import static java.lang.Math.abs;
 
 public class ArmCommands {
     /* 
@@ -30,7 +31,7 @@ public class ArmCommands {
 
     public static Command getHighPiecePickUpCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition targetPosition, int numpadPosition) {
         return new ParallelCommandGroup(
-                new InstantCommand(m_arm::extendClamp),
+                new InstantCommand(m_arm::openClamp),
                 getPlaceGamePieceCommand(m_drivebase, m_arm, targetPosition, numpadPosition),
                 new SequentialCommandGroup(
                         new WaitUntilCommand(() -> {
@@ -39,12 +40,12 @@ public class ArmCommands {
                                     new Translation2d(0.02, 0.02),
                                     Rotation2d.fromDegrees(0.5)
                             );
-                            return error.getRotation().getRadians() < tolerance.getRotation().getRadians() &&
-                                    error.getX() < tolerance.getX() &&
-                                    error.getY() < tolerance.getY();
+                            return abs(error.getRotation().getRadians()) < tolerance.getRotation().getRadians() &&
+                                    abs(error.getX()) < tolerance.getX() &&
+                                    abs(error.getY()) < tolerance.getY();
                         }),
                         new WaitUntilCommand(m_arm::getArmAtPosition),
-                        new InstantCommand(m_arm::retractClamp),
+                        new InstantCommand(m_arm::closeClamp),
                         new WaitCommand(0.5),
                         m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
                 )
@@ -71,9 +72,19 @@ public class ArmCommands {
         SmartDashboard.putNumber("targetPosX", finalTargetGrid.getX());
         SmartDashboard.putNumber("targetPosY", finalTargetGrid.getY());
         return new ParallelCommandGroup(
-                new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(0.5)))),
+                new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(
+                        switch (position) {
+                            case DOUBLE_SUBSTATION -> 0.27;
+                            default -> 0.44;
+                        }
+                )))),
                 m_drivebase.chasePoseC(
-                        () -> finalTargetGrid.plus(ONE_METER_BACK.times(0.5))),
+                        () -> finalTargetGrid.plus(ONE_METER_BACK.times(
+                                switch (position) {
+                                    case DOUBLE_SUBSTATION -> 0.27;
+                                    default -> 0.44;
+                                }
+                        ))),
                 m_arm.getGoToPositionCommand(
                         switch (numpadPosition) {
                             case 1, 2, 3 -> extendToFloor;
@@ -93,9 +104,15 @@ public class ArmCommands {
         );
     }
 
-    public static Command getPrepareAngleCommand(ArmSubsystem m_arm, int numpadPosition) {
+    public static Command getArmExtensionCommand(ArmSubsystem m_arm, int numpadPosition) {
         return m_arm.getGoToPositionCommand(
-                m_arm.getExtendPosition(),
+                switch (numpadPosition) {
+                    case 1, 2, 3 -> extendToFloor;
+                    case 4, 5, 6 -> extendToMid;
+                    case 7, 8, 9 -> extendToHigh;
+                    case 10, 11 -> extendToSubstation;
+                    default -> minExtendHardStop;
+                },
                 switch (numpadPosition) {
                     case 1, 2, 3 -> angleToFloor;
                     case 4, 5, 6 -> angleToMid;

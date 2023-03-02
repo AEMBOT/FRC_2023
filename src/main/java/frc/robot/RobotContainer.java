@@ -15,7 +15,6 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -24,12 +23,9 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.arm.ArmCommands;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.docking.AutoPathDocking;
-import frc.robot.commands.docking.Docking;
 import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import frc.robot.commands.drivetrain.OperatorControlHoldingC;
@@ -51,7 +47,7 @@ public class RobotContainer {
 
     @Log(methodName = "getTotalCurrent")
     private PowerDistribution power = new PowerDistribution();
-    private final Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
+    private final Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);
 
     // Subsystems
     private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
@@ -62,8 +58,7 @@ public class RobotContainer {
     private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
 
     //Commands
-    private final Docking m_docking = new Docking(drivebaseS, m_limelight);
-    private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS, m_limelight);
+    private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS);
     private final DockingForceBalance m_dockingForceBalance = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
@@ -80,9 +75,9 @@ public class RobotContainer {
     // Path Planner Built Autos
     private final SwerveAutoBuilder autoBuilder = drivebaseS.getSwerveAutoBuilder();
     private final Command redLeft_blueRight = new SequentialCommandGroup(
-    autoBuilder.fullAuto(
-            PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)).withTimeout(15.0),
-            new AutoPathDocking(drivebaseS, m_limelight)
+            autoBuilder.fullAuto(
+                    PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)).withTimeout(10.0),
+            new AutoPathDocking(drivebaseS)
     );
     private final Command redRight_blueLeft = autoBuilder.fullAuto(
             PathPlanner.loadPath("redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
@@ -142,14 +137,14 @@ public class RobotContainer {
         eventMap.put("placeConeHigh",
                 new SequentialCommandGroup(
                         m_armSubsystem.getGoToPositionCommand(extendToHigh, angleToHigh).withTimeout(3),
-                        new InstantCommand(m_armSubsystem::extendClamp)
+                        new InstantCommand(m_armSubsystem::openClamp)
                 )
         );
         eventMap.put("floorPickup",
                 new SequentialCommandGroup(
-                        new InstantCommand(m_armSubsystem::extendClamp),
+                        new InstantCommand(m_armSubsystem::openClamp),
                         m_armSubsystem.getGoToPositionCommand(extendToFloor, angleToFloor).withTimeout(3),
-                        new InstantCommand(m_armSubsystem::retractClamp)
+                        new InstantCommand(m_armSubsystem::closeClamp)
                 )
         );
         eventMap.put("autoDock", m_newDocking);
@@ -179,9 +174,9 @@ public class RobotContainer {
 
         autoSelector.addOption("twopiece",
                 new SequentialCommandGroup(
-//                        new InstantCommand(m_armSubsystem::extendClamp),
+//                        new InstantCommand(m_armSubsystem::openClamp),
 //                        m_GoToPositionHigh,
-//                        new InstantCommand(m_armSubsystem::retractClamp),
+//                        new InstantCommand(m_armSubsystem::closeClamp),
                         new ParallelCommandGroup(
 //                                new GoToPosition(m_armSubsystem, 0, -0.5),
                                 new SequentialCommandGroup(
@@ -286,9 +281,10 @@ public class RobotContainer {
         );
 
         m_numpad.button(17).whileTrue(
-                new ProxyCommand(
-                        () -> getPrepareAngleCommand(m_armSubsystem, lastPressedNumpad)
-                )
+                m_armSubsystem.getGoToPositionCommand(minExtendHardStop, startingConfigurationAngle)
+//                new ProxyCommand(
+//                          () -> getArmExtensionCommand(m_armSubsystem, lastPressedNumpad)
+//                )
         );
 
         m_numpad.button(1).whileTrue(
@@ -373,7 +369,7 @@ public class RobotContainer {
 
         // Elevator go to Position\
         //y will be replaced with numpad buttons 
-        m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::extendClamp)));
+        m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::openClamp)));
         //Docking
         m_secondaryController.b().whileTrue(m_newDocking);
 
@@ -431,13 +427,11 @@ public class RobotContainer {
     }
 
     public void onDisabled(){
-        CommandScheduler.getInstance().schedule(new InstantCommand(m_armSubsystem::unlockRatchet, m_armSubsystem));
     }
 
     public void onEnabled() {
         CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
         ALLIANCE = DriverStation.getAlliance();
-        CommandScheduler.getInstance().schedule(new InstantCommand(m_armSubsystem::lockRatchet, m_armSubsystem));
     }
 
     public void onInit() {

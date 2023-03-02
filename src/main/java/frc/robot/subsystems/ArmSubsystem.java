@@ -7,7 +7,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -28,8 +27,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     // Elevator
     private final CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
     private final CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
-    private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.REVPH, clampSolenoidID);
-    private final Solenoid m_ratchetSolenoid = new Solenoid(PneumaticsModuleType.REVPH, ratchetSolenoidID);
+    private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, clampSolenoidID);
 
     public RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
@@ -125,7 +123,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         m_angleMotor.setInverted(false);
        
 
-        extendEncoder.setPositionConversionFactor(extendTickToMeter);
+        extendEncoder.setPositionConversionFactor(extendMetersPerTick);
         absoluteAngleEncoder.setPositionOffset(0.049);
         relativeAngleEncoder.setDistancePerPulse(2 * Math.PI / 8192.0);
 
@@ -134,7 +132,6 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
         pidExtend.setTolerance(0.01);
         pidTheta.setTolerance(0.01);
-        lockRatchet();
     }
 
     public boolean isGamePieceThere() {
@@ -226,30 +223,18 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     // Extends the clamp
-    public void extendClamp() {
+    public void openClamp() {
         m_clampSolenoid.set(true);
     }
 
     // Retracts the clamp
-    public void retractClamp() {
+    public void closeClamp() {
         m_clampSolenoid.set(false);
     }
 
     // Toggles the clamp
     public void toggleClamp() {
         m_clampSolenoid.set(!m_clampSolenoid.get());
-    }
-
-    public void unlockRatchet(){
-        m_ratchetSolenoid.set(false);
-    }
-
-    public void lockRatchet(){
-        m_ratchetSolenoid.set(true);
-    }
-
-    public void toggleRatchet(){
-        m_ratchetSolenoid.set(!m_ratchetSolenoid.get());
     }
 
     public void setExtendPIDState(boolean ready) {
