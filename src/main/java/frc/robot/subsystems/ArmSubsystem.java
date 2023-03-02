@@ -187,7 +187,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     public void angleUp() {
-        setAngleMotorVoltage(10.0);
+        setAngleMotorVoltage(2.0);
     }
 
     public double getAnglePosition() {
@@ -195,11 +195,11 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     public void angleDown() {
-        setAngleMotorVoltage(-10.0);
+        setAngleMotorVoltage(-2.0);
     }
 
     public void extendArm() {
-        setExtendMotorVoltage(10.0);
+        setExtendMotorVoltage(2.0);
     }
 
     public void extendArm(double power) {
@@ -207,7 +207,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     public void retractArm() {
-        setExtendMotorVoltage(-10.0);
+        setExtendMotorVoltage(-2.0);
     }
 
     public void retractArm(double power) {

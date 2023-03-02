@@ -16,10 +16,12 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "placeConeHigh"
+        ],
         "executionBehavior": "parallel",
         "waitBehavior": "deadline",
-        "waitTime": 4.0
+        "waitTime": 3.0
       }
     },
     {
@@ -47,9 +49,8 @@
   ],
   "markers": [
     {
-      "position": 0.2,
+      "position": 0.05,
       "names": [
-        "event",
         "stowArm"
       ]
     }

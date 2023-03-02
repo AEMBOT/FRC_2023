@@ -21,7 +21,7 @@
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "deadline",
-        "waitTime": 4.0
+        "waitTime": 3.0
       }
     },
     {
@@ -75,7 +75,7 @@
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "deadline",
-        "waitTime": 4.0
+        "waitTime": 3.0
       }
     },
     {

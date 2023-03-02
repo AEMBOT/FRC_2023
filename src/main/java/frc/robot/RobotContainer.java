@@ -72,31 +72,6 @@ public class RobotContainer {
     // Path Planner Trajectories
     private final PathPlannerTrajectory twoPiecePath = PathPlanner.loadPath("twopiece", 1.0, 0.5);
 
-    // Path Planner Built Autos
-    private final SwerveAutoBuilder autoBuilder = drivebaseS.getSwerveAutoBuilder();
-    private final Command redLeft_blueRight = new SequentialCommandGroup(
-            autoBuilder.fullAuto(
-                    PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)).withTimeout(10.0),
-            new AutoPathDocking(drivebaseS)
-    );
-    private final Command redRight_blueLeft = autoBuilder.fullAuto(
-            PathPlanner.loadPath("redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
-    );
-    private final Command leave_redLeft_blueRight = autoBuilder.fullAuto(
-            PathPlanner.loadPath("leave-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
-    );
-    private final Command leave_redRight_blueLeft = autoBuilder.fullAuto(
-            PathPlanner.loadPath("leave-redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
-    );
-
-    private final Command twopiece_redLeft_blueRight =
-    autoBuilder.fullAuto(
-            PathPlanner.loadPath("twopiece-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq));
-
-    private final Command twopiece_redRight_blueLeft = autoBuilder.fullAuto(
-            PathPlanner.loadPath("twopiece-redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
-    );
-
     @Log
     private final Field2d field = new Field2d();
     @Log
@@ -149,7 +124,41 @@ public class RobotContainer {
         );
         eventMap.put("autoDock", m_newDocking);
 
-        eventMap.put("stowArm", m_armSubsystem.getGoToPositionCommand(maxAngleHardStop, minExtendHardStop));
+        eventMap.put("stowArm", m_armSubsystem.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop));
+
+        // Construct Autos
+        // Path Planner Built Autos
+        SwerveAutoBuilder autoBuilder = drivebaseS.getSwerveAutoBuilder();
+
+        Command redLeft_blueRight = new SequentialCommandGroup(
+                autoBuilder.fullAuto(
+                        PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+                ).withTimeout(9.75),
+                new AutoPathDocking(drivebaseS)
+        );
+
+        Command redRight_blueLeft = new SequentialCommandGroup(
+                autoBuilder.fullAuto(
+                        PathPlanner.loadPath("redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+                ).withTimeout(10.0),
+                new AutoPathDocking(drivebaseS)
+        );
+
+        Command leave_redLeft_blueRight = autoBuilder.fullAuto(
+                PathPlanner.loadPath("leave-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+        );
+
+        Command leave_redRight_blueLeft = autoBuilder.fullAuto(
+                PathPlanner.loadPath("leave-redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+        );
+
+        Command twopiece_redLeft_blueRight = autoBuilder.fullAuto(
+                PathPlanner.loadPath("twopiece-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+        );
+
+        Command twopiece_redRight_blueLeft = autoBuilder.fullAuto(
+                PathPlanner.loadPath("twopiece-redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+        );
 
         // Build Autos
         autoSelector.setDefaultOption("No-op", new InstantCommand());
@@ -258,11 +267,17 @@ public class RobotContainer {
         ));
 
         m_numpad.button(10).onTrue(
-                Commands.runOnce(() -> { targetPosition = TargetPosition.DOUBLE_SUBSTATION; lastPressedNumpad = 10; })
+                Commands.runOnce(() -> {
+                    targetPosition = TargetPosition.DOUBLE_SUBSTATION;
+                    lastPressedNumpad = 10;
+                })
         );
 
         m_numpad.button(11).onTrue(
-                Commands.runOnce(() -> { targetPosition = TargetPosition.DOUBLE_SUBSTATION; lastPressedNumpad = 11; })
+                Commands.runOnce(() -> {
+                    targetPosition = TargetPosition.DOUBLE_SUBSTATION;
+                    lastPressedNumpad = 11;
+                })
         );
 
         m_numpad.button(12).onTrue(
@@ -281,10 +296,10 @@ public class RobotContainer {
         );
 
         m_numpad.button(17).whileTrue(
-                m_armSubsystem.getGoToPositionCommand(minExtendHardStop, startingConfigurationAngle)
-//                new ProxyCommand(
-//                          () -> getArmExtensionCommand(m_armSubsystem, lastPressedNumpad)
-//                )
+//                m_armSubsystem.getGoToPositionCommand(minExtendHardStop, startingConfigurationAngle)
+                new ProxyCommand(
+                        () -> getArmExtensionCommand(m_armSubsystem, lastPressedNumpad)
+                )
         );
 
         m_numpad.button(1).whileTrue(
@@ -426,7 +441,7 @@ public class RobotContainer {
 
     }
 
-    public void onDisabled(){
+    public void onDisabled() {
     }
 
     public void onEnabled() {
