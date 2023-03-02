@@ -48,7 +48,7 @@ public class RobotContainer {
     @Log(methodName = "getTotalCurrent")
     private PowerDistribution power = new PowerDistribution();
     private final Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);
-    private final SerialPort serial = new SerialPort(115200, SerialPort.Port.kOnboard);
+    private SerialPort serial;
 
     // Subsystems
     private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
@@ -95,6 +95,11 @@ public class RobotContainer {
     public RobotContainer() {
         target.setPose(new Pose2d(0, 0, new Rotation2d()));
         compressor.enableDigital();
+        try {
+            serial = new SerialPort(115200, SerialPort.Port.kUSB);
+        } catch (Exception e) {
+            serial = new SerialPort(115200, SerialPort.Port.kMXP);
+        }
 
         // Subsystem Default Commands
         drivebaseS.setDefaultCommand(
@@ -460,5 +465,8 @@ public class RobotContainer {
 
     public void onInit() {
         drivebaseS.resetRelativeRotationEncoders();
+        serial.writeString(
+                ALLIANCE == DriverStation.Alliance.Red ? "r" : "b"
+        );
     }
 }
