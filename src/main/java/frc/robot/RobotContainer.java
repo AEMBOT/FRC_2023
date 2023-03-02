@@ -48,6 +48,7 @@ public class RobotContainer {
     @Log(methodName = "getTotalCurrent")
     private PowerDistribution power = new PowerDistribution();
     private final Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);
+    private final SerialPort serial = new SerialPort(115200, SerialPort.Port.kOnboard);
 
     // Subsystems
     private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
@@ -336,6 +337,14 @@ public class RobotContainer {
 
         m_numpad.button(9).whileTrue(
                 new InstantCommand(() -> lastPressedNumpad = 9)
+        );
+
+        m_numpad.button(19).whileTrue(
+                new InstantCommand(() -> serial.writeString("y")).ignoringDisable(true)
+        );
+
+        m_numpad.button(20).whileTrue(
+                new InstantCommand(() -> serial.writeString("p")).ignoringDisable(true)
         );
         // Secondary Controller
         // Clamp
