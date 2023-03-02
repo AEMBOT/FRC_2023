@@ -93,6 +93,8 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
+        DataLogManager.start();
+        DriverStation.startDataLog(DataLogManager.getLog());
         target.setPose(new Pose2d(0, 0, new Rotation2d()));
         compressor.enableDigital();
         serial = new SerialPort(115200, SerialPort.Port.kUSB);
