@@ -75,14 +75,14 @@ public class ArmCommands {
                 new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(
                         switch (position) {
                             case DOUBLE_SUBSTATION -> 0.27;
-                            default -> 0.45;
+                            default -> 0.44;
                         }
                 )))),
                 m_drivebase.chasePoseC(
                         () -> finalTargetGrid.plus(ONE_METER_BACK.times(
                                 switch (position) {
                                     case DOUBLE_SUBSTATION -> 0.27;
-                                    default -> 0.45;
+                                    default -> 0.44;
                                 }
                         ))),
                 m_arm.getGoToPositionCommand(
