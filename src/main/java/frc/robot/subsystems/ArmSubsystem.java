@@ -29,7 +29,6 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     private final CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
     private final CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
     private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.REVPH, clampSolenoidID);
-    private final Solenoid m_ratchetSolenoid = new Solenoid(PneumaticsModuleType.REVPH, ratchetSolenoidID);
 
     public RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
@@ -134,7 +133,6 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
         pidExtend.setTolerance(0.01);
         pidTheta.setTolerance(0.01);
-        lockRatchet();
     }
 
     public boolean isGamePieceThere() {
@@ -238,18 +236,6 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     // Toggles the clamp
     public void toggleClamp() {
         m_clampSolenoid.set(!m_clampSolenoid.get());
-    }
-
-    public void unlockRatchet(){
-        m_ratchetSolenoid.set(false);
-    }
-
-    public void lockRatchet(){
-        m_ratchetSolenoid.set(true);
-    }
-
-    public void toggleRatchet(){
-        m_ratchetSolenoid.set(!m_ratchetSolenoid.get());
     }
 
     public void setExtendPIDState(boolean ready) {

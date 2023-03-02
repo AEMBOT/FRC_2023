@@ -426,13 +426,11 @@ public class RobotContainer {
     }
 
     public void onDisabled(){
-        CommandScheduler.getInstance().schedule(new InstantCommand(m_armSubsystem::unlockRatchet, m_armSubsystem));
     }
 
     public void onEnabled() {
         CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
         ALLIANCE = DriverStation.getAlliance();
-        CommandScheduler.getInstance().schedule(new InstantCommand(m_armSubsystem::lockRatchet, m_armSubsystem));
     }
 
     public void onInit() {
