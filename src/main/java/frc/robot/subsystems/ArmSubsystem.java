@@ -7,7 +7,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -124,7 +123,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         m_angleMotor.setInverted(false);
        
 
-        extendEncoder.setPositionConversionFactor(extendTickToMeter);
+        extendEncoder.setPositionConversionFactor(extendMetersPerTick);
         absoluteAngleEncoder.setPositionOffset(0.049);
         relativeAngleEncoder.setDistancePerPulse(2 * Math.PI / 8192.0);
 
@@ -162,8 +161,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
         if (getAnglePosition() > maxAngleHardStop) {
             m_angleMotor.setVoltage(MathUtil.clamp(voltage, -12, 0));
-        } 
-        else if (getAnglePosition() < minAngleSoftStop) {
+        } else if (getAnglePosition() < minAngleSoftStop) {
             m_angleMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));
         } else {
             m_angleMotor.setVoltage(voltage);
@@ -172,12 +170,11 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     private void setExtendMotorVoltage(double voltage) {
         if (getExtendPosition() < minExtendHardStop && extendZeroed) {
-            m_extendMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));}
-            else if (getExtendPosition() < 0.2){
-                m_angleMotor.setVoltage(MathUtil.clamp(voltage, 0,4));
-            }
-         else if (getExtendPosition() > maxExtendSoftStop && extendZeroed) {
+            m_extendMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));
+        } else if (getExtendPosition() > maxExtendSoftStop && extendZeroed) {
             m_extendMotor.setVoltage(MathUtil.clamp(voltage, -12, 0));
+        } else if (getExtendPosition() < 0.1) {
+            m_angleMotor.setVoltage(MathUtil.clamp(voltage, 0,2));
         } else {
             m_extendMotor.setVoltage(voltage);
         }

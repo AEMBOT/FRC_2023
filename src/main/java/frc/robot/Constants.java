@@ -187,7 +187,7 @@ public final class Constants {
         public static final int ultrasonicEchoPort = 3;
 
         //Angle and Extend arm Constants
-        public static final double angleToHigh = 0.52;
+        public static final double angleToHigh = 0.50;
         public static final double angleToMid = 0.40;
         public static final double angleToFloor = -0.25;
         public static final double angleToSubstation = 0.39;
@@ -202,13 +202,13 @@ public final class Constants {
         //All of these need testing...
         //meter value * tick conversion
 
-//        public static final double extendTickToMeter = 0.01285875;
-        public static final double extendTickToMeter = 0.02143125;
+//        public static final double extendMetersPerTick = 0.01285875;
+        public static final double extendMetersPerTick = 0.00771525;
 
         public static final double extendOffset = 2.5;
         public static final double extendToFloor = 0.257175;
         public static final double extendToMid = 0.45;
-        public static final double extendToHigh = 1.01;
+        public static final double extendToHigh = 1.04;
         public static final double extendToSubstation = 0.90;
         // Arm Constants that need measuring
         public static final double pivotPointHeight = 0; // Height of pivot point of arm above point where belt separates from belt wheel
