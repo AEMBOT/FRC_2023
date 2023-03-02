@@ -71,7 +71,12 @@ public class ArmCommands {
         SmartDashboard.putNumber("targetPosX", finalTargetGrid.getX());
         SmartDashboard.putNumber("targetPosY", finalTargetGrid.getY());
         return new ParallelCommandGroup(
-                new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(0.5)))),
+                new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(
+                        switch (position) {
+                            case DOUBLE_SUBSTATION -> 0.4;
+                            default -> 0.5;
+                        }
+                )))),
                 m_drivebase.chasePoseC(
                         () -> finalTargetGrid.plus(ONE_METER_BACK.times(0.5))),
                 m_arm.getGoToPositionCommand(

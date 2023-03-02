@@ -75,8 +75,8 @@ public class RobotContainer {
     // Path Planner Built Autos
     private final SwerveAutoBuilder autoBuilder = drivebaseS.getSwerveAutoBuilder();
     private final Command redLeft_blueRight = new SequentialCommandGroup(
-    autoBuilder.fullAuto(
-            PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)).withTimeout(15.0),
+            autoBuilder.fullAuto(
+                    PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)).withTimeout(10.0),
             new AutoPathDocking(drivebaseS)
     );
     private final Command redRight_blueLeft = autoBuilder.fullAuto(
@@ -164,7 +164,7 @@ public class RobotContainer {
                         )
                 )
         );
-        
+
         autoSelector.addOption("redLeft-blueRight", redLeft_blueRight);
         autoSelector.addOption("redRight-blueLeft", redRight_blueLeft);
         autoSelector.addOption("leave-redLeft-blueRight", leave_redLeft_blueRight);
@@ -281,9 +281,10 @@ public class RobotContainer {
         );
 
         m_numpad.button(17).whileTrue(
-                new ProxyCommand(
-                        () -> getArmExtensionCommand(m_armSubsystem, lastPressedNumpad)
-                )
+                m_armSubsystem.getGoToPositionCommand(minExtendHardStop, startingConfigurationAngle)
+//                new ProxyCommand(
+//                          () -> getArmExtensionCommand(m_armSubsystem, lastPressedNumpad)
+//                )
         );
 
         m_numpad.button(1).whileTrue(
