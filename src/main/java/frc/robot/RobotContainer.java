@@ -95,11 +95,7 @@ public class RobotContainer {
     public RobotContainer() {
         target.setPose(new Pose2d(0, 0, new Rotation2d()));
         compressor.enableDigital();
-        try {
-            serial = new SerialPort(115200, SerialPort.Port.kUSB);
-        } catch (Exception e) {
-            serial = new SerialPort(115200, SerialPort.Port.kMXP);
-        }
+        serial = new SerialPort(115200, SerialPort.Port.kUSB);
 
         // Subsystem Default Commands
         drivebaseS.setDefaultCommand(
