@@ -162,7 +162,8 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
         if (getAnglePosition() > maxAngleHardStop) {
             m_angleMotor.setVoltage(MathUtil.clamp(voltage, -12, 0));
-        } else if (getAnglePosition() < minAngleSoftStop) {
+        } 
+        else if (getAnglePosition() < minAngleSoftStop) {
             m_angleMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));
         } else {
             m_angleMotor.setVoltage(voltage);
@@ -171,8 +172,11 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     private void setExtendMotorVoltage(double voltage) {
         if (getExtendPosition() < minExtendHardStop && extendZeroed) {
-            m_extendMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));
-        } else if (getExtendPosition() > maxExtendSoftStop && extendZeroed) {
+            m_extendMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));}
+            else if (getExtendPosition() < 0.2){
+                m_angleMotor.setVoltage(MathUtil.clamp(voltage, 0,4));
+            }
+         else if (getExtendPosition() > maxExtendSoftStop && extendZeroed) {
             m_extendMotor.setVoltage(MathUtil.clamp(voltage, -12, 0));
         } else {
             m_extendMotor.setVoltage(voltage);
