@@ -47,7 +47,7 @@ public class RobotContainer {
 
     @Log(methodName = "getTotalCurrent")
     private PowerDistribution power = new PowerDistribution();
-    private final Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
+    private final Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);
 
     // Subsystems
     private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
