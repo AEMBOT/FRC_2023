@@ -173,8 +173,6 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
             m_extendMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));
         } else if (getExtendPosition() > maxExtendSoftStop && extendZeroed) {
             m_extendMotor.setVoltage(MathUtil.clamp(voltage, -12, 0));
-        } else if (getExtendPosition() < 0.1) {
-            m_angleMotor.setVoltage(MathUtil.clamp(voltage, 0,2));
         } else {
             m_extendMotor.setVoltage(voltage);
         }

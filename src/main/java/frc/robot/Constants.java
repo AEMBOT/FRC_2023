@@ -190,7 +190,7 @@ public final class Constants {
         public static final double angleToHigh = 0.50;
         public static final double angleToMid = 0.40;
         public static final double angleToFloor = -0.25;
-        public static final double angleToSubstation = 0.39;
+        public static final double angleToSubstation = 0.34;
 
         public static final double maxAngleHardStop = 1.15;
         public static final double minAngleSoftStop = -0.27;
@@ -218,7 +218,7 @@ public final class Constants {
 
     public static final class VisionConstants {
         public static final double VISION_MEASUREMENT_STD_DEV = 0.4;
-        public static final int VISION_AVERAGING_TIME = 20;
+        public static final int VISION_AVERAGING_TIME = 10;
         public static final double VISION_TRANSLATIONAL_RANGE = 0.5;
         public static final double VISION_ROTATIONAL_RANGE = 10;
         public static AprilTagFieldLayout getFieldLayout() {

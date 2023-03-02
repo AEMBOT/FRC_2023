@@ -11,6 +11,7 @@ import frc.robot.subsystems.DrivebaseS;
 
 import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
+import static java.lang.Math.abs;
 
 public class ArmCommands {
     /* 
@@ -39,12 +40,12 @@ public class ArmCommands {
                                     new Translation2d(0.02, 0.02),
                                     Rotation2d.fromDegrees(0.5)
                             );
-                            return error.getRotation().getRadians() < tolerance.getRotation().getRadians() &&
-                                    error.getX() < tolerance.getX() &&
-                                    error.getY() < tolerance.getY();
+                            return abs(error.getRotation().getRadians()) < tolerance.getRotation().getRadians() &&
+                                    abs(error.getX()) < tolerance.getX() &&
+                                    abs(error.getY()) < tolerance.getY();
                         }),
                         new WaitUntilCommand(m_arm::getArmAtPosition),
-                        new InstantCommand(m_arm::openClamp),
+                        new InstantCommand(m_arm::closeClamp),
                         new WaitCommand(0.5),
                         m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
                 )
@@ -73,12 +74,17 @@ public class ArmCommands {
         return new ParallelCommandGroup(
                 new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(
                         switch (position) {
-                            case DOUBLE_SUBSTATION -> 0.4;
-                            default -> 0.5;
+                            case DOUBLE_SUBSTATION -> 0.27;
+                            default -> 0.45;
                         }
                 )))),
                 m_drivebase.chasePoseC(
-                        () -> finalTargetGrid.plus(ONE_METER_BACK.times(0.5))),
+                        () -> finalTargetGrid.plus(ONE_METER_BACK.times(
+                                switch (position) {
+                                    case DOUBLE_SUBSTATION -> 0.27;
+                                    default -> 0.45;
+                                }
+                        ))),
                 m_arm.getGoToPositionCommand(
                         switch (numpadPosition) {
                             case 1, 2, 3 -> extendToFloor;
