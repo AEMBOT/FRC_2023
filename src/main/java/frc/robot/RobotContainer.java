@@ -164,6 +164,14 @@ public class RobotContainer {
                 PathPlanner.loadPath("twopiece-redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
         );
 
+        Command basicRedLeft_blueRight = autoBuilder.fullAuto(
+                PathPlanner.loadPath("BasicRedLeft-BlueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+        );
+
+        Command basicRedRight_blueLeft = autoBuilder.fullAuto(
+                PathPlanner.loadPath("BasicRedRight-BlueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+        );
+
         // Build Autos
         autoSelector.setDefaultOption("No-op", new InstantCommand());
         autoSelector.addOption("Leave Immediately",
@@ -172,7 +180,8 @@ public class RobotContainer {
                                 DrivebaseS.generateTrajectoryToPose(
                                         drivebaseS.getPose(),
                                         drivebaseS.getPose().plus(ONE_METER_BACK.times(5.0)),
-                                        drivebaseS.getFieldRelativeLinearSpeedsMPS()
+                                        drivebaseS.getFieldRelativeLinearSpeedsMPS(),
+                                        1, 0.3
                                 )
                         )
                 )
@@ -184,6 +193,8 @@ public class RobotContainer {
         autoSelector.addOption("leave-redRight-blueLeft", leave_redRight_blueLeft);
         autoSelector.addOption("twopiece-redLeft-blueRight", twopiece_redLeft_blueRight);
         autoSelector.addOption("twopiece-redRight-blueLeft", twopiece_redRight_blueLeft);
+        autoSelector.addOption("BasicRedLeft-BlueRight", basicRedLeft_blueRight);
+        autoSelector.addOption("BasicRedRight-BlueLeft", basicRedRight_blueLeft);
 
         autoSelector.addOption("twopiece",
                 new SequentialCommandGroup(
@@ -457,6 +468,7 @@ public class RobotContainer {
     }
 
     public void onEnabled() {
+        CommandScheduler.getInstance().schedule(new InstantCommand(m_armSubsystem::resetExtendEncoder));
         CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
         ALLIANCE = DriverStation.getAlliance();
     }
