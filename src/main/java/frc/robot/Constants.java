@@ -192,9 +192,9 @@ public final class Constants {
         public static final double angleToFloor = -0.25;
         public static final double angleToSubstation = 0.34;
 
-        public static final double maxAngleHardStop = 1.15;
+        public static final double maxAngleHardStop = 0.94;
         public static final double minAngleSoftStop = -0.27;
-        public static final double startingConfigurationAngle = 0.946;
+        public static final double startingConfigurationAngle = 0.96;
 
         public static final double minExtendHardStop = 0.00;
         public static final double maxExtendSoftStop = 1.05;

@@ -398,7 +398,7 @@ public class RobotContainer {
         //y will be replaced with numpad buttons 
         m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::openClamp)));
         //Docking
-        m_secondaryController.b().whileTrue(m_newDocking);
+        m_primaryController.b().whileTrue(m_newDocking);
 
         m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
 
