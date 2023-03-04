@@ -17,6 +17,7 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.*;
@@ -475,8 +476,12 @@ public class RobotContainer {
 
     public void onInit() {
         drivebaseS.resetRelativeRotationEncoders();
-        serial.writeString(
-                ALLIANCE == DriverStation.Alliance.Red ? "r" : "b"
-        );
+        if (ALLIANCE == Alliance.Red) {
+                serial.writeString("r");
+        } else if (ALLIANCE == Alliance.Blue) {
+                serial.writeString("b");
+        } else {
+                serial.writeString("o");
+        }
     }
 }
