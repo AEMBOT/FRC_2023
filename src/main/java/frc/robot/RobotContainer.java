@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.docking.AutoPathDocking;
-import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import frc.robot.commands.drivetrain.OperatorControlHoldingC;
 import frc.robot.subsystems.*;
@@ -61,7 +60,6 @@ public class RobotContainer {
 
     //Commands
     private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS);
-    private final DockingForceBalance m_dockingForceBalance = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
 
@@ -463,6 +461,9 @@ public class RobotContainer {
         field3d.setRobotPose(new Pose3d(drivebaseS.getPose()));
         //Put LED stuff here
 
+        SmartDashboard.putNumber("Pitch", drivebaseS.getPitch());
+        SmartDashboard.putNumber("Roll", drivebaseS.getRoll());
+        SmartDashboard.putNumber("Yaw", drivebaseS.getHeading().getRadians());
     }
 
     public void onDisabled() {

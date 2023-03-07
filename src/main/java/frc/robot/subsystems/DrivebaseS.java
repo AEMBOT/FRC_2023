@@ -362,6 +362,14 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
         simNavx.resetToPose(new Pose2d());
     }
 
+    public float getPitch() {
+        return navx.getPitch();
+    }
+
+    public float getRoll() {
+        return navx.getRoll();
+    }
+
     public Pose2d getTargetPose() {
         return targetPose;
     }
