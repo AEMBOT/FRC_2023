@@ -39,6 +39,7 @@ import frc.robot.util.trajectory.PPChasePoseCommand;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -606,6 +607,79 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
 
     public static PathPlannerTrajectory generateTrajectoryToPose(Pose2d robotPose, Pose2d target, Translation2d currentSpeedVectorMPS) {
         return generateTrajectoryToPose(robotPose, target, currentSpeedVectorMPS, 4, 4);
+    }
+
+
+    /**
+     * For use with PathPlannerCommand
+     * Generates a PathPlannerTrajectory on the fly to drive through the supplied waypoints.
+     * Takes into account the current speed of the robot for the start point.
+     * The returned PathPlannerTrajectory will go straight towards the target from the robot pose.
+     * The component of the current velocity that points toward the first waypoint will be used as the initial
+     * velocity of the trajectory.
+     * <p>
+     * This function assumes that your trajectory has no waypoints spaced less than 0.1 meters apart.
+     * Do not use this function if your waypoints are spaced closer than this, as the generator will have undefined behavior.
+     *
+     * @param pathWaypoints Waypoint List, minimum length 2.
+     * @param currentSpeedVectorMPS a Translation2d where x and y are the robot's x and y field-relative speeds in m/s.
+     * @param maxVelocity Maximum Velocity in Meters per Second.
+     * @param maxAcceleration Maximum Acceleration in Meters per Second Squared.
+     * @return a PathPlannerTrajectory through the supplied waypoints.
+     */
+    public static PathPlannerTrajectory generateTrajectoryToPose(ArrayList<Pose2d> pathWaypoints, Translation2d currentSpeedVectorMPS, double maxVelocity, double maxAcceleration) {
+        if (pathWaypoints.size() < 2) {
+            return new PathPlannerTrajectory();
+        }
+
+        ArrayList<PathPoint> pathPoints = new ArrayList<>();
+
+        // Robot velocity calculated from module states.
+        Rotation2d fieldRelativeTravelDirection = NomadMathUtil.getDirection(currentSpeedVectorMPS);
+        double travelSpeed = currentSpeedVectorMPS.getNorm();
+
+        Translation2d robotToTargetTranslation = pathWaypoints.get(1).getTranslation().minus(pathWaypoints.get(0).getTranslation());
+        // Initial velocity override is the component of robot velocity along the robot-to-target vector.
+        // If the robot velocity is pointing away from the target, start at 0 velocity.
+        Rotation2d travelOffsetFromTarget = NomadMathUtil.getDirection(robotToTargetTranslation).minus(fieldRelativeTravelDirection);
+        travelSpeed = Math.max(0, travelSpeed * travelOffsetFromTarget.getCos());
+
+        pathPoints.add(
+                new PathPoint(
+                        pathWaypoints.get(0).getTranslation(),
+                        NomadMathUtil.getDirection(robotToTargetTranslation),
+                        pathWaypoints.get(0).getRotation(),
+                        travelSpeed
+                )
+        );
+
+        for (int i = 1; i < pathWaypoints.size() - 1; i += 1) {
+            robotToTargetTranslation = pathWaypoints.get(i + 1).getTranslation().minus(pathWaypoints.get(i).getTranslation());
+            pathPoints.add(
+                    new PathPoint(
+                            pathWaypoints.get(i).getTranslation(),
+                            NomadMathUtil.getDirection(robotToTargetTranslation),
+                            pathWaypoints.get(i).getRotation()
+                    )
+            );
+        }
+
+        pathPoints.add(
+                new PathPoint(
+                        pathWaypoints.get(pathWaypoints.size() - 1).getTranslation(),
+                        NomadMathUtil.getDirection(robotToTargetTranslation),
+                        pathWaypoints.get(pathWaypoints.size() - 1).getRotation()
+                )
+        );
+
+        try {
+            return PathPlanner.generatePath(
+                    new PathConstraints(maxVelocity, maxAcceleration),
+                    pathPoints
+            );
+        } catch (Exception e) {
+            return new PathPlannerTrajectory();
+        }
     }
 
     /**

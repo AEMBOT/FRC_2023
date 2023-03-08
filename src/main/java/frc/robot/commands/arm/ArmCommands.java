@@ -10,6 +10,9 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DrivebaseS;
 import frc.robot.subsystems.IntakeSubsystem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 import static java.lang.Math.abs;
@@ -63,28 +66,34 @@ public class ArmCommands {
         SmartDashboard.putNumber("targetPosY", finalTargetGrid.getY());
         return new ParallelCommandGroup(
                 new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(0.44)))),
-                m_drivebase.chasePoseC(
-                        () -> finalTargetGrid.plus(ONE_METER_BACK.times(
-                                switch (position) {
-                                    case DOUBLE_SUBSTATION -> {
-                                        if (m_drivebase.atTargetPose()) {
-                                            m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(0.27)));
-                                            yield 0.27;
-                                        } else {
-                                            yield 0.44;
-                                        }
-                                    }
-                                    default -> 0.44;
-                                }
-                        )),
-                        switch (position) {
-                            case DOUBLE_SUBSTATION -> 1.0;
-                            default -> 1.5;
-                        },
-                        switch(position) {
-                            case DOUBLE_SUBSTATION -> 0.3;
-                            default -> 0.5;
-                        }),
+                switch (position) {
+                    case DOUBLE_SUBSTATION -> new SequentialCommandGroup(
+                            m_drivebase.pathPlannerCommand(
+                                    DrivebaseS.generateTrajectoryToPose(
+                                            new ArrayList<>(
+                                                    List.of(
+                                                            m_drivebase.getPose(),
+                                                            finalTargetGrid.plus(ONE_METER_BACK.times(0.44)),
+                                                            finalTargetGrid.plus(ONE_METER_BACK.times(0.27))
+                                                    )
+                                            ),
+                                            m_drivebase.getFieldRelativeLinearSpeedsMPS(),
+                                            1.0,
+                                            0.3
+                                    )
+                            ),
+                            m_drivebase.chasePoseC(
+                                    () -> finalTargetGrid.plus(ONE_METER_BACK.times(0.27)),
+                                    1.0,
+                                    0.3
+                            )
+                    );
+                    default -> m_drivebase.chasePoseC(
+                            () -> finalTargetGrid.plus(ONE_METER_BACK.times(0.44)),
+                            1.5,
+                            0.5
+                    );
+                },
                 m_arm.getGoToPositionCommand(
                         switch (numpadPosition) {
                             case 1, 2, 3 -> extendToFloor;
