@@ -378,6 +378,17 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
         targetPose = target;
     }
 
+    public boolean atTargetPose() {
+        Transform2d error = getPose().minus(getTargetPose());
+        Transform2d tolerance = new Transform2d(
+                new Translation2d(0.02, 0.02),
+                Rotation2d.fromDegrees(0.5)
+        );
+        return abs(error.getRotation().getRadians()) < tolerance.getRotation().getRadians() &&
+                abs(error.getX()) < tolerance.getX() &&
+                abs(error.getY()) < tolerance.getY();
+    }
+
     public void setRotationState(double radians) {
         thetaController.setSetpoint(radians);
     }

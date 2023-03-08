@@ -35,18 +35,7 @@ public class ArmCommands {
                 new InstantCommand(m_intake::openClamp),
                 getPlaceGamePieceCommand(m_drivebase, m_arm, targetPosition, numpadPosition),
                 new SequentialCommandGroup(
-                        new WaitUntilCommand(() -> {
-                            Transform2d error = m_drivebase.getPose().minus(m_drivebase.getTargetPose());
-                            Transform2d tolerance = new Transform2d(
-                                    new Translation2d(0.02, 0.02),
-                                    Rotation2d.fromDegrees(0.5)
-                            );
-                            return abs(error.getRotation().getRadians()) < tolerance.getRotation().getRadians() &&
-                                    abs(error.getX()) < tolerance.getX() &&
-                                    abs(error.getY()) < tolerance.getY();
-                        }),
-                        new WaitUntilCommand(m_arm::getArmAtPosition),
-                        new InstantCommand(m_intake::closeClamp),
+                        m_intake.getIntakeAutoClampCommand(),
                         new WaitCommand(0.5),
                         m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
                 )
@@ -73,16 +62,18 @@ public class ArmCommands {
         SmartDashboard.putNumber("targetPosX", finalTargetGrid.getX());
         SmartDashboard.putNumber("targetPosY", finalTargetGrid.getY());
         return new ParallelCommandGroup(
-                new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(
-                        switch (position) {
-                            case DOUBLE_SUBSTATION -> 0.27;
-                            default -> 0.44;
-                        }
-                )))),
+                new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(0.44)))),
                 m_drivebase.chasePoseC(
                         () -> finalTargetGrid.plus(ONE_METER_BACK.times(
                                 switch (position) {
-                                    case DOUBLE_SUBSTATION -> 0.27;
+                                    case DOUBLE_SUBSTATION -> {
+                                        if (m_drivebase.atTargetPose()) {
+                                            m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(0.27)));
+                                            yield 0.27;
+                                        } else {
+                                            yield 0.44;
+                                        }
+                                    }
                                     default -> 0.44;
                                 }
                         )),
