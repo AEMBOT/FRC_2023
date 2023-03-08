@@ -45,7 +45,8 @@ public class ArmCommands {
                                     abs(error.getX()) < tolerance.getX() &&
                                     abs(error.getY()) < tolerance.getY();
                         }),
-                        m_intake.getIntakeAutoClampCommand(),
+                        new WaitUntilCommand(m_arm::getArmAtPosition),
+                        new InstantCommand(m_intake::closeClamp),
                         new WaitCommand(0.5),
                         m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
                 )
