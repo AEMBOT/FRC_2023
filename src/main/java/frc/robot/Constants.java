@@ -201,8 +201,9 @@ public final class Constants {
         //All of these need testing...
         //meter value * tick conversion
 
-//        public static final double extendMetersPerTick = 0.01285875;
-        public static final double extendMetersPerTick = 0.00771525;
+//        public static final double extendMetersPerTick = 0.01285875; // 15:1
+//        public static final double extendMetersPerTick = 0.00771525; // 25:1
+        public static final double extendMetersPerTick = 0.0160734375; // 12:1
 
         public static final double extendOffset = 2.5;
         public static final double extendToFloor = 0.257175;
