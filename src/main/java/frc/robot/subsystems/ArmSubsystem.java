@@ -27,13 +27,11 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     // Elevator
     private final CANSparkMax m_angleMotor = new CANSparkMax(angleMotorCanID, MotorType.kBrushless);
     private final CANSparkMax m_extendMotor = new CANSparkMax(extendMotorCanID, MotorType.kBrushless);
-    private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, clampSolenoidID);
 
     public RelativeEncoder angleEncoder = m_angleMotor.getEncoder();
     public RelativeEncoder extendEncoder = m_extendMotor.getEncoder();
     public DutyCycleEncoder absoluteAngleEncoder = new DutyCycleEncoder(angleEncoderPort);
     public Encoder relativeAngleEncoder = new Encoder(2, 1);
-    private Ultrasonic objectSensor = new Ultrasonic(ultrasonicPingPort, ultrasonicEchoPort);
     @Log
     private boolean activateExtendPID = false; // Activates PID controller, false when zeroing
     @Log
@@ -134,11 +132,6 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
         pidTheta.setTolerance(0.01);
     }
 
-    public boolean isGamePieceThere() {
-        return objectSensor.getRangeInches() <= 4;
-    }
-
-
     public void resetExtendEncoder() {
         extendEncoder.setPosition(0);
     }
@@ -220,21 +213,6 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     public boolean isCurrentLimited() {
         return filter.calculate(m_extendMotor.getOutputCurrent()) >= 35;
-    }
-
-    // Extends the clamp
-    public void openClamp() {
-        m_clampSolenoid.set(true);
-    }
-
-    // Retracts the clamp
-    public void closeClamp() {
-        m_clampSolenoid.set(false);
-    }
-
-    // Toggles the clamp
-    public void toggleClamp() {
-        m_clampSolenoid.set(!m_clampSolenoid.get());
     }
 
     public void setExtendPIDState(boolean ready) {

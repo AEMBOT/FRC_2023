@@ -32,7 +32,6 @@ import frc.robot.commands.drivetrain.OperatorControlHoldingC;
 import frc.robot.subsystems.*;
 import io.github.oblarg.oblog.annotations.Log;
 
-import static frc.robot.Constants.LedConstants.*;
 import static frc.robot.Constants.VisionConstants.APRILTAG_LAYOUT;
 import static frc.robot.commands.arm.ArmCommands.*;
 
@@ -52,9 +51,8 @@ public class RobotContainer {
 
     // Subsystems
     private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
-    private final VisionSubsystem visionSubsystem = new VisionSubsystem(new Limelight[]{new Limelight("limelight")});
+    private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
     private final Limelight m_limelight = new Limelight();
-    private final LEDSubsystem m_LedSubsystem = new LEDSubsystem();
     @Log
     private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
 
@@ -115,14 +113,14 @@ public class RobotContainer {
         eventMap.put("placeConeHigh",
                 new SequentialCommandGroup(
                         m_armSubsystem.getGoToPositionCommand(extendToHigh, angleToHigh).withTimeout(3),
-                        new InstantCommand(m_armSubsystem::openClamp)
+                        new InstantCommand(m_intakeSubsystem::openClamp)
                 )
         );
         eventMap.put("floorPickup",
                 new SequentialCommandGroup(
-                        new InstantCommand(m_armSubsystem::openClamp),
+                        new InstantCommand(m_intakeSubsystem::openClamp),
                         m_armSubsystem.getGoToPositionCommand(extendToFloor, angleToFloor).withTimeout(3),
-                        new InstantCommand(m_armSubsystem::closeClamp)
+                        new InstantCommand(m_intakeSubsystem::closeClamp)
                 )
         );
         eventMap.put("autoDock", m_newDocking);
@@ -265,7 +263,7 @@ public class RobotContainer {
                 new ProxyCommand(
                         () -> {
                             if (lastPressedNumpad == 10 || lastPressedNumpad == 11) {
-                                return getHighPiecePickUpCommand(drivebaseS, m_armSubsystem, targetPosition, lastPressedNumpad);
+                                return getHighPiecePickUpCommand(drivebaseS, m_armSubsystem, m_intakeSubsystem, targetPosition, lastPressedNumpad);
                             } else {
                                 return getPlaceGamePieceCommand(drivebaseS, m_armSubsystem, targetPosition, lastPressedNumpad);
                             }
@@ -275,9 +273,9 @@ public class RobotContainer {
 
         m_numpad.button(15).onTrue(new InstantCommand(
                 // Toggles the clamp
-                m_armSubsystem::toggleClamp,
+                m_intakeSubsystem::toggleClamp,
                 // Requires the Arm subsystem
-                m_armSubsystem
+                m_intakeSubsystem
         ));
 
         m_numpad.button(10).onTrue(
@@ -364,9 +362,9 @@ public class RobotContainer {
 
         m_secondaryController.a().toggleOnTrue(new InstantCommand(
                 // Toggles the clamp
-                m_armSubsystem::toggleClamp,
+                m_intakeSubsystem::toggleClamp,
                 // Requires the Arm subsystem
-                m_armSubsystem
+                m_intakeSubsystem
         ));
 
         // Elevator
@@ -406,14 +404,9 @@ public class RobotContainer {
 
         // Elevator go to Position\
         //y will be replaced with numpad buttons 
-        m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_armSubsystem::openClamp)));
+        m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_intakeSubsystem::openClamp)));
         //Docking
         m_primaryController.b().whileTrue(m_newDocking);
-
-        m_secondaryController.x().whileTrue(new RunCommand(visionSubsystem.limelights[0]::test, visionSubsystem.limelights[0]));
-
-        m_secondaryController.start().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorYellow), m_LedSubsystem));
-        m_secondaryController.back().onTrue(runOnce(() -> m_LedSubsystem.setColor(colorPurple), m_LedSubsystem));
 
         // slow mode for driver
         m_primaryController.leftBumper().whileTrue(

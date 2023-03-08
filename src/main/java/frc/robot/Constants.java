@@ -178,7 +178,6 @@ public final class Constants {
         public static final int angleEncoderPort = 0;
         public static final int angleEncoderOffset = 0;
         public static final int extendMotorCanID = 11;
-        public static final int clampSolenoidID = 0;
         public static final int movingAverage = 5;
         public static final int extendMotorCurrentLimit = 35;
         public static final int angleMotorCurrentLimit = 40;
@@ -214,6 +213,11 @@ public final class Constants {
         public static final double pivotPointHeight = 0; // Height of pivot point of arm above point where belt separates from belt wheel
         public static final double pivotPointDistance = 0; // Distance of pivot point of arm behind point where belt separates from belt wheel
         public static final double pivotRadius = 0; // Distance from belt connection to pivot point of arm
+    }
+
+    public static final class IntakeConstants {
+        public static final int clampSolenoidID = 0;
+        public static final int limitSwitchID = 5;
     }
 
     public static final class VisionConstants {

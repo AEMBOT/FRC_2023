@@ -1,0 +1,52 @@
+package frc.robot.subsystems;
+
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Ultrasonic;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
+
+import static frc.robot.Constants.IntakeConstants.clampSolenoidID;
+import static frc.robot.Constants.IntakeConstants.limitSwitchID;
+
+public class IntakeSubsystem extends SubsystemBase implements Loggable {
+    private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, clampSolenoidID);
+    private final DigitalInput limitSwitch = new DigitalInput(limitSwitchID);
+
+    public IntakeSubsystem() {
+    }
+
+    public Command getIntakeAutoClampCommand() {
+        return startEnd(this::openClamp, this::closeClamp).until(this::getLimitSwitchState);
+    }
+
+    @Override
+    public void periodic() {
+
+    }
+
+    @Log
+    public boolean getLimitSwitchState() {
+        return !limitSwitch.get(); // The limit switch is active-low, but code is easier to understand active-high
+    }
+
+    // Extends the clamp
+    public void openClamp() {
+        m_clampSolenoid.set(true);
+    }
+
+    // Retracts the clamp
+    public void closeClamp() {
+        m_clampSolenoid.set(false);
+    }
+
+    // Toggles the clamp
+    public void toggleClamp() {
+        m_clampSolenoid.set(!m_clampSolenoid.get());
+    }
+}
