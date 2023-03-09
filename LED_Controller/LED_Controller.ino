@@ -14,9 +14,9 @@ int shift = 0;
 
 int SetWidth = 12;
 
-int storedRed = 0;
-int storedGreen = 0;
-int storedBlue = 0;
+int storedRed = 60;
+int storedGreen = 112;
+int storedBlue = 203;
 
 bool loopq = false;
 
@@ -46,10 +46,8 @@ void loop() {
     shift = 0;
   } else if (storedRed == 0 && storedGreen == 0 && storedBlue == 0 && loopq) {
     turnOff();
-    Serial.println("turnOff");
   } else if (!loopq) {
     turnOn(SetWidth, storedRed, storedGreen, storedBlue);
-    Serial.println("turnOn");
   } else if (loopq) {
     setColor(shift, SetWidth);
     delay(50);
@@ -152,7 +150,7 @@ void turnOn(int SetWidth, int InRed, int InGreen, int InBlue) {
 void turnOff() {
   for (int i = 0; i < NUMPIXELS; i++) {
     pixels.setPixelColor(i, pixels.Color(0,0,0));
-    pixels2.setPixelColor(i, pixels2.Color(red, green, blue));
+    pixels2.setPixelColor(i, pixels2.Color(0, 0, 0));
     pixels.show();
     pixels2.show();
     delay(50);
