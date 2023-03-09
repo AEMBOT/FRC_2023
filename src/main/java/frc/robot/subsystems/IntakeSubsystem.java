@@ -19,6 +19,7 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable {
     private final DigitalInput limitSwitch = new DigitalInput(limitSwitchID);
 
     public IntakeSubsystem() {
+        closeClamp();
     }
 
     public Command getIntakeAutoClampCommand() {

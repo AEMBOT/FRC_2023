@@ -88,6 +88,9 @@ public class RobotContainer {
     @Log(methodName = "toString")
     private TargetPosition targetPosition = TargetPosition.NONE;
 
+    // Arbitrary Subsystem Triggers
+    private Trigger limitSwitchTrigger = new Trigger(m_intakeSubsystem::getLimitSwitchState);
+
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -237,6 +240,8 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureBindings() {
+        // Subsystem State Machines
+        limitSwitchTrigger.onTrue(new InstantCommand(() -> serial.writeString("g")).ignoringDisable(true));
         // Primary Controller
         new Trigger(RobotController::getUserButton).onTrue(runOnce(() -> drivebaseS.resetPose(new Pose2d())));
 
