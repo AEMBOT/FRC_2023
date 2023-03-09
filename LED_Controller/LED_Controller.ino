@@ -1,6 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 
-#define PIN D1  // input pin Neopixel is attached to
+// input pin Neopixel is attached to
+#define PIN D1
 #define PIN2 D5
 
 #define NUMPIXELS 58  // number of neopixels in strip
@@ -9,13 +10,15 @@ Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ80
 Adafruit_NeoPixel pixels2 = Adafruit_NeoPixel(NUMPIXELS, PIN2, NEO_GRB + NEO_KHZ800);
 
 
-int add = 0;
+int shift = 0;
 
-int DarkPix = 12;
+int SetWidth = 12;
 
-int storedRed = 60;
-int storedGreen = 112;
-int storedBlue = 203;
+int storedRed = 0;
+int storedGreen = 0;
+int storedBlue = 0;
+
+bool loopq = false;
 
 void setup() {
   // Initialize the NeoPixel library.
@@ -25,6 +28,8 @@ void setup() {
 
   pinMode(D1, OUTPUT);
   pinMode(D5, OUTPUT);
+
+  turnOn(SetWidth, 60, 112, 203);
 }
 
 int modulo(int a, int n) {
@@ -36,13 +41,24 @@ int modulo(int a, int n) {
 }
 
 void loop() {
-  setColor(add, DarkPix);
-  delay(50);
-  add = modulo(add - 1, DarkPix);
+  getColor();
+  if (storedRed == 0 && storedGreen == 0 && storedBlue == 0 && !loopq) {
+    shift = 0;
+  } else if (storedRed == 0 && storedGreen == 0 && storedBlue == 0 && loopq) {
+    turnOff();
+    Serial.println("turnOff");
+  } else if (!loopq) {
+    turnOn(SetWidth, storedRed, storedGreen, storedBlue);
+    Serial.println("turnOn");
+  } else if (loopq) {
+    setColor(shift, SetWidth);
+    delay(50);
+    shift = modulo(shift - 1, SetWidth);
+  }
 }
 
 
-void setColor(int add, int DarkPix) {
+void getColor() {
   if (Serial.available()) {
     int input = Serial.read();
     if (input == 'p') {  //purple
@@ -83,6 +99,9 @@ void setColor(int add, int DarkPix) {
       storedBlue = 0;
     }
   }
+}
+
+void setColor(int shift, int SetWidth) {
 
   int red;
   int green;
@@ -92,9 +111,9 @@ void setColor(int add, int DarkPix) {
   int SubtractValB;
 
   for (int i = 0; i < NUMPIXELS; i++) {
-    SubtractValR = map(modulo(i + add, DarkPix), 0, (DarkPix), 0, storedRed);
-    SubtractValG = map(modulo(i + add, DarkPix), 0, (DarkPix), 0, storedGreen);
-    SubtractValB = map(modulo(i + add, DarkPix), 0, (DarkPix), 0, storedBlue);
+    SubtractValR = map(modulo(i + shift, SetWidth), 0, (SetWidth), 0, storedRed);
+    SubtractValG = map(modulo(i + shift, SetWidth), 0, (SetWidth), 0, storedGreen);
+    SubtractValB = map(modulo(i + shift, SetWidth), 0, (SetWidth), 0, storedBlue);
     red = round(storedRed - SubtractValR);
     green = round(storedGreen - SubtractValG);
     blue = round(storedBlue - SubtractValB);
@@ -105,3 +124,39 @@ void setColor(int add, int DarkPix) {
   pixels.show();
   pixels2.show();
 }
+
+void turnOn(int SetWidth, int InRed, int InGreen, int InBlue) {
+  int red;
+  int green;
+  int blue;
+  int SubtractValR;
+  int SubtractValG;
+  int SubtractValB;
+
+  for (int i = 0; i < NUMPIXELS; i++) {
+    SubtractValR = map(modulo(i, SetWidth), 0, (SetWidth), 0, InRed);
+    SubtractValG = map(modulo(i, SetWidth), 0, (SetWidth), 0, InGreen);
+    SubtractValB = map(modulo(i, SetWidth), 0, (SetWidth), 0, InBlue);
+    red = round(InRed - SubtractValR);
+    green = round(InGreen - SubtractValG);
+    blue = round(InBlue - SubtractValB);
+    pixels.setPixelColor(i, pixels.Color(red, green, blue));
+    pixels2.setPixelColor(i, pixels2.Color(red, green, blue));
+    pixels.show();
+    pixels2.show();
+    delay(50);
+  }
+  loopq = true;
+}
+
+void turnOff() {
+  for (int i = 0; i < NUMPIXELS; i++) {
+    pixels.setPixelColor(i, pixels.Color(0,0,0));
+    pixels2.setPixelColor(i, pixels2.Color(red, green, blue));
+    pixels.show();
+    pixels2.show();
+    delay(50);
+  }
+  loopq = false;
+}
+
