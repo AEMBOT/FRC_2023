@@ -18,6 +18,8 @@ int storedRed = 60;
 int storedGreen = 112;
 int storedBlue = 203;
 
+int speed = 10;
+
 bool loopq = false;
 
 void setup() {
@@ -30,6 +32,7 @@ void setup() {
   pinMode(D5, OUTPUT);
 
   turnOn(SetWidth, 60, 112, 203);
+  speed = 45;
 }
 
 int modulo(int a, int n) {
@@ -50,7 +53,7 @@ void loop() {
     turnOn(SetWidth, storedRed, storedGreen, storedBlue);
   } else if (loopq) {
     setColor(shift, SetWidth);
-    delay(50);
+    delay(speed);
     shift = modulo(shift - 1, SetWidth);
   }
 }
@@ -95,6 +98,10 @@ void getColor() {
       storedRed = 0;
       storedGreen = 0;
       storedBlue = 0;
+    } else if (input == '1') { // regular
+      speed = 45;
+    } else if (input == '2') { // fast
+      speed = 10;
     }
   }
 }
@@ -142,7 +149,7 @@ void turnOn(int SetWidth, int InRed, int InGreen, int InBlue) {
     pixels2.setPixelColor(i, pixels2.Color(red, green, blue));
     pixels.show();
     pixels2.show();
-    delay(50);
+    delay(10);
   }
   loopq = true;
 }
@@ -153,7 +160,7 @@ void turnOff() {
     pixels2.setPixelColor(i, pixels2.Color(0, 0, 0));
     pixels.show();
     pixels2.show();
-    delay(50);
+    delay(10);
   }
   loopq = false;
 }
