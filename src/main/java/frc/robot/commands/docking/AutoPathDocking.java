@@ -58,11 +58,6 @@ public class AutoPathDocking extends CommandBase implements Loggable {
         m_drivebase.drive(new ChassisSpeeds(appliedSpeed,0,0));
     }
     @Override
-    public boolean isFinished() {
-        return (m_drivebase.getFieldRelativeLinearSpeedsMPS().getX() > -0.3 && m_drivebase.getFieldRelativeLinearSpeedsMPS().getX() < .3)
-                && (m_drivebase.getRoll() > -8 && m_drivebase.getRoll() < 13);
-    }
-    @Override
     public void end(boolean _interrupted) {
 
     }
