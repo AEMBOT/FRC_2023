@@ -457,6 +457,11 @@ public class RobotContainer {
         SmartDashboard.putNumber("Pitch", drivebaseS.getPitch());
         SmartDashboard.putNumber("Roll", drivebaseS.getRoll());
         SmartDashboard.putNumber("Yaw", drivebaseS.getHeading().getRadians());
+
+        // If we are in end-game, increase the LED shifting speed!
+        if (DriverStation.isTeleopEnabled() && DriverStation.getMatchTime() < 30) {
+                serial.writeString("2");
+        }
     }
 
     public void onDisabled() {
