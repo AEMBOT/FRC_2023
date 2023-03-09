@@ -1,5 +1,7 @@
 package frc.robot.commands.docking;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -8,7 +10,6 @@ import io.github.oblarg.oblog.Loggable;
 
 public class AutoPathDocking extends CommandBase implements Loggable {
     private final DrivebaseS m_drivebase;
-
     private double appliedSpeed;
 
     public AutoPathDocking(DrivebaseS drive) {
@@ -25,7 +26,8 @@ public class AutoPathDocking extends CommandBase implements Loggable {
         double sx = (Math.sin(Units.degreesToRadians(roll)));
         double sy = (Math.sin(Units.degreesToRadians(pitch)));
 
-        return Units.radiansToDegrees(Math.asin(Math.sqrt(Math.pow(sy, 2) + Math.pow(sx, 2) * Math.pow(cy, 2))));
+        double a = Units.radiansToDegrees(Math.asin(Math.sqrt(Math.pow(sy, 2) + Math.pow(sx, 2) * Math.pow(cy, 2))));
+        return a;
     }
 
     //public double distanceTrakcer(double )
@@ -48,13 +50,12 @@ public class AutoPathDocking extends CommandBase implements Loggable {
         }
         if (tilt(m_drivebase.getRoll(), m_drivebase.getPitch()) < 5){
             appliedSpeed =0;
+        } 
+        if ((m_drivebase.getFieldRelativeLinearSpeedsMPS().getX() > -0.3 && m_drivebase.getFieldRelativeLinearSpeedsMPS().getX() < .3) 
+        && (m_drivebase.getRoll() > -8 && m_drivebase.getRoll() < 13)) {
+            appliedSpeed = 0;
         }
         m_drivebase.drive(new ChassisSpeeds(appliedSpeed,0,0));
-    }
-    @Override
-    public boolean isFinished() {
-        return (m_drivebase.getFieldRelativeLinearSpeedsMPS().getX() > -0.3 && m_drivebase.getFieldRelativeLinearSpeedsMPS().getX() < .3)
-                && (m_drivebase.getRoll() > -8 && m_drivebase.getRoll() < 13);
     }
     @Override
     public void end(boolean _interrupted) {

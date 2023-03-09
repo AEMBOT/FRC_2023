@@ -371,6 +371,10 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
         return navx.getRoll();
     }
 
+    public float getRawGyroY(){
+        return navx.getRawGyroY();
+    }
+
     public Pose2d getTargetPose() {
         return targetPose;
     }

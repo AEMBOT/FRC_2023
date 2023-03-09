@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.arm.GetHomeCommand;
 import frc.robot.commands.arm.GoToPosition;
 import frc.robot.commands.docking.AutoPathDocking;
+import frc.robot.commands.docking.DockingForceBalance;
 import frc.robot.commands.drivetrain.OperatorControlC;
 import frc.robot.commands.drivetrain.OperatorControlHoldingC;
 import frc.robot.subsystems.*;
@@ -58,6 +59,7 @@ public class RobotContainer {
 
     //Commands
     private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS);
+    private final DockingForceBalance m_teleopDocking = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
 
@@ -85,6 +87,9 @@ public class RobotContainer {
     private int lastPressedNumpad = -1;
     @Log(methodName = "toString")
     private TargetPosition targetPosition = TargetPosition.NONE;
+
+    // Arbitrary Subsystem Triggers
+    private Trigger limitSwitchTrigger = new Trigger(m_intakeSubsystem::getLimitSwitchState);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -235,6 +240,8 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureBindings() {
+        // Subsystem State Machines
+        limitSwitchTrigger.onTrue(new InstantCommand(() -> serial.writeString("g")).ignoringDisable(true));
         // Primary Controller
         new Trigger(RobotController::getUserButton).onTrue(runOnce(() -> drivebaseS.resetPose(new Pose2d())));
 
@@ -406,7 +413,7 @@ public class RobotContainer {
         //y will be replaced with numpad buttons 
         m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_intakeSubsystem::openClamp)));
         //Docking
-        m_primaryController.b().whileTrue(m_newDocking);
+        m_primaryController.b().whileTrue(m_teleopDocking);
 
         // slow mode for driver
         m_primaryController.leftBumper().whileTrue(
