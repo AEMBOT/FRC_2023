@@ -61,24 +61,24 @@ public class ArmCommands {
             default -> m_drivebase.getPose().plus(ONE_METER_BACK.times(-0.5));
         };
 
-        Pose2d finalTargetGrid = targetPosition;
-        SmartDashboard.putNumber("targetPosX", finalTargetGrid.getX());
-        SmartDashboard.putNumber("targetPosY", finalTargetGrid.getY());
+        Pose2d finalTargetPosition = targetPosition;
+        SmartDashboard.putNumber("targetPosX", finalTargetPosition.getX());
+        SmartDashboard.putNumber("targetPosY", finalTargetPosition.getY());
         return new ParallelCommandGroup(
-                new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(0.44)))),
+                new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetPosition.plus(ONE_METER_BACK.times(0.44)))),
                 new SequentialCommandGroup(
                         m_drivebase.pathPlannerCommand(
                                 DrivebaseS.generateTrajectoryToPose(
                                         new ArrayList<>(
                                                 List.of(
                                                         m_drivebase.getPose(),
-                                                        finalTargetGrid.plus(ONE_METER_BACK.times(
+                                                        finalTargetPosition.plus(ONE_METER_BACK.times(
                                                                 switch (position) {
                                                                     case DOUBLE_SUBSTATION -> 0.44;
                                                                     default -> 0.51;
                                                                 }
                                                         )),
-                                                        finalTargetGrid.plus(ONE_METER_BACK.times(
+                                                        finalTargetPosition.plus(ONE_METER_BACK.times(
                                                                 switch (position) {
                                                                     case DOUBLE_SUBSTATION -> 0.25;
                                                                     default -> 0.44;
@@ -92,7 +92,7 @@ public class ArmCommands {
                                 )
                         ),
                         m_drivebase.chasePoseC(
-                                () -> finalTargetGrid.plus(ONE_METER_BACK.times(0.27)),
+                                () -> finalTargetPosition.plus(ONE_METER_BACK.times(0.27)),
                                 1.0,
                                 0.3
                         )
