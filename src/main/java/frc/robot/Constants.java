@@ -162,17 +162,6 @@ public final class Constants {
 
         public static HashMap<String, Command> eventMap = new HashMap<String, Command>();
     }
-
-    public static final class LedConstants {
-        public static final int[] colorRed = {64, 3, 3}; //red
-        public static final int[] colorBlue = {0,0,64}; //blue
-        public static final int[] colorYellow = {64,32,0}; //yellow
-        public static final int[] colorPurple = {64,0,64}; //purple
-        //These show up as rainbow... 
-        public static final int[] color = {64,36,0}; //orange
-        public static final int[] colorGreen = {0,64,0}; //green    
-    }
-    
     
     public static final class ArmConstants {
 
@@ -295,7 +284,7 @@ public final class Constants {
                         ) :
                         new Pose2d(
                                 feetToMeters(4) + inchesToMeters(8.25),
-                                feetToMeters(6.25) + feetToMeters(5.5) + feetToMeters(5.5 / 2.0) + inchesToMeters(9),
+                                feetToMeters(6.25) + feetToMeters(5.5) + feetToMeters(5.5 / 2.0),
                                 new Rotation2d(Math.PI)
                         );
 
@@ -316,7 +305,7 @@ public final class Constants {
                 ALLIANCE == DriverStation.Alliance.Red ?
                         new Pose2d(
                                 feetToMeters(4) + inchesToMeters(8.25),
-                                FIELD_WIDTH - (feetToMeters(6.25) + feetToMeters(5.5) + feetToMeters(5.5 / 2.0) + inchesToMeters(9.0)),
+                                FIELD_WIDTH - (feetToMeters(6.25) + feetToMeters(5.5) + feetToMeters(5.5 / 2.0)),
                                 new Rotation2d(Math.PI)
                         ) :
                         new Pose2d(
