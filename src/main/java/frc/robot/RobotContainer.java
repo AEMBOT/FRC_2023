@@ -90,6 +90,7 @@ public class RobotContainer {
 
     // Arbitrary Subsystem Triggers
     private Trigger limitSwitchTrigger = new Trigger(m_intakeSubsystem::getLimitSwitchState);
+    private Trigger endgameLEDTrigger = new Trigger(DriverStation::isTeleopEnabled).and(new Trigger(() -> DriverStation.getMatchTime() < 30));
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -250,6 +251,7 @@ public class RobotContainer {
     private void configureBindings() {
         // Subsystem State Machines
         limitSwitchTrigger.onTrue(new InstantCommand(() -> serial.writeString("g")).ignoringDisable(true));
+        endgameLEDTrigger.onTrue(new InstantCommand(() -> serial.writeString("2")));
         // Primary Controller
         new Trigger(RobotController::getUserButton).onTrue(runOnce(() -> drivebaseS.resetPose(new Pose2d())));
 
@@ -487,11 +489,6 @@ public class RobotContainer {
         SmartDashboard.putNumber("Pitch", drivebaseS.getPitch());
         SmartDashboard.putNumber("Roll", drivebaseS.getRoll());
         SmartDashboard.putNumber("Yaw", drivebaseS.getHeading().getRadians());
-
-        // If we are in end-game, increase the LED shifting speed!
-        if (DriverStation.isTeleopEnabled() && DriverStation.getMatchTime() < 30) {
-                serial.writeString("2");
-        }
     }
 
     public void onDisabled() {
