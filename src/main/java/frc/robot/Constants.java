@@ -180,7 +180,9 @@ public final class Constants {
         public static final double angleToHigh = 0.48;
         public static final double angleToMid = 0.375;
         public static final double angleToFloor = -0.25;
+        public static final double angletoFloorPickUp = -0.28;
         public static final double angleToSubstation = 0.34;
+        public static final double angleToSingleSubstation = 0.20;
 
         public static final double maxAngleHardStop = 0.94;
         public static final double minAngleSoftStop = -0.27;
@@ -201,6 +203,7 @@ public final class Constants {
         public static final double extendToMid = 0.625;
         public static final double extendToHigh = 1.04;
         public static final double extendToSubstation = 0.90;
+        public static final double extendToSingleSubstation = 0.4;
         // Arm Constants that need measuring
         public static final double pivotPointHeight = 0; // Height of pivot point of arm above point where belt separates from belt wheel
         public static final double pivotPointDistance = 0; // Distance of pivot point of arm behind point where belt separates from belt wheel

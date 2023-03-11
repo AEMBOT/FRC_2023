@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.subsystems.ArmSubsystem;
@@ -80,7 +81,7 @@ public class ArmCommands {
                                                         )),
                                                         finalTargetPosition.plus(ONE_METER_BACK.times(
                                                                 switch (position) {
-                                                                    case DOUBLE_SUBSTATION -> 0.25;
+                                                                    case DOUBLE_SUBSTATION -> 0.17;
                                                                     default -> 0.44;
                                                                 }
                                                         ))
@@ -123,6 +124,8 @@ public class ArmCommands {
                     case 4, 5, 6 -> extendToMid;
                     case 7, 8, 9 -> extendToHigh;
                     case 10, 11 -> extendToSubstation;
+                    case 18 -> extendToFloor;
+                    case 21 -> extendToSingleSubstation;
                     default -> minExtendHardStop;
                 },
                 switch (numpadPosition) {
@@ -130,12 +133,65 @@ public class ArmCommands {
                     case 4, 5, 6 -> angleToMid;
                     case 7, 8, 9 -> angleToHigh;
                     case 10, 11 -> angleToSubstation;
+                    case 18 -> angletoFloorPickUp;
+                    case 21 -> angleToSingleSubstation;
                     default -> maxAngleHardStop;
                 }
         );
     }
+
+    public static Command getPickUpPieceFromGround(DrivebaseS m_drivebase, ArmSubsystem m_arm, IntakeSubsystem m_intake){
+        return new ParallelCommandGroup(
+                new InstantCommand(m_intake::openClamp),
+                getArmExtensionCommand(m_arm, 18),
+                new SequentialCommandGroup(
+                        m_intake.getIntakeAutoClampCommand(),
+                        new WaitCommand(0.5),
+                        m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
+                )
+        );
+    }
     /* 
     public static Command getPlacePieceAnyOrientationCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition targetPosition){
+
+    }*/
+    
+    //called when driver moving, drops when translating in x and y direction
+    /* 
+    public static Command getPlacePieceMovingCommand(DrivebaseS m_drivebase, IntakeSubsystem m_intake, ArmSubsystem m_arm, TargetPosition position, int numpadPosition){
+        double drivebaseXVel = m_drivebase.getFieldRelativeLinearSpeedsMPS().getX();
+        double drivebaseYVel = m_drivebase.getFieldRelativeLinearSpeedsMPS().getY();
+        Pose2d targetPosition = switch (position) {
+                case LEFT_GRID -> GRID_LEFT;
+                case COOP_GRID, NONE -> GRID_COOP;
+                case RIGHT_GRID -> GRID_RIGHT;
+                //create new enum for no double substation
+                case DOUBLE_SUBSTATION -> DOUBLE_SUBSTATION;
+            };
+            targetPosition = switch (numpadPosition) {
+                case 1, 4, 7 -> targetPosition.plus(CONE_OFFSET_LEFT);
+                case 2, 5, 8 -> targetPosition;
+                case 3, 6, 9 -> targetPosition.plus(CONE_OFFSET_RIGHT);
+                default -> m_drivebase.getPose().plus(ONE_METER_BACK.times(-0.5));
+            };
+
+        Pose2d finalTargetGrid = targetPosition;
+
+        //move robot back necessary x offset
+        //calculate speed of extension and angle
+        //everything with respect to time:
+//              total time = y distance / y drivebaes vel
+//              delta time: time for extension and angle
+//              start time: total time - delta time
+        return new ParallelCommandGroup(
+                new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(0.44)))),
+                new SequentialCommandGroup(
+                        
+                )
+                
+                )
+        )
+        
 
     }*/
 

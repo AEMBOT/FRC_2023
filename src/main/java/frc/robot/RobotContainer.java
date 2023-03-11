@@ -135,7 +135,7 @@ public class RobotContainer {
         // Construct Autos
         // Path Planner Built Autos
         SwerveAutoBuilder autoBuilder = drivebaseS.getSwerveAutoBuilder();
-
+/* 
         Command redLeft_blueRight = new SequentialCommandGroup(
                 autoBuilder.fullAuto(
                         PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
@@ -148,6 +148,14 @@ public class RobotContainer {
                         PathPlanner.loadPath("redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
                 ).withTimeout(10.0),
                 new AutoPathDocking(drivebaseS)
+        );*/
+
+        Command redLeft_blueRight = autoBuilder.fullAuto(
+                PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+        );
+
+        Command redRight_blueLeft = autoBuilder.fullAuto(
+                PathPlanner.loadPath("redRight-blueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
         );
 
         Command leave_redLeft_blueRight = autoBuilder.fullAuto(
@@ -299,6 +307,14 @@ public class RobotContainer {
                 })
         );
 
+        //single substation
+        /* 
+        m_numpad.button(21).onTrue(
+                Commands.runOnce(() -> {
+                        lastPressedNumpad = 21;
+                })
+        );*/
+
         m_numpad.button(12).onTrue(
                 //m_driverAssist.setTargetGrid(TargetGrid.INNER)
                 Commands.runOnce(() -> targetPosition = TargetPosition.LEFT_GRID)
@@ -321,6 +337,11 @@ public class RobotContainer {
                 )
         );
 
+        m_numpad.button(18).whileTrue(
+                new ProxyCommand(
+                        () -> getPickUpPieceFromGround(drivebaseS, m_armSubsystem, m_intakeSubsystem)
+                )
+        );
         m_numpad.button(1).whileTrue(
                 new InstantCommand(() -> lastPressedNumpad = 1)
         );
