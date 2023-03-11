@@ -180,7 +180,7 @@ public final class Constants {
         public static final double angleToHigh = 0.48;
         public static final double angleToMid = 0.375;
         public static final double angleToFloor = -0.25;
-        public static final double angletoFloorPickUp = -0.33;
+        public static final double angletoFloorPickUp = -0.28;
         public static final double angleToSubstation = 0.34;
         public static final double angleToSingleSubstation = 0.20;
 
@@ -199,8 +199,9 @@ public final class Constants {
         public static final double extendMetersPerTick = 0.0160734375; // 12:1
 
         public static final double extendOffset = 2.5;
-        public static final double extendToFloor = 0.257175;
-        public static final double extendToMid = 0.625;
+        public static final double extendToGroundPickup = 0.25;
+        public static final double extendToFloor = 0.10;
+        public static final double extendToMid = 0.50;
         public static final double extendToHigh = 1.04;
         public static final double extendToSubstation = 0.90;
         public static final double extendToSingleSubstation = 0.4;

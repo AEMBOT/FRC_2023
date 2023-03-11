@@ -340,11 +340,11 @@ public class RobotContainer {
         );
 
         m_numpad.button(18).whileTrue(
-                new SequentialCommandGroup( 
-                new InstantCommand(() -> lastPressedNumpad = 18),
-                new ProxyCommand(
-                        () -> getPickUpPieceFromGround(drivebaseS, m_armSubsystem, m_intakeSubsystem, lastPressedNumpad)
-                ))
+                new SequentialCommandGroup(
+                        new InstantCommand(() -> lastPressedNumpad = 18),
+                        new ProxyCommand(
+                                () -> getPickUpPieceFromGround(drivebaseS, m_armSubsystem, m_intakeSubsystem, lastPressedNumpad)
+                        ))
         );
         m_numpad.button(1).whileTrue(
                 new InstantCommand(() -> lastPressedNumpad = 1)
