@@ -30,12 +30,12 @@
         "y": 0.932805659207859
       },
       "prevControl": {
-        "x": 4.810310135931377,
-        "y": 0.6547000848605493
+        "x": 4.440742625331285,
+        "y": 0.6054773525598918
       },
       "nextControl": {
-        "x": 6.401767022294259,
-        "y": 0.9817540102744532
+        "x": 6.8071039642009525,
+        "y": 1.0550705338645614
       },
       "holonomicAngle": 0.0,
       "isReversal": false,
@@ -44,25 +44,25 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "floorPickup"
+          "closeIntake"
         ],
         "executionBehavior": "sequential",
-        "waitBehavior": "deadline",
+        "waitBehavior": "none",
         "waitTime": 4.0
       }
     },
     {
       "anchorPoint": {
-        "x": 1.8656873770482334,
-        "y": 1.0533029970217314
+        "x": 2.062972185854737,
+        "y": 1.0620054732715496
       },
       "prevControl": {
-        "x": 1.89559700332631,
-        "y": 0.21128359533499907
+        "x": 2.1009434237947824,
+        "y": 0.225340607536196
       },
       "nextControl": {
-        "x": 1.8432782958443985,
-        "y": 1.6841661503147236
+        "x": 2.0140021053374975,
+        "y": 2.1410207507217462
       },
       "holonomicAngle": -180.0,
       "isReversal": false,
@@ -71,10 +71,10 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "placeConeHigh"
+          "openIntake"
         ],
         "executionBehavior": "sequential",
-        "waitBehavior": "deadline",
+        "waitBehavior": "none",
         "waitTime": 1.5
       }
     },
@@ -111,6 +111,18 @@
       "position": 0.05,
       "names": [
         "goToFloorPickup"
+      ]
+    },
+    {
+      "position": 1.2,
+      "names": [
+        "goToHighAngle"
+      ]
+    },
+    {
+      "position": 1.75,
+      "names": [
+        "goToHighPlace"
       ]
     }
   ]

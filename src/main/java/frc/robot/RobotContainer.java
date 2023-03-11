@@ -129,7 +129,11 @@ public class RobotContainer {
                         new InstantCommand(m_intakeSubsystem::closeClamp)
                 )
         );
+        eventMap.put("openIntake", new InstantCommand(m_intakeSubsystem::openClamp, m_intakeSubsystem));
+        eventMap.put("closeIntake", new InstantCommand(m_intakeSubsystem::closeClamp, m_intakeSubsystem));
         eventMap.put("goToFloorPickup", m_armSubsystem.getGoToPositionCommand(extendToGroundPickup, angletoFloorPickUp));
+        eventMap.put("goToHighAngle", m_armSubsystem.getGoToPositionCommand(minExtendHardStop, angleToHigh));
+        eventMap.put("goToHighPlace", m_armSubsystem.getGoToPositionCommand(extendToHigh, angleToHigh));
         eventMap.put("autoDock", m_newDocking);
         eventMap.put("stowArm", m_armSubsystem.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop));
 
