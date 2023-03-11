@@ -54,7 +54,9 @@ public class DockingForceBalance extends CommandBase implements Loggable {
         //double appliedSpeed  = 0.05* (m_drivebase.getRoll()) - 0.005 * navx.getRawGyroY() * Math.signum(m_drivebase.getRoll());
         //double appliedSpeed  = 0.05* (m_drivebase.getRoll()) - 0.005 * navx.getRawGyroY() * -Math.signum(m_drivebase.getRoll());
         //double appliedSpeed = 0.027 * (m_drivebase.getRoll());
-        double appliedSpeed = -0.027 * (m_drivebase.getRoll() + 11 * Math.signum(m_drivebase.getRoll())) + 0.01 * m_drivebase.getRawGyroY() * Math.signum(m_drivebase.getRoll());
+        //+ 11 * Math.signum(m_drivebase.getRoll())
+        //+ 0.01 * m_drivebase.getRawGyroY() * Math.signum(m_drivebase.getRoll()
+        double appliedSpeed = -0.027 * (m_drivebase.getRoll() + 0.02 * m_drivebase.getRawGyroY() * Math.signum(m_drivebase.getRoll()));
         if (Math.abs(appliedSpeed) > 0.35){
             appliedSpeed = 0.35 * Math.signum(appliedSpeed);   
         }
