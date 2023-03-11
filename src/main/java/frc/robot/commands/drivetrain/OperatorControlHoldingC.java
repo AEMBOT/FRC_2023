@@ -10,6 +10,7 @@ import frc.robot.subsystems.DrivebaseS;
 import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.math.MathUtil.applyDeadband;
+import static edu.wpi.first.math.util.Units.degreesToRadians;
 import static frc.robot.Constants.InputDevices.JOYSTICK_DEADBAND;
 
 public class OperatorControlHoldingC extends CommandBase {
@@ -38,15 +39,14 @@ public class OperatorControlHoldingC extends CommandBase {
     public OperatorControlHoldingC(
             DoubleSupplier fwdX,
             DoubleSupplier fwdY,
-            DoubleSupplier povAngle,
+            DoubleSupplier rot,
             DrivebaseS subsystem
     ) {
 
         drive = subsystem;
         forwardX = fwdX;
         forwardY = fwdY;
-        rotation = povAngle;
-
+        rotation = rot;
         addRequirements(subsystem);
 
     }
@@ -76,6 +76,12 @@ public class OperatorControlHoldingC extends CommandBase {
         fwdY = applyDeadband(fwdY, JOYSTICK_DEADBAND);
         fwdY = yRateLimiter.calculate(fwdY);
 
+        if (Math.abs(fwdY) > Math.abs(fwdX)) {
+            fwdX = 0;
+        } else {
+            fwdY = 0;
+        }
+
         double driveDirectionRadians = Math.atan2(fwdY, fwdX);
         double driveMagnitude = Math.hypot(fwdX, fwdY);
         driveMagnitude *= MAX_LINEAR_SPEED;
@@ -87,10 +93,15 @@ public class OperatorControlHoldingC extends CommandBase {
         fwdX = driveMagnitude * Math.cos(driveDirectionRadians);
         fwdY = driveMagnitude * Math.sin(driveDirectionRadians);
 
-        double rot = rotation.getAsDouble();
+        double rot = -rotation.getAsDouble();
 
-        drive.setRotationState(rot);
-        drive.driveFieldRelativeHeading(new ChassisSpeeds(fwdX, fwdY, 0));
+        //rot = Math.copySign(rot * rot, rot);
+        rot = applyDeadband(rot, JOYSTICK_DEADBAND);
+        rot = thetaRateLimiter.calculate(rot);
+        rot *= DriveConstants.MAX_TELEOP_TURN_RATE;
+
+
+        drive.driveFieldRelative(new ChassisSpeeds(fwdX, fwdY, rot));
 //        drive.drive(new ChassisSpeeds(fwdX, fwdY, rot));
 
         SmartDashboard.putNumber("GetPose", drive.getPose().getX());

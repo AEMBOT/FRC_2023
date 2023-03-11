@@ -21,7 +21,7 @@
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "deadline",
-        "waitTime": 3.0
+        "waitTime": 1.5
       }
     },
     {
@@ -53,16 +53,16 @@
     },
     {
       "anchorPoint": {
-        "x": 1.8882001176913905,
-        "y": 3.8706317595566277
+        "x": 1.8653518154640243,
+        "y": 4.402318232126699
       },
       "prevControl": {
-        "x": 1.6317603904651865,
-        "y": 5.212181160795078
+        "x": 1.8869564092800757,
+        "y": 5.087752958709043
       },
       "nextControl": {
-        "x": 1.9186455303903882,
-        "y": 3.711358367642708
+        "x": 1.8602432326186709,
+        "y": 4.240241586963092
       },
       "holonomicAngle": -180.0,
       "isReversal": false,
@@ -75,7 +75,7 @@
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "deadline",
-        "waitTime": 3.0
+        "waitTime": 1.5
       }
     },
     {
@@ -84,8 +84,8 @@
         "y": 3.450983113165306
       },
       "prevControl": {
-        "x": 1.723730281828588,
-        "y": 3.3725977298669165
+        "x": 1.6343025050552056,
+        "y": 3.326296786783725
       },
       "nextControl": null,
       "holonomicAngle": -180.0,
@@ -103,5 +103,12 @@
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 0.05,
+      "names": [
+        "goToFloorPickup"
+      ]
+    }
+  ]
 }

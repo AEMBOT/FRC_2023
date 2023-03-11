@@ -125,12 +125,12 @@ public class RobotContainer {
         eventMap.put("floorPickup",
                 new SequentialCommandGroup(
                         new InstantCommand(m_intakeSubsystem::openClamp),
-                        m_armSubsystem.getGoToPositionCommand(extendToFloor, angleToFloor).withTimeout(3),
+                        m_armSubsystem.getGoToPositionCommand(extendToGroundPickup, angletoFloorPickUp).withTimeout(3),
                         new InstantCommand(m_intakeSubsystem::closeClamp)
                 )
         );
+        eventMap.put("goToFloorPickup", m_armSubsystem.getGoToPositionCommand(extendToGroundPickup, angletoFloorPickUp));
         eventMap.put("autoDock", m_newDocking);
-
         eventMap.put("stowArm", m_armSubsystem.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop));
 
         // Construct Autos
@@ -255,11 +255,11 @@ public class RobotContainer {
         // Primary Controller
         new Trigger(RobotController::getUserButton).onTrue(runOnce(() -> drivebaseS.resetPose(new Pose2d())));
 
-        m_primaryController.povCenter().whileFalse(
+        m_primaryController.rightBumper().whileTrue(
                 new OperatorControlHoldingC(
                         m_primaryController::getLeftY,
                         m_primaryController::getLeftX,
-                        m_primaryController.getHID()::getPOV,
+                        m_primaryController::getRightX,
                         drivebaseS
                 )
         );
