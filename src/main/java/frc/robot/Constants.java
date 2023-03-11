@@ -180,7 +180,7 @@ public final class Constants {
         public static final double angleToHigh = 0.48;
         public static final double angleToMid = 0.375;
         public static final double angleToFloor = -0.25;
-        public static final double angletoFloorPickUp = -0.28;
+        public static final double angletoFloorPickUp = -0.33;
         public static final double angleToSubstation = 0.34;
         public static final double angleToSingleSubstation = 0.20;
 
@@ -217,7 +217,7 @@ public final class Constants {
 
     public static final class VisionConstants {
         public static final double VISION_MEASUREMENT_STD_DEV = 0.4;
-        public static final int VISION_AVERAGING_TIME = 10;
+        public static final int VISION_AVERAGING_TIME = 6;
         public static final double VISION_TRANSLATIONAL_RANGE = 0.5;
         public static final double VISION_ROTATIONAL_RANGE = 10;
         public static AprilTagFieldLayout getFieldLayout() {

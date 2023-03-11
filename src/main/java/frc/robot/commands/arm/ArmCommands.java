@@ -140,10 +140,10 @@ public class ArmCommands {
         );
     }
 
-    public static Command getPickUpPieceFromGround(DrivebaseS m_drivebase, ArmSubsystem m_arm, IntakeSubsystem m_intake){
+    public static Command getPickUpPieceFromGround(DrivebaseS m_drivebase, ArmSubsystem m_arm, IntakeSubsystem m_intake, int numpadPosition){
         return new ParallelCommandGroup(
                 new InstantCommand(m_intake::openClamp),
-                getArmExtensionCommand(m_arm, 18),
+                getArmExtensionCommand(m_arm, numpadPosition),
                 new SequentialCommandGroup(
                         m_intake.getIntakeAutoClampCommand(),
                         new WaitCommand(0.5),
@@ -151,48 +151,4 @@ public class ArmCommands {
                 )
         );
     }
-    /* 
-    public static Command getPlacePieceAnyOrientationCommand(DrivebaseS m_drivebase, ArmSubsystem m_arm, TargetPosition targetPosition){
-
-    }*/
-    
-    //called when driver moving, drops when translating in x and y direction
-    /* 
-    public static Command getPlacePieceMovingCommand(DrivebaseS m_drivebase, IntakeSubsystem m_intake, ArmSubsystem m_arm, TargetPosition position, int numpadPosition){
-        double drivebaseXVel = m_drivebase.getFieldRelativeLinearSpeedsMPS().getX();
-        double drivebaseYVel = m_drivebase.getFieldRelativeLinearSpeedsMPS().getY();
-        Pose2d targetPosition = switch (position) {
-                case LEFT_GRID -> GRID_LEFT;
-                case COOP_GRID, NONE -> GRID_COOP;
-                case RIGHT_GRID -> GRID_RIGHT;
-                //create new enum for no double substation
-                case DOUBLE_SUBSTATION -> DOUBLE_SUBSTATION;
-            };
-            targetPosition = switch (numpadPosition) {
-                case 1, 4, 7 -> targetPosition.plus(CONE_OFFSET_LEFT);
-                case 2, 5, 8 -> targetPosition;
-                case 3, 6, 9 -> targetPosition.plus(CONE_OFFSET_RIGHT);
-                default -> m_drivebase.getPose().plus(ONE_METER_BACK.times(-0.5));
-            };
-
-        Pose2d finalTargetGrid = targetPosition;
-
-        //move robot back necessary x offset
-        //calculate speed of extension and angle
-        //everything with respect to time:
-//              total time = y distance / y drivebaes vel
-//              delta time: time for extension and angle
-//              start time: total time - delta time
-        return new ParallelCommandGroup(
-                new InstantCommand(() -> m_drivebase.setTargetPose(finalTargetGrid.plus(ONE_METER_BACK.times(0.44)))),
-                new SequentialCommandGroup(
-                        
-                )
-                
-                )
-        )
-        
-
-    }*/
-
 }

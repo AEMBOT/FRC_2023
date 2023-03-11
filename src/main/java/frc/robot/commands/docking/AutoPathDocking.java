@@ -41,10 +41,10 @@ public class AutoPathDocking extends CommandBase implements Loggable {
 
     @Override
     public void execute() {
-        appliedSpeed  = -0.04* (m_drivebase.getRoll() + 11 * Math.signum(m_drivebase.getRoll())) 
-            + 0.03 * m_drivebase.getRawGyroY() * Math.signum(m_drivebase.getRoll());
-        if (Math.abs(appliedSpeed) > 0.35){;
-            appliedSpeed = 0.35 * Math.signum(appliedSpeed);
+        appliedSpeed  = -0.03* (m_drivebase.getRoll() + 11 * Math.signum(m_drivebase.getRoll())) 
+            + 0.02 * m_drivebase.getRawGyroY() * Math.signum(m_drivebase.getRoll());
+        if (Math.abs(appliedSpeed) > 0.40){;
+            appliedSpeed = 0.40 * Math.signum(appliedSpeed);
         }
         if (m_drivebase.getRoll() < 11 && m_drivebase.getRoll() > -11){
             appliedSpeed = 0;
