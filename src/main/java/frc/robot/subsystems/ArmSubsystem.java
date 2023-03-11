@@ -163,7 +163,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
 
     private void setExtendMotorVoltage(double voltage) {
         if (getExtendPosition() < minExtendHardStop && extendZeroed) {
-            m_extendMotor.setVoltage(MathUtil.clamp(voltage, 0, 12));
+            m_extendMotor.setVoltage(MathUtil.clamp(voltage, 0, 10));
         } else if (getExtendPosition() > maxExtendSoftStop && extendZeroed) {
             m_extendMotor.setVoltage(MathUtil.clamp(voltage, -12, 0));
         } else {
@@ -196,7 +196,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     }
 
     public void extendArm(double power) {
-        setExtendMotorVoltage(9 * power);
+        setExtendMotorVoltage(10.0 * power);
     }
 
     public void retractArm() {

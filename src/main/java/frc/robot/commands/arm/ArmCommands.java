@@ -41,7 +41,7 @@ public class ArmCommands {
                 new SequentialCommandGroup(
                         m_intake.getIntakeAutoClampCommand(),
                         new WaitCommand(0.5),
-                        m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop)
+                        new ScheduleCommand(m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop))
                 )
         );
     }
@@ -88,14 +88,19 @@ public class ArmCommands {
                                                 )
                                         ),
                                         m_drivebase.getFieldRelativeLinearSpeedsMPS(),
-                                        1.0,
-                                        0.3
+                                        2.0,
+                                        1.0
                                 )
                         ),
                         m_drivebase.chasePoseC(
-                                () -> finalTargetPosition.plus(ONE_METER_BACK.times(0.27)),
-                                1.0,
-                                0.3
+                                () -> finalTargetPosition.plus(ONE_METER_BACK.times(
+                                        switch (position) {
+                                            case DOUBLE_SUBSTATION -> 0.17;
+                                            default -> 0.44;
+                                        }
+                                )),
+                                2.0,
+                                1.0
                         )
                 ),
                 m_arm.getGoToPositionCommand(
@@ -124,7 +129,7 @@ public class ArmCommands {
                     case 4, 5, 6 -> extendToMid;
                     case 7, 8, 9 -> extendToHigh;
                     case 10, 11 -> extendToSubstation;
-                    case 18 -> extendToFloor;
+                    case 18 -> extendToGroundPickup;
                     case 21 -> extendToSingleSubstation;
                     default -> minExtendHardStop;
                 },
