@@ -11,11 +11,11 @@
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel pixels2 = Adafruit_NeoPixel(NUMPIXELS, PIN2, NEO_GRB + NEO_KHZ800);
 
-// Tells the LEDs when to shift, should never be bigger then 'SetWidth'
+// Tells the LEDs when to shift, should never be bigger then 'setWidth'
 int shift = 0;
 
 // The width of each light-to-dark set
-int SetWidth = 12;
+int setWidth = 12;
 
 // The stored RGB values, default is currently AEMLIGHT
 int storedRed = 60;
@@ -41,7 +41,7 @@ void setup() {
   pinMode(D5, OUTPUT);
 
   // Turns the LEDs on with a cool function in the stored color
-  turnOn(SetWidth, StoredRed, StoredGreen, StoredBlue);
+  turnOn(setWidth, storedRed, storedGreen, storedBlue);
 
   // Sets the shifting speed to a slower speed
   speed = 45;
@@ -71,17 +71,17 @@ void loop() {
 
   // Checks if the LEDs were just turned on, and if so, runs the turn on function
   } else if (!loopq) {
-    turnOn(SetWidth, storedRed, storedGreen, storedBlue);
+    turnOn(setWidth, storedRed, storedGreen, storedBlue);
 
   // Checks if the LEDs should just be shifting like normal, and shifts them
   } else if (loopq) {
-    setColor(shift, SetWidth);
+    setColor(shift, setWidth);
 
     // Delay for [speed] ms 
     delay(speed);
 
-    // Shift the LEDs and make sure if is always below SetWidth
-    shift = modulo(shift - 1, SetWidth);
+    // Shift the LEDs and make sure if is always below setWidth
+    shift = modulo(shift - 1, setWidth);
   }
 }
 
@@ -138,7 +138,7 @@ void getColor() {
 }
 
 // Set the color (shifting support)
-void setColor(int shift, int SetWidth) {
+void setColor(int shift, int setWidth) {
 
   // Declare the variables that stores the final red, green, and blue values
   int red;
@@ -154,9 +154,9 @@ void setColor(int shift, int SetWidth) {
   for (int i = 0; i < NUMPIXELS; i++) {
 
     // Calculate the SubtractVal values
-    SubtractValR = map(modulo(i + shift, SetWidth), 0, (SetWidth), 0, storedRed);
-    SubtractValG = map(modulo(i + shift, SetWidth), 0, (SetWidth), 0, storedGreen);
-    SubtractValB = map(modulo(i + shift, SetWidth), 0, (SetWidth), 0, storedBlue);
+    SubtractValR = map(modulo(i + shift, setWidth), 0, (setWidth), 0, storedRed);
+    SubtractValG = map(modulo(i + shift, setWidth), 0, (setWidth), 0, storedGreen);
+    SubtractValB = map(modulo(i + shift, setWidth), 0, (setWidth), 0, storedBlue);
 
     // Set red, green, or and blue to the corresponding stored value - the corresponding subtract value
     red = round(storedRed - SubtractValR);
@@ -173,7 +173,7 @@ void setColor(int shift, int SetWidth) {
 }
 
 // Turn on function
-void turnOn(int SetWidth, int InRed, int InGreen, int InBlue) {
+void turnOn(int setWidth, int InRed, int InGreen, int InBlue) {
 
   // Declare the variables that stores the final red, green, and blue values
   int red;
@@ -189,9 +189,9 @@ void turnOn(int SetWidth, int InRed, int InGreen, int InBlue) {
   for (int i = 0; i < NUMPIXELS; i++) {
 
     // Calculate the SubtractVal values
-    SubtractValR = map(modulo(i, SetWidth), 0, (SetWidth), 0, InRed);
-    SubtractValG = map(modulo(i, SetWidth), 0, (SetWidth), 0, InGreen);
-    SubtractValB = map(modulo(i, SetWidth), 0, (SetWidth), 0, InBlue);
+    SubtractValR = map(modulo(i, setWidth), 0, (setWidth), 0, InRed);
+    SubtractValG = map(modulo(i, setWidth), 0, (setWidth), 0, InGreen);
+    SubtractValB = map(modulo(i, setWidth), 0, (setWidth), 0, InBlue);
 
     // Set red, green, or and blue to the corresponding stored value - the corresponding subtract value
     red = round(InRed - SubtractValR);
