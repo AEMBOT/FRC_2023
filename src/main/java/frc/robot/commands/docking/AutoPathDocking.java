@@ -50,7 +50,7 @@ public class AutoPathDocking extends CommandBase implements Loggable {
             maxSpeed = 0.35;
         }
         else{
-            appliedSpeed  = -0.03* (m_drivebase.getRoll()) 
+            appliedSpeed  = -0.03* (m_drivebase.getRoll())
             + 0.02 * m_drivebase.getRawGyroY();
             maxSpeed = 0.25;
         }

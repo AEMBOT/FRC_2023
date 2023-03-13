@@ -122,7 +122,7 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
        
 
         extendEncoder.setPositionConversionFactor(extendMetersPerTick);
-        absoluteAngleEncoder.setPositionOffset(0.049);
+        absoluteAngleEncoder.setPositionOffset(0.386);
         relativeAngleEncoder.setDistancePerPulse(2 * Math.PI / 8192.0);
 
         pidExtend.setSetpoint(0);
