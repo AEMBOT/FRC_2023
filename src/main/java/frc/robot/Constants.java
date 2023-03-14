@@ -177,11 +177,11 @@ public final class Constants {
         public static final int ultrasonicEchoPort = 3;
 
         //Angle and Extend arm Constants
-        public static final double angleToHigh = 0.48;
-        public static final double angleToMid = 0.375;
+        public static final double angleToHigh = 0.40;
+        public static final double angleToMid = 0.295;
         public static final double angleToFloor = -0.28;
         public static final double angletoFloorPickUp = -0.30;
-        public static final double angleToSubstation = 0.34;
+        public static final double angleToSubstation = 0.26;
         public static final double angleToSingleSubstation = 0.20;
 
         public static final double maxAngleHardStop = 0.94;
@@ -189,7 +189,7 @@ public final class Constants {
         public static final double startingConfigurationAngle = 0.96;
 
         public static final double minExtendHardStop = 0.00;
-        public static final double maxExtendSoftStop = 1.05;
+        public static final double maxExtendSoftStop = 1.06;
 
         //All of these need testing...
         //meter value * tick conversion
@@ -202,7 +202,7 @@ public final class Constants {
         public static final double extendToGroundPickup = 0.20;
         public static final double extendToFloor = 0.10;
         public static final double extendToMid = 0.50;
-        public static final double extendToHigh = 1.04;
+        public static final double extendToHigh = 1.05;
         public static final double extendToSubstation = 0.90;
         public static final double extendToSingleSubstation = 0.4;
         // Arm Constants that need measuring
