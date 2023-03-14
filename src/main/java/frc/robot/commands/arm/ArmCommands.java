@@ -40,7 +40,7 @@ public class ArmCommands {
                 getPlaceGamePieceCommand(m_drivebase, m_arm, targetPosition, numpadPosition),
                 new SequentialCommandGroup(
                         m_intake.getIntakeAutoClampCommand(),
-                        new WaitCommand(0.5),
+                        new WaitCommand(0.75),
                         new ScheduleCommand(m_arm.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop))
                 )
         );
