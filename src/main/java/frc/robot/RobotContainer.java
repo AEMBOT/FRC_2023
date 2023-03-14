@@ -58,8 +58,7 @@ public class RobotContainer {
     private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
 
     //Commands
-    private final AutoPathDocking m_autoDockingForward = new AutoPathDocking(drivebaseS, true);
-    private final AutoPathDocking m_autoDockingBackward = new AutoPathDocking(drivebaseS, false);
+    private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS);
     private final DockingForceBalance m_teleopDocking = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
@@ -135,8 +134,7 @@ public class RobotContainer {
         eventMap.put("goToFloorPickup", m_armSubsystem.getGoToPositionCommand(extendToGroundPickup, angletoFloorPickUp));
         eventMap.put("goToHighAngle", m_armSubsystem.getGoToPositionCommand(minExtendHardStop, angleToHigh));
         eventMap.put("goToHighPlace", m_armSubsystem.getGoToPositionCommand(extendToHigh, angleToHigh));
-        eventMap.put("autoDock", m_autoDockingForward);
-        eventMap.put("autoDockBackwards", m_autoDockingBackward);
+        eventMap.put("autoDock", m_newDocking);
         eventMap.put("stowArm", m_armSubsystem.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop));
 
         // Construct Autos

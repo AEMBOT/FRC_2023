@@ -11,12 +11,9 @@ import io.github.oblarg.oblog.Loggable;
 public class AutoPathDocking extends CommandBase implements Loggable {
     private final DrivebaseS m_drivebase;
     private double appliedSpeed;
-    private Boolean isForward;
-    private double maxSpeed;
 
-    public AutoPathDocking(DrivebaseS drive, Boolean forward) {
+    public AutoPathDocking(DrivebaseS drive) {
         m_drivebase = drive;
-        isForward = forward;
         addRequirements(m_drivebase);
     }
 
@@ -45,17 +42,10 @@ public class AutoPathDocking extends CommandBase implements Loggable {
     @Override
     public void execute() {
         //+ 11 * Math.signum(m_drivebase.getRoll())
-        if (isForward){
-            appliedSpeed = -0.05 * (m_drivebase.getRoll()) + 0.03 * m_drivebase.getRawGyroY();
-            maxSpeed = 0.35;
-        }
-        else{
-            appliedSpeed  = -0.03* (m_drivebase.getRoll())
-            + 0.02 * m_drivebase.getRawGyroY();
-            maxSpeed = 0.25;
-        }
-        if (Math.abs(appliedSpeed) > maxSpeed){;
-            appliedSpeed = maxSpeed * Math.signum(appliedSpeed);
+        appliedSpeed  = -0.05* (m_drivebase.getRoll() )
+            + 0.04 * m_drivebase.getRawGyroY() * Math.signum(m_drivebase.getRoll());
+        if (Math.abs(appliedSpeed) > 0.40){;
+            appliedSpeed = 0.40 * Math.signum(appliedSpeed);
         }
         if (m_drivebase.getRoll() < 11 && m_drivebase.getRoll() > -11){
             appliedSpeed = 0;
