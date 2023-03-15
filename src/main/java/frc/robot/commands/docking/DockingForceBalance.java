@@ -14,6 +14,8 @@ public class DockingForceBalance extends CommandBase implements Loggable {
     double pitchLower = -75;
 
     private final DrivebaseS m_drivebase;
+    private double stationAngle;
+    private double stationOmega;
 
     public DockingForceBalance(DrivebaseS drive) {
         m_drivebase = drive;
@@ -56,11 +58,13 @@ public class DockingForceBalance extends CommandBase implements Loggable {
         //double appliedSpeed = 0.027 * (m_drivebase.getRoll());
         //+ 11 * Math.signum(m_drivebase.getRoll())
         //+ 0.01 * m_drivebase.getRawGyroY() * Math.signum(m_drivebase.getRoll()
-        double appliedSpeed = -0.027 * (m_drivebase.getRoll() + 0.02 * m_drivebase.getRawGyroY() * Math.signum(m_drivebase.getRoll()));
-        if (Math.abs(appliedSpeed) > 0.35){
-            appliedSpeed = 0.35 * Math.signum(appliedSpeed);   
+        //double appliedSpeed = -0.027 * (m_drivebase.getRoll() + 0.02 * m_drivebase.getRawGyroY() * Math.signum(m_drivebase.getRoll()));
+        double appliedSpeed = -0.03 * ((m_drivebase.getRoll() + 11) + 0.03 * (m_drivebase.getRawGyroY() + 3));
+        if (Math.abs(appliedSpeed) > 0.4){
+            appliedSpeed = 0.4 * Math.signum(appliedSpeed);   
         }
         m_drivebase.drive(new ChassisSpeeds(appliedSpeed,0,0));
+        
     }
 
     @Override

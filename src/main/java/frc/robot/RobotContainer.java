@@ -187,6 +187,10 @@ public class RobotContainer {
                 PathPlanner.loadPath("BasicRedRight-BlueLeft", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
         );
 
+        Command twoPlusOnePieceDock_redLeft_blueRight = autoBuilder.fullAuto(
+                PathPlanner.loadPath("twoPlusOnePieceDock-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+        );
+
         // Build Autos
         autoSelector.setDefaultOption("No-op", new InstantCommand());
         autoSelector.addOption("Leave Immediately",
@@ -210,6 +214,7 @@ public class RobotContainer {
         autoSelector.addOption("twopiece-redRight-blueLeft", twopiece_redRight_blueLeft);
         autoSelector.addOption("BasicRedLeft-BlueRight", basicRedLeft_blueRight);
         autoSelector.addOption("BasicRedRight-BlueLeft", basicRedRight_blueLeft);
+        autoSelector.addOption("twoPlusOnePieceDock-redLeft-blueRight", twoPlusOnePieceDock_redLeft_blueRight);
 
         autoSelector.addOption("twopiece",
                 new SequentialCommandGroup(
