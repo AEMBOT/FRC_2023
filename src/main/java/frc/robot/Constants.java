@@ -55,7 +55,7 @@ public final class Constants {
         static public final double MAX_ROTATE_SPEED_RAD_PER_SEC = 5; // Calculated from max module free speed around a 25-inch wheelbase
         static public final double MAX_TRANSLATE_ACCEL_MPS2 = MAX_FWD_REV_SPEED_MPS / 0.125; //0-full time of 0.25 second
         static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC / 0.25; //0-full time of 0.25 second
-        static public final int DRIVE_MOTOR_CURRENT_LIMIT = 40;
+        static public final int DRIVE_MOTOR_CURRENT_LIMIT = 50;
         static public final int ROTATION_MOTOR_CURRENT_LIMIT = 30;
 
         // HELPER ORGANIZATION CONSTANTS
@@ -177,14 +177,14 @@ public final class Constants {
         public static final int ultrasonicEchoPort = 3;
 
         //Angle and Extend arm Constants
-        public static final double angleToHigh = 0.40;
-        public static final double angleToMid = 0.295;
+        public static final double angleToHigh = 0.48;
+        public static final double angleToMid = 0.375;
         public static final double angleToFloor = -0.28;
         public static final double angletoFloorPickUp = -0.30;
-        public static final double angleToSubstation = 0.26;
+        public static final double angleToSubstation = 0.34;
         public static final double angleToSingleSubstation = 0.20;
 
-        public static final double maxAngleHardStop = 0.94;
+        public static final double maxAngleHardStop = 0.92;
         public static final double minAngleSoftStop = -0.27;
         public static final double startingConfigurationAngle = 0.96;
 

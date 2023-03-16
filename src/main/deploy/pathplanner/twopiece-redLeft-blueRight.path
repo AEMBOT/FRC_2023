@@ -160,13 +160,13 @@
       ]
     },
     {
-      "position": 2.2,
+      "position": 2.5,
       "names": [
         "goToHighAngle"
       ]
     },
     {
-      "position": 2.5,
+      "position": 3.5,
       "names": [
         "goToHighPlace"
       ]
@@ -174,19 +174,25 @@
     {
       "position": 1.0,
       "names": [
-        "closeIntake"
+        "openIntake"
       ]
     },
     {
-      "position": 3.0,
+      "position": 4.0,
       "names": [
         "openIntake"
       ]
     },
     {
-      "position": 3.1,
+      "position": 4.1,
       "names": [
         "stowArm"
+      ]
+    },
+    {
+      "position": 2.0,
+      "names": [
+        "closeIntake"
       ]
     }
   ]
