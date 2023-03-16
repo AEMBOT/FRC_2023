@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.math.MathUtil.applyDeadband;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.AutoConstants.*;
@@ -58,7 +57,8 @@ public class RobotContainer {
     private final DrivebaseS drivebaseS = new DrivebaseS(m_limelight);
 
     //Commands
-    private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS);
+    private final AutoPathDocking m_newDocking = new AutoPathDocking(drivebaseS,true);
+    private final AutoPathDocking m_DockingBackwards = new AutoPathDocking(drivebaseS, false);
     private final DockingForceBalance m_teleopDocking = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
     private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
@@ -135,6 +135,7 @@ public class RobotContainer {
         eventMap.put("goToHighAngle", m_armSubsystem.getGoToPositionCommand(minExtendHardStop, angleToHigh));
         eventMap.put("goToHighPlace", m_armSubsystem.getGoToPositionCommand(extendToHigh, angleToHigh));
         eventMap.put("autoDock", m_newDocking);
+        eventMap.put("autoDockBackwards", m_DockingBackwards);
         eventMap.put("stowArm", m_armSubsystem.getGoToPositionCommand(minExtendHardStop, maxAngleHardStop));
 
         // Construct Autos
@@ -408,6 +409,7 @@ public class RobotContainer {
                 m_intakeSubsystem
         ));
 
+        m_secondaryController.b().whileTrue(new GetHomeCommand(m_armSubsystem));
         // Elevator
         // Angle Motor
         m_secondaryController.rightBumper().whileTrue(

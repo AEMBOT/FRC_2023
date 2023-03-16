@@ -38,7 +38,9 @@ public class ArmSubsystem extends SubsystemBase implements Loggable {
     private boolean extendZeroed = false;
 
 
-    LinearFilter filter = LinearFilter.movingAverage(movingAverage);
+    //LinearFilter filter = LinearFilter.movingAverage(movingAverage);
+    LinearFilter filter = LinearFilter.movingAverage(10);
+
 
     @Log
     PIDController pidExtend = new PIDController(120, 0, 2); // p = 582.62, d = 10.198

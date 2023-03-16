@@ -8,12 +8,15 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DrivebaseS;
 import io.github.oblarg.oblog.Loggable;
 
-public class AutoPathDocking extends CommandBase implements Loggable {
+public class AutoPathDocking extends CommandBase{
     private final DrivebaseS m_drivebase;
     private double appliedSpeed;
+    private boolean isforward;
+    private double maxSpeed  = 0.25;
 
-    public AutoPathDocking(DrivebaseS drive) {
+    public AutoPathDocking(DrivebaseS drive, Boolean isForward) {
         m_drivebase = drive;
+        isforward = isForward;
         addRequirements(m_drivebase);
     }
 
@@ -42,12 +45,20 @@ public class AutoPathDocking extends CommandBase implements Loggable {
     @Override
     public void execute() {
         //+ 11 * Math.signum(m_drivebase.getRoll())
-        appliedSpeed  = -0.05* (m_drivebase.getRoll() )
-            + 0.04 * m_drivebase.getRawGyroY() * Math.signum(m_drivebase.getRoll());
-        if (Math.abs(appliedSpeed) > 0.40){;
-            appliedSpeed = 0.40 * Math.signum(appliedSpeed);
+        if (isforward){
+            appliedSpeed = -0.05 * (m_drivebase.getRoll())
+            + 0.04 * m_drivebase.getRawGyroY();
+            maxSpeed = 0.30;
+        }  
+        else{
+            appliedSpeed  = -0.02* (m_drivebase.getRoll() )
+            + 0.03 * m_drivebase.getRawGyroY();
+            maxSpeed = 0.25;
         }
-        if (m_drivebase.getRoll() < 11 && m_drivebase.getRoll() > -11){
+        if (Math.abs(appliedSpeed) > maxSpeed){;
+            appliedSpeed = maxSpeed * Math.signum(appliedSpeed);
+        }
+        if (m_drivebase.getRoll() < 6 && m_drivebase.getRoll() > -6){
             appliedSpeed = 0;
         }
         if (tilt(m_drivebase.getRoll(), m_drivebase.getPitch()) < 5){
