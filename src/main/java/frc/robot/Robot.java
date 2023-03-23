@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -38,6 +39,7 @@ public class Robot extends TimedRobot {
         Logger.configureLoggingAndConfig(m_robotContainer, false);
         SmartDashboard.putNumber("vel", new SwerveModuleState().speedMetersPerSecond);
         m_robotContainer.onInit();
+        PortForwarder.add(5801, "10.64.43.11", 5801);
 
         // Remove before Comp
 //        PathPlannerServer.startServer(5811);

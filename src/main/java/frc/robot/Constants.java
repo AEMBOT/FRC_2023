@@ -177,12 +177,12 @@ public final class Constants {
         public static final int ultrasonicEchoPort = 3;
 
         //Angle and Extend arm Constants
-        public static final double angleToHigh = 0.48;
-        public static final double angleToMid = 0.375;
+        public static final double angleToHigh = 0.46;
+        public static final double angleToMid = 0.355;
         public static final double angleToFloor = -0.28;
         public static final double angletoFloorPickUp = -0.30;
-        public static final double angleToSubstation = 0.34;
-        public static final double angleToSingleSubstation = 0.20;
+        public static final double angleToSubstation = 0.31;
+        public static final double angleToSingleSubstation = 0.18;
 
         public static final double maxAngleHardStop = 0.92;
         public static final double minAngleSoftStop = -0.27;

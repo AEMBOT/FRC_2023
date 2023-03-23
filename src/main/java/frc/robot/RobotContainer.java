@@ -192,8 +192,18 @@ public class RobotContainer {
                 PathPlanner.loadPath("twoPlusOnePieceDock-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
         );
 
+        Command twopiece_NoDock_redLeft_blueRight = autoBuilder.fullAuto(
+                PathPlanner.loadPath("twopieceNoDock-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
+        );
+
         // Build Autos
-        autoSelector.setDefaultOption("No-op", new InstantCommand());
+        autoSelector.setDefaultOption("placePieceHigh", 
+                new SequentialCommandGroup(
+                        m_armSubsystem.getGoToPositionCommand(extendToHigh, angleToHigh).withTimeout(3),
+                        new InstantCommand(m_intakeSubsystem::openClamp)
+                )
+        );
+        autoSelector.addOption("No-op", new InstantCommand());
         autoSelector.addOption("Leave Immediately",
                 new ProxyCommand(
                         () -> drivebaseS.pathPlannerCommand(
@@ -212,26 +222,27 @@ public class RobotContainer {
         autoSelector.addOption("leave-redLeft-blueRight", leave_redLeft_blueRight);
         autoSelector.addOption("leave-redRight-blueLeft", leave_redRight_blueLeft);
         autoSelector.addOption("twopiece-redLeft-blueRight", twopiece_redLeft_blueRight);
-        autoSelector.addOption("twopiece-redRight-blueLeft", twopiece_redRight_blueLeft);
+        autoSelector.addOption("twopieceNoDock-redLeft-blueRight", twopiece_NoDock_redLeft_blueRight);
+        // autoSelector.addOption("twopiece-redRight-blueLeft", twopiece_redRight_blueLeft);
         autoSelector.addOption("BasicRedLeft-BlueRight", basicRedLeft_blueRight);
         autoSelector.addOption("BasicRedRight-BlueLeft", basicRedRight_blueLeft);
-        autoSelector.addOption("twoPlusOnePieceDock-redLeft-blueRight", twoPlusOnePieceDock_redLeft_blueRight);
+        // autoSelector.addOption("twoPlusOnePieceDock-redLeft-blueRight", twoPlusOnePieceDock_redLeft_blueRight);
 
-        autoSelector.addOption("twopiece",
-                new SequentialCommandGroup(
-//                        new InstantCommand(m_armSubsystem::openClamp),
-//                        m_GoToPositionHigh,
-//                        new InstantCommand(m_armSubsystem::closeClamp),
-                        new ParallelCommandGroup(
-//                                new GoToPosition(m_armSubsystem, 0, -0.5),
-                                new SequentialCommandGroup(
-                                        new InstantCommand(() -> drivebaseS.resetPose(twoPiecePath.getInitialHolonomicPose())),
-                                        drivebaseS.pathPlannerCommand(twoPiecePath)
-                                        //m_newDocking
-                                )
-                        )
-                )
-        );
+//         autoSelector.addOption("twopiece",
+//                 new SequentialCommandGroup(
+// //                        new InstantCommand(m_armSubsystem::openClamp),
+// //                        m_GoToPositionHigh,
+// //                        new InstantCommand(m_armSubsystem::closeClamp),
+//                         new ParallelCommandGroup(
+// //                                new GoToPosition(m_armSubsystem, 0, -0.5),
+//                                 new SequentialCommandGroup(
+//                                         new InstantCommand(() -> drivebaseS.resetPose(twoPiecePath.getInitialHolonomicPose())),
+//                                         drivebaseS.pathPlannerCommand(twoPiecePath)
+//                                         //m_newDocking
+//                                 )
+//                         )
+//                 )
+//         );
 //    autoSelector.addOption("apriltag",
 //            drivebaseS.pathPlannerCommand(
 //                    DrivebaseS.generateTrajectoryToPose(
@@ -243,13 +254,13 @@ public class RobotContainer {
 //                    )
 //            )
 //    );
-        autoSelector.addOption("apriltag",
-                drivebaseS.chasePoseC(
-                        () -> APRILTAG_LAYOUT.getTagPose(3).get().toPose2d().plus(new Transform2d(new Translation2d(2.77, 2.5), new Rotation2d(Math.PI)))
-                )
-        );
-        field.getObject("target").setPose(APRILTAG_LAYOUT.getTagPose(3).get().toPose2d().plus(new Transform2d(new Translation2d(2.77, 2.5), new Rotation2d(Math.PI))));
-        field.getObject("target").setPose(GRID_LEFT.plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5)));
+        // autoSelector.addOption("apriltag",
+        //         drivebaseS.chasePoseC(
+        //                 () -> APRILTAG_LAYOUT.getTagPose(3).get().toPose2d().plus(new Transform2d(new Translation2d(2.77, 2.5), new Rotation2d(Math.PI)))
+        //         )
+        // );
+        // field.getObject("target").setPose(APRILTAG_LAYOUT.getTagPose(3).get().toPose2d().plus(new Transform2d(new Translation2d(2.77, 2.5), new Rotation2d(Math.PI))));
+        // field.getObject("target").setPose(GRID_LEFT.plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5)));
     }
 
     /**
