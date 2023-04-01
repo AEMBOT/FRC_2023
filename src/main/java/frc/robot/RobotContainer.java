@@ -196,6 +196,10 @@ public class RobotContainer {
                 PathPlanner.loadPath("twopieceNoDock-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
         );
 
+        Command twoHalf_redLeft_blueRight = autoBuilder.fullAuto(
+                PathPlanner.loadPath("threepieceNoDock-redLeft-blueRight", maxVelMetersPerSec + 1, maxAccelMetersPerSecondSq + 0.5)
+        );
+
         // Build Autos
         autoSelector.setDefaultOption("placePieceHigh", 
                 new SequentialCommandGroup(
@@ -223,6 +227,7 @@ public class RobotContainer {
         autoSelector.addOption("leave-redRight-blueLeft", leave_redRight_blueLeft);
         autoSelector.addOption("twopiece-redLeft-blueRight", twopiece_redLeft_blueRight);
         autoSelector.addOption("twopieceNoDock-redLeft-blueRight", twopiece_NoDock_redLeft_blueRight);
+        autoSelector.addOption("twoHalf-redLeft-blueRight", twoHalf_redLeft_blueRight);
         // autoSelector.addOption("twopiece-redRight-blueLeft", twopiece_redRight_blueLeft);
         autoSelector.addOption("BasicRedLeft-BlueRight", basicRedLeft_blueRight);
         autoSelector.addOption("BasicRedRight-BlueLeft", basicRedRight_blueLeft);
@@ -520,6 +525,7 @@ public class RobotContainer {
         CommandScheduler.getInstance().schedule(new InstantCommand(m_armSubsystem::resetExtendEncoder));
         CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
         ALLIANCE = DriverStation.getAlliance();
+        m_intakeSubsystem.closeClamp();
     }
 
     public void onInit() {

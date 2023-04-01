@@ -11,6 +11,7 @@ import static frc.robot.Constants.IntakeConstants.clampSolenoidID;
 import static frc.robot.Constants.IntakeConstants.limitSwitchID;
 
 public class IntakeSubsystem extends SubsystemBase implements Loggable {
+    @Log(methodName = "get")
     private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, clampSolenoidID);
     private final DigitalInput limitSwitch = new DigitalInput(limitSwitchID);
 

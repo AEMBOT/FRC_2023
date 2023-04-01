@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -155,7 +156,8 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static DriverStation.Alliance ALLIANCE = DriverStation.getAlliance();
+//        public static DriverStation.Alliance ALLIANCE = DriverStation.getAlliance();
+        public static DriverStation.Alliance ALLIANCE = new DigitalInput(4).get() ? DriverStation.Alliance.Red : DriverStation.Alliance.Blue;
 
         public static final double maxVelMetersPerSec = 3;
         public static final double maxAccelMetersPerSecondSq = 1.5;
@@ -179,13 +181,13 @@ public final class Constants {
         //Angle and Extend arm Constants
         public static final double angleToHigh = 0.46;
         public static final double angleToMid = 0.355;
-        public static final double angleToFloor = -0.28;
+        public static final double angleToFloor = -0.30;
         public static final double angletoFloorPickUp = -0.30;
         public static final double angleToSubstation = 0.31;
         public static final double angleToSingleSubstation = 0.18;
 
         public static final double maxAngleHardStop = 0.92;
-        public static final double minAngleSoftStop = -0.27;
+        public static final double minAngleSoftStop = -0.35;
         public static final double startingConfigurationAngle = 0.96;
 
         public static final double minExtendHardStop = 0.00;
@@ -217,6 +219,10 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
+        public static final Transform3d BACK_CAMERA_TRANSFORM = new Transform3d(
+                new Translation3d(-0.343, -0.152, 0.445),
+                new Rotation3d(0.0, 0.0, Math.PI)
+        );
         public static final double VISION_MEASUREMENT_STD_DEV = 0.4;
         public static final int VISION_AVERAGING_TIME = 6;
         public static final double VISION_TRANSLATIONAL_RANGE = 0.5;

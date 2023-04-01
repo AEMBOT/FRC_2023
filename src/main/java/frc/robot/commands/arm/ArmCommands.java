@@ -75,7 +75,7 @@ public class ArmCommands {
                                                         m_drivebase.getPose(),
                                                         finalTargetPosition.plus(ONE_METER_BACK.times(
                                                                 switch (position) {
-                                                                    case DOUBLE_SUBSTATION -> 0.44;
+                                                                    case DOUBLE_SUBSTATION -> 0.69;
                                                                     default -> 0.51;
                                                                 }
                                                         )),
@@ -88,8 +88,8 @@ public class ArmCommands {
                                                 )
                                         ),
                                         m_drivebase.getFieldRelativeLinearSpeedsMPS(),
-                                        2.0,
-                                        1.0
+                                        4.0,
+                                        3.0
                                 )
                         ),
                         m_drivebase.chasePoseC(
@@ -99,8 +99,8 @@ public class ArmCommands {
                                             default -> 0.44;
                                         }
                                 )),
-                                2.0,
-                                1.0
+                                4.0,
+                                3.0
                         )
                 ),
                 m_arm.getGoToPositionCommand(

@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
@@ -38,9 +39,14 @@ import frc.robot.util.sim.wpiClasses.SwerveModuleSim;
 import frc.robot.util.trajectory.PPChasePoseCommand;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static frc.robot.Constants.AutoConstants.eventMap;
@@ -107,6 +113,10 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
     private final LinearFilter visionPoseAverageY = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
     private final LinearFilter visionPoseAverageT = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
 
+    private final PhotonCamera backCamera = new PhotonCamera("USB_webcam");
+    private final PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(
+            APRILTAG_LAYOUT, PoseStrategy.MULTI_TAG_PNP, backCamera, BACK_CAMERA_TRANSFORM);
+
     private Pose2d targetPose = new Pose2d();
 
     public DrivebaseS(Limelight m_limelight) {
@@ -120,7 +130,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
                         getModulePositions(),
                         new Pose2d()
                 );
-        odometry.setVisionMeasurementStdDevs(VecBuilder.fill(VISION_MEASUREMENT_STD_DEV, VISION_MEASUREMENT_STD_DEV, VISION_MEASUREMENT_STD_DEV));
+        odometry.setVisionMeasurementStdDevs(VecBuilder.fill(VISION_MEASUREMENT_STD_DEV, VISION_MEASUREMENT_STD_DEV, 1.0));
         resetPose(new Pose2d());
         limelight = m_limelight;
     }
@@ -152,6 +162,17 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
             ) {
                 odometry.addVisionMeasurement(limelightPose, limelight.getLastTimestamp() / 1000.0);
             }
+        }
+
+        Optional<EstimatedRobotPose> result = photonPoseEstimator.update();
+        if (result.isPresent()) {
+            EstimatedRobotPose camPose = result.get();
+            Pose2d camPose2d = camPose.estimatedPose.toPose2d();
+            odometry.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds, VecBuilder.fill(0.3, 0.3, 1.0));
+            SmartDashboard.putNumberArray("pv pose",
+                    new double[] {
+                            camPose2d.getX(), camPose2d.getY(), camPose2d.getRotation().getDegrees()
+                    });
         }
     }
 
@@ -663,8 +684,9 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
                     new PathPoint(
                             pathWaypoints.get(i).getTranslation(),
                             NomadMathUtil.getDirection(robotToTargetTranslation),
-                            pathWaypoints.get(i).getRotation()
-                    )
+                            pathWaypoints.get(i).getRotation(),
+                            0.5
+                    ).withNextControlLength(0.005)
             );
         }
 
