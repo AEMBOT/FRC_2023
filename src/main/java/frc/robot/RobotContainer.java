@@ -61,7 +61,6 @@ public class RobotContainer {
     private final AutoPathDocking m_DockingBackwards = new AutoPathDocking(drivebaseS, false);
     private final DockingForceBalance m_teleopDocking = new DockingForceBalance(drivebaseS);
     private final GetHomeCommand m_GetHomeCommand = new GetHomeCommand(m_armSubsystem);
-    private final GoToPosition m_GoToPositionTest = new GoToPosition(m_armSubsystem, 1, 0);
 
 
     // Controllers
@@ -197,7 +196,7 @@ public class RobotContainer {
         );
 
         Command twoHalf_redLeft_blueRight = autoBuilder.fullAuto(
-                PathPlanner.loadPath("threepieceNoDock-redLeft-blueRight", maxVelMetersPerSec + 1, maxAccelMetersPerSecondSq + 0.5)
+                PathPlanner.loadPath("twoHalfNoDock-redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
         );
 
         // Build Autos
@@ -461,9 +460,6 @@ public class RobotContainer {
                 new RunCommand(m_armSubsystem::extendArm).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
         );
 
-        // Elevator go to Position\
-        //y will be replaced with numpad buttons 
-        m_secondaryController.y().whileTrue(m_GoToPositionTest.andThen(new InstantCommand(m_intakeSubsystem::openClamp)));
         //Docking
         m_primaryController.b().whileTrue(m_teleopDocking);
 

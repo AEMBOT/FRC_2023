@@ -113,6 +113,10 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
     private final LinearFilter visionPoseAverageY = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
     private final LinearFilter visionPoseAverageT = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
 
+    private final LinearFilter photonPoseAverageX = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
+    private final LinearFilter photonPoseAverageY = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
+    private final LinearFilter photonPoseAverageT = LinearFilter.movingAverage(VISION_AVERAGING_TIME);
+
     private final PhotonCamera backCamera = new PhotonCamera("USB_webcam");
     private final PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(
             APRILTAG_LAYOUT, PoseStrategy.MULTI_TAG_PNP, backCamera, BACK_CAMERA_TRANSFORM);
@@ -168,7 +172,17 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
         if (result.isPresent()) {
             EstimatedRobotPose camPose = result.get();
             Pose2d camPose2d = camPose.estimatedPose.toPose2d();
-            odometry.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds, VecBuilder.fill(0.3, 0.3, 1.0));
+            double poseAvgX = photonPoseAverageX.calculate(camPose2d.getX());
+            double poseAvgY = photonPoseAverageY.calculate(camPose2d.getY());
+            double poseAvgT = photonPoseAverageT.calculate(camPose2d.getRotation().getRadians());
+            if (
+                    abs(poseAvgX - camPose2d.getX()) < VISION_TRANSLATIONAL_RANGE &&
+                            abs(poseAvgY - camPose2d.getY()) < VISION_TRANSLATIONAL_RANGE &&
+                            abs(poseAvgT - camPose2d.getRotation().getRadians()) < VISION_ROTATIONAL_RANGE
+                // limelightPose.minus(odometry.getEstimatedPosition()).getTranslation().getNorm() < 1.0
+            ) {
+                odometry.addVisionMeasurement(camPose2d, camPose.timestampSeconds, VecBuilder.fill(0.3, 0.3, 1.0));
+            }
             SmartDashboard.putNumberArray("pv pose",
                     new double[] {
                             camPose2d.getX(), camPose2d.getY(), camPose2d.getRotation().getDegrees()
@@ -685,7 +699,7 @@ public class DrivebaseS extends SubsystemBase implements Loggable {
                             pathWaypoints.get(i).getTranslation(),
                             NomadMathUtil.getDirection(robotToTargetTranslation),
                             pathWaypoints.get(i).getRotation(),
-                            0.5
+                            1.0
                     ).withNextControlLength(0.005)
             );
         }

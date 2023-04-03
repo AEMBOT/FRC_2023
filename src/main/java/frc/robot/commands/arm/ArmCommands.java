@@ -96,7 +96,7 @@ public class ArmCommands {
                                 () -> finalTargetPosition.plus(ONE_METER_BACK.times(
                                         switch (position) {
                                             case DOUBLE_SUBSTATION -> 0.17;
-                                            default -> 0.44;
+                                            default -> 0.38;
                                         }
                                 )),
                                 4.0,
