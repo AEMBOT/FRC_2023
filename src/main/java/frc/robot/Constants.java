@@ -172,8 +172,8 @@ public final class Constants {
         public static final int angleEncoderOffset = 0;
         public static final int extendMotorCanID = 11;
         public static final int movingAverage = 5;
-        public static final int extendMotorCurrentLimit = 35;
-        public static final int angleMotorCurrentLimit = 40;
+        public static final int extendMotorCurrentLimit = 50;
+        public static final int angleMotorCurrentLimit = 50;
 
         public static final int ultrasonicPingPort = 4;
         public static final int ultrasonicEchoPort = 3;
