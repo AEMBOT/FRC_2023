@@ -435,6 +435,22 @@ public class RobotContainer {
                 new RunCommand(m_armSubsystem::angleUp).finallyDo((interrupted) -> m_armSubsystem.stopAngle())
         );
 
+        m_primaryController.povUp().whileTrue(
+                new RunCommand(m_armSubsystem::angleUp).finallyDo((interreupted) -> m_armSubsystem.stopAngle())
+        );
+
+        m_primaryController.povDown().whileTrue(
+                new RunCommand(m_armSubsystem::angleDown).finallyDo((interrupted) -> m_armSubsystem.stopAngle())
+        );
+
+        m_primaryController.povRight().whileTrue(
+                new RunCommand(m_armSubsystem::extendArm).finallyDo((interupted) -> m_armSubsystem.stopExtend())
+        );
+
+        m_primaryController.povLeft().whileTrue(
+                new RunCommand(m_armSubsystem::retractArm).finallyDo((interrupted) -> m_armSubsystem.stopExtend())
+        );
+
         // Extend Motor
 //        m_secondaryController.leftTrigger(TRIGGER_DEADBAND).whileTrue(
 //                new RunCommand(() -> m_armSubsystem.retractArm(
@@ -520,7 +536,6 @@ public class RobotContainer {
     public void onEnabled() {
         CommandScheduler.getInstance().schedule(new InstantCommand(m_armSubsystem::resetExtendEncoder));
         CommandScheduler.getInstance().schedule(new GetHomeCommand(m_armSubsystem));
-        ALLIANCE = DriverStation.getAlliance();
         m_intakeSubsystem.closeClamp();
     }
 
