@@ -155,6 +155,10 @@ public class RobotContainer {
                 new AutoPathDocking(drivebaseS)
         );*/
 
+        Command StraightBackDock = autoBuilder.fullAuto(
+                PathPlanner.loadPath("StraightBackDock", 1.5, 1)
+        );
+
         Command redLeft_blueRight = autoBuilder.fullAuto(
                 PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
         );
@@ -227,6 +231,7 @@ public class RobotContainer {
         autoSelector.addOption("twopiece-redLeft-blueRight", twopiece_redLeft_blueRight);
         autoSelector.addOption("twopieceNoDock-redLeft-blueRight", twopiece_NoDock_redLeft_blueRight);
         autoSelector.addOption("twoHalf-redLeft-blueRight", twoHalf_redLeft_blueRight);
+        autoSelector.addOption("straightBackDock", StraightBackDock);
         // autoSelector.addOption("twopiece-redRight-blueLeft", twopiece_redRight_blueLeft);
         autoSelector.addOption("BasicRedLeft-BlueRight", basicRedLeft_blueRight);
         autoSelector.addOption("BasicRedRight-BlueLeft", basicRedRight_blueLeft);
@@ -264,7 +269,7 @@ public class RobotContainer {
         //         )
         // );
         // field.getObject("target").setPose(APRILTAG_LAYOUT.getTagPose(3).get().toPose2d().plus(new Transform2d(new Translation2d(2.77, 2.5), new Rotation2d(Math.PI))));
-        // field.getObject("target").setPose(GRID_LEFT.plus(CONE_OFFSET_RIGHT).plus(ONE_METER_BACK.times(0.5)));
+        // field.getObject("target").setPose(GRID_LEFT.plus(CONE_OFFSEfT_RIGHT).plus(ONE_METER_BACK.times(0.5)));
     }
 
     /**
