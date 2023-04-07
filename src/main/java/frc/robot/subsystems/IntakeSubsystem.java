@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -14,6 +15,7 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable {
     @Log(methodName = "get")
     private final Solenoid m_clampSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, clampSolenoidID);
     private final DigitalInput limitSwitch = new DigitalInput(limitSwitchID);
+    private final Debouncer debouncer = new Debouncer(0.1);
 
     public IntakeSubsystem() {
         closeClamp();
@@ -30,7 +32,7 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable {
 
     @Log
     public boolean getLimitSwitchState() {
-        return !limitSwitch.get(); // The limit switch is active-low, but code is easier to understand active-high
+        return debouncer.calculate(!limitSwitch.get()); // The limit switch is active-low, but code is easier to understand active-high
     }
 
     // Extends the clamp
