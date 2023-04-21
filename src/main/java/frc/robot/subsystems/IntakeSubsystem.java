@@ -22,7 +22,18 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable {
     }
 
     public Command getIntakeAutoClampCommand() {
-        return startEnd(this::openClamp, this::closeClamp).until(this::getLimitSwitchState);
+//        return startEnd(this::openClamp, this::closeClamp).until(this::getLimitSwitchState);
+        return new FunctionalCommand(
+                this::openClamp,
+                () -> {},
+                (interrupted) -> {
+                    if (!interrupted) {
+                        this.closeClamp();
+                    }
+                },
+                this::getLimitSwitchState,
+                this
+        );
     }
 
     @Override

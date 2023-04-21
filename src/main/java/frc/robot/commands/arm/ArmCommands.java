@@ -81,7 +81,7 @@ public class ArmCommands {
                                                         )),
                                                         finalTargetPosition.plus(ONE_METER_BACK.times(
                                                                 switch (position) {
-                                                                    case DOUBLE_SUBSTATION -> 0.17;
+                                                                    case DOUBLE_SUBSTATION -> 0;
                                                                     default -> 0.38;
                                                                 }
                                                         ))
@@ -95,7 +95,7 @@ public class ArmCommands {
                         m_drivebase.chasePoseC(
                                 () -> finalTargetPosition.plus(ONE_METER_BACK.times(
                                         switch (position) {
-                                            case DOUBLE_SUBSTATION -> 0.17;
+                                            case DOUBLE_SUBSTATION -> 0;
                                             default -> 0.38;
                                         }
                                 )),

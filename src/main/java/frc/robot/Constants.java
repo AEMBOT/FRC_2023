@@ -203,7 +203,7 @@ public final class Constants {
         public static final double extendOffset = 2.5;
         public static final double extendToGroundPickup = 0.20;
         public static final double extendToFloor = 0.10;
-        public static final double extendToMid = 0.50;
+        public static final double extendToMid = 0.53;
         public static final double extendToHigh = 1.05;
         public static final double extendToSubstation = 0.90;
         public static final double extendToSingleSubstation = 0.4;

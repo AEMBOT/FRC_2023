@@ -159,6 +159,11 @@ public class RobotContainer {
                 PathPlanner.loadPath("StraightBackDock", 1.5, 1)
         );
 
+        Command TwistBackDock = autoBuilder.fullAuto(
+                PathPlanner.loadPath("StraightBackDock2", 1.5, 1)
+        );
+
+
         Command redLeft_blueRight = autoBuilder.fullAuto(
                 PathPlanner.loadPath("redLeft-blueRight", maxVelMetersPerSec, maxAccelMetersPerSecondSq)
         );
@@ -232,6 +237,7 @@ public class RobotContainer {
         autoSelector.addOption("twopieceNoDock-redLeft-blueRight", twopiece_NoDock_redLeft_blueRight);
         autoSelector.addOption("twoHalf-redLeft-blueRight", twoHalf_redLeft_blueRight);
         autoSelector.addOption("straightBackDock", StraightBackDock);
+        autoSelector.addOption("twistBackDock", TwistBackDock);
         // autoSelector.addOption("twopiece-redRight-blueLeft", twopiece_redRight_blueLeft);
         autoSelector.addOption("MobilityRedLeft-BlueRight", basicRedLeft_blueRight);
         autoSelector.addOption("MobilityRedRight-BlueLeft", basicRedRight_blueLeft);
