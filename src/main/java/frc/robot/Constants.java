@@ -327,7 +327,7 @@ public final class Constants {
         public static final Transform2d CONE_OFFSET_LEFT = new Transform2d(
                 new Translation2d(
                         0,
-                        -(feetToMeters(1) + inchesToMeters(10.5))
+                        -(feetToMeters(1) + inchesToMeters(10.5) + inchesToMeters(1.0)) // 1.0 is test offset
                 ),
                 new Rotation2d()
         );
@@ -335,7 +335,7 @@ public final class Constants {
         public static final Transform2d CONE_OFFSET_RIGHT = new Transform2d(
                 new Translation2d(
                         0,
-                        feetToMeters(1) + inchesToMeters(10.5)
+                        feetToMeters(1) + inchesToMeters(10.5) + inchesToMeters(1.0) // 1.0 is test offset
                 ),
                 new Rotation2d()
         );

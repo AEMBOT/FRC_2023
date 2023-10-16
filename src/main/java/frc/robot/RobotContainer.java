@@ -382,47 +382,47 @@ public class RobotContainer {
                                 () -> getPickUpPieceFromGround(drivebaseS, m_armSubsystem, m_intakeSubsystem, lastPressedNumpad)
                         ))
         );
-        m_numpad.button(1).whileTrue(
+        m_numpad.button(1).onTrue(
                 new InstantCommand(() -> lastPressedNumpad = 1)
         );
 
-        m_numpad.button(2).whileTrue(
+        m_numpad.button(2).onTrue(
                 new InstantCommand(() -> lastPressedNumpad = 2)
         );
 
-        m_numpad.button(3).whileTrue(
+        m_numpad.button(3).onTrue(
                 new InstantCommand(() -> lastPressedNumpad = 3)
         );
 
-        m_numpad.button(4).whileTrue(
+        m_numpad.button(4).onTrue(
                 new InstantCommand(() -> lastPressedNumpad = 4)
         );
 
-        m_numpad.button(5).whileTrue(
+        m_numpad.button(5).onTrue(
                 new InstantCommand(() -> lastPressedNumpad = 5)
         );
 
-        m_numpad.button(6).whileTrue(
+        m_numpad.button(6).onTrue(
                 new InstantCommand(() -> lastPressedNumpad = 6)
         );
 
-        m_numpad.button(7).whileTrue(
+        m_numpad.button(7).onTrue(
                 new InstantCommand(() -> lastPressedNumpad = 7)
         );
 
-        m_numpad.button(8).whileTrue(
+        m_numpad.button(8).onTrue(
                 new InstantCommand(() -> lastPressedNumpad = 8)
         );
 
-        m_numpad.button(9).whileTrue(
+        m_numpad.button(9).onTrue(
                 new InstantCommand(() -> lastPressedNumpad = 9)
         );
 
-        m_numpad.button(19).whileTrue(
+        m_numpad.button(19).onTrue(
                 new InstantCommand(() -> serial.writeString("y")).ignoringDisable(true)
         );
 
-        m_numpad.button(20).whileTrue(
+        m_numpad.button(20).onTrue(
                 new InstantCommand(() -> serial.writeString("p")).ignoringDisable(true)
         );
         // Secondary Controller
